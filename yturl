@@ -12,9 +12,9 @@ import sys
 __author__ = 'Christopher Down'
 __copyright__ = 'Copyright 2011 %s' % __author__
 __license__ = 'BSD'
-__version__ = 1.0
+__version__ = 1.01
 
-class YTGetURL():
+class YTURL():
     def __init__(self):
         self.youtubeQueryURL = 'http://youtube.com/get_video_info?&video_id=%s&el=detailpage&ps=default&eurl=&gl=US&hl=en'
         self.videoURLListKey = 'url_encoded_fmt_stream_map'
@@ -94,7 +94,7 @@ class YTGetURL():
         return url
 
 def main():
-    y = YTGetURL()
+    y = YTURL()
 
     if len(sys.argv) == 1:
         print >> sys.stderr, 'Usage: %s id [itag ...]' % basename(sys.argv[0])
