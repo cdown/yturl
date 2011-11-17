@@ -9,7 +9,7 @@ url="https://github.com/cdown/${pkgname}"
 license=('BSD')
 depends=('python2')
 source=("http://fakkelbrigade.eu/chris/software/${pkgname}/${pkgname}-${pkgver}.tar.gz")
-md5sums=()
+md5sums=('d36b6792d076784d123765680ac2d1f1')
 
 package() {
     install -d "${pkgdir}/usr/"{bin/,share/man/man1/}
