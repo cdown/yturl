@@ -6,6 +6,7 @@
 
 from urllib import urlopen
 from urlparse import parse_qs
+from os.path import basename
 import sys
 
 __author__ = 'Christopher Down'
@@ -96,7 +97,7 @@ def main():
     y = YTGetURL()
 
     if len(sys.argv) == 1:
-        print >> sys.stderr, 'Usage: %s id [itag ...]' % sys.argv[0]
+        print >> sys.stderr, 'Usage: %s id [itag ...]' % basename(sys.argv[0])
         sys.exit(1)
 
     videoID = y.stripYouTubeURL(sys.argv[1])
