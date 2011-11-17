@@ -12,7 +12,7 @@ source=("http://fakkelbrigade.eu/chris/software/${pkgname}/${pkgname}-${pkgver}.
 md5sums=()
 
 package() {
-	install -d "${pkgdir}/usr/"{bin/,share/man/man1/}
+    install -d "${pkgdir}/usr/"{bin/,share/man/man1/}
 
     # Change the shebang to work on Arch. ex is part of core/vi, so we don't
     # need to list it as a dependency. Interesting that Arch fails to comply
@@ -25,10 +25,10 @@ EOF
     # Compress the manual page to save a small amount of space.
     gzip -9 "${srcdir}/${pkgname}-${pkgver}/${pkgname}.1"
 
-	install -m755 \
+    install -m755 \
         "${srcdir}/${pkgname}-${pkgver}/${pkgname}" \
         "${pkgdir}/usr/bin/${pkgname}"
-	install -m755 \
+    install -m755 \
         "${srcdir}/${pkgname}-${pkgver}/${pkgname}.1.gz" \
         "${pkgdir}/share/man/man1/${pkgname}.1.gz"
 }
