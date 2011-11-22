@@ -122,7 +122,8 @@ def main():
                 print availableFormats[itag]
                 sys.exit(itag)
     else:
-        print >> sys.stderr, "Couldn't parse YouTube API reply."
+        print >> sys.stderr, """ The YouTube API returned data from which no
+                                 media URL could be retrieved. """
         sys.exit(4)
 
 if __name__ == '__main__':

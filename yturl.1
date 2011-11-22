@@ -13,22 +13,12 @@ is a simple media URL grabber for YouTube.
 .TP
 .I videoid
 The video ID to get information about. This can also be a URL in a recognised
-format. A URL should be successfully parsed if it contains either
-.B v
-or
-.B video_id
-as a POST key present in the URL, or if the link is to
-.B youtu.be
-or
-.BR youtube.com/v/ .
-Bear in mind, however, that some URLs will likely have to be escaped or quoted
-in your shell to avoid unwanted character interpretation. Please read your
-shell's documentation for details on how to handle this (in POSIX shells, use
-"..." or '...' as appropriate).
+format. Any official YouTube URL (including one from alternative services like
+youtu.be) should be successfully parsed.
 .TP
 .I itag
 The itag(s) to use. Depending on the number of itags specified, different
-format selection methods may be used.
+format selection methods may be used (see "QUALITY SELECTION").
 
 .SH "QUALITY SELECTION"
 If no itags are specified on the command line, yturl will get a URL to the
@@ -48,7 +38,7 @@ quality video available.
 Successful operation (exit status denotes the itag that was eventually used).
 .TP
 .B 1
-Insufficient arguments, or general Python error.
+Insufficient arguments.
 .TP
 .B 2
 Invalid video ID.
