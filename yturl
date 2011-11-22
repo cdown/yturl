@@ -4,6 +4,8 @@
 # (c) Christopher Down 2011
 # See the COPYING file for copyright information.
 
+""" Prints direct URLs to YouTube media. """
+
 from urllib import urlopen
 from urlparse import parse_qs
 from os.path import basename
@@ -71,7 +73,7 @@ class YTURL():
 
     def stripYouTubeURL(self, url):
         """ Strips a YouTube URL to the video ID. """
-        if '?' in set(url):
+        if '?' in url:
             url = url[url.index('?') + 1:]
             urlPost = parse_qs(url)
             for key in self.videoIDKeys:
