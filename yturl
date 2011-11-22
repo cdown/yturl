@@ -22,7 +22,7 @@ class YTURL():
         self.videoURLListKey = 'url_encoded_fmt_stream_map'
         self.videoIDKeys = [ 'v', 'video_id' ]
         self.videoItagQualityOrder = [ 38, 37, 22, 45, 44, 35, 18, 34, 43, 5, 17 ]
-        self.allowedVideoIDCharacters = set('-_abcdefghijklmnopqrstuvwxyz0123456789')
+        self.allowedVideoIDCharacters = '-_abcdefghijklmnopqrstuvwxyz0123456789'
 
     def getVideoItags(self, videoID):
         """ Returns the available itags and their associated URLs as a list. """
