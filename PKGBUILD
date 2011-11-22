@@ -11,6 +11,10 @@ depends=('python2')
 source=("http://fakkelbrigade.eu/chris/software/${pkgname}/${pkgname}-${pkgver}.tar.gz")
 md5sums=('8f5c966f90ffee4faa8153bcd74381af')
 
+build() {
+    gzip -9 "${srcdir}/${pkgname}.1"
+}
+
 package() {
     install -d "${pkgdir}/usr/"{bin/,share/man/man1/}
 
@@ -21,9 +25,6 @@ package() {
 1s/.*/#!\/usr\/bin\/env python2/g
 w
 EOF
-
-    # Compress the manual page to save a small amount of space.
-    gzip -9 "${srcdir}/${pkgname}.1"
 
     install -m755 \
         "${srcdir}/${pkgname}" \
