@@ -96,11 +96,11 @@ class YTURL():
         return url
 
 def main():
-    y = YTURL()
-
     if len(sys.argv) == 1:
         print >> sys.stderr, 'Usage: %s id [itag ...]' % basename(sys.argv[0])
         sys.exit(1)
+
+    y = YTURL()
 
     videoID = y.stripYouTubeURL(sys.argv[1])
 
