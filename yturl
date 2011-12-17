@@ -4,7 +4,7 @@
 # (c) Christopher Down 2011
 # See the COPYING file for copyright information.
 
-""" Prints direct URLs to YouTube media. """
+"""Prints direct URLs to YouTube media."""
 
 from urllib import urlopen
 from urlparse import parse_qs
@@ -17,6 +17,7 @@ __license__ = 'BSD'
 __version__ = 1.01
 
 class YTURL():
+    """Prints direct URLs to YouTube media."""
     def __init__(self):
         self.youtubeQueryURL = 'http://youtube.com/get_video_info?&video_id=%s&el=detailpage&ps=default&eurl=&gl=US&hl=en'
         self.videoURLListKey = 'url_encoded_fmt_stream_map'
@@ -25,7 +26,7 @@ class YTURL():
         self.allowedVideoIDCharacters = '-_abcdefghijklmnopqrstuvwxyz0123456789'
 
     def getVideoItags(self, videoID):
-        """ Returns the available itags and their associated URLs as a list. """
+        """Returns the available itags and their associated URLs as a list."""
         availableFormats = {}
         parsedResponse = parse_qs(urlopen(self.youtubeQueryURL % videoID).read())
         if self.videoURLListKey in parsedResponse:
@@ -40,16 +41,16 @@ class YTURL():
         return availableFormats
 
     def checkIsValidItag(self, itag):
-        """ Checks that all arguments are known itags. """
+        """Checks that all arguments are known itags."""
         if itag not in self.videoItagQualityOrder:
             return False
         else:
             return True
 
     def getPreferredItagOrder(self, preferredItags):
-        """ Determines and returns the preferred video itag sorting.
-            If argv has a length of 3, this returns a tuple, otherwise, it
-            returns a list. """
+        """Determines and returns the preferred video itag sorting.
+           If argv has a length of 3, this returns a tuple, otherwise, it
+           returns a list."""
 
         if len(preferredItags) == 1:
             v = self.videoItagQualityOrder
@@ -62,7 +63,7 @@ class YTURL():
             return self.videoItagQualityOrder
 
     def checkIsValidVideoID(self, videoID):
-        """ Checks that a video ID is syntactically valid. """
+        """Checks that a video ID is syntactically valid."""
         if len(videoID) != 11:
             return False
 
@@ -72,7 +73,7 @@ class YTURL():
         return True
 
     def stripYouTubeURL(self, url):
-        """ Strips a YouTube URL to the video ID. """
+        """Strips a YouTube URL to the video ID."""
         if '?' in url:
             url = url[url.index('?') + 1:]
             urlPost = parse_qs(url)
@@ -122,8 +123,8 @@ def main():
                 print availableFormats[itag]
                 sys.exit(itag)
     else:
-        print >> sys.stderr, """ The YouTube API returned data from which no
-                                 media URL could be retrieved. """
+        print >> sys.stderr, """The YouTube API returned data from which no
+                                media URL could be retrieved."""
         sys.exit(4)
 
 if __name__ == '__main__':
