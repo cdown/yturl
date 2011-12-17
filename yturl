@@ -22,8 +22,82 @@ class YTURL():
         self.youtubeQueryURL = 'http://youtube.com/get_video_info?&video_id=%s&el=detailpage&ps=default&eurl=&gl=US&hl=en'
         self.videoURLListKey = 'url_encoded_fmt_stream_map'
         self.videoIDKeys = [ 'v', 'video_id' ]
-        self.videoItagQualityOrder = [ 38, 37, 22, 45, 44, 35, 18, 34, 43, 5, 17 ]
+        self.videoItagQualityOrder = self.getItagQualityOrder()
         self.allowedVideoIDCharacters = '-_abcdefghijklmnopqrstuvwxyz0123456789'
+
+    def getItagQualityOrder(self):
+        """Returns the itags in order of quality preference."""
+        itags = {
+            5: { 'video':{ 'container':'flv', 'encoding':'h263',
+                           'max-bitrate':0.25,'max-dimensions':400 * 240 },
+                 'audio':{ 'bitrate':64, 'encoding':'mp3',
+                           'sample-rate':22050 } },
+            6: { 'video':{ 'container':'flv', 'encoding':'h263',
+                           'max-bitrate':0.8, 'max-dimensions':480 * 270 },
+                 'audio':{ 'bitrate':64, 'encoding':'mp3',
+                           'sample-rate':22050 } },
+            34:{ 'video':{ 'container':'flv', 'encoding':'h264',
+                           'max-bitrate':0.5, 'max-dimensions':640 * 360 },
+                 'audio':{ 'bitrate':128, 'encoding':'aac',
+                           'sample-rate':44100 } },
+            35:{ 'video':{ 'container':'flv', 'encoding':'h264',
+                           'max-bitrate':1, 'max-dimensions':854 * 480 },
+                 'audio':{ 'bitrate':128, 'encoding':'aac',
+                           'sample-rate':44100 } },
+            18:{ 'video':{ 'container':'mp4', 'encoding':'h264',
+                           'max-bitrate':0.5, 'max-dimensions':640 * 360 },
+                 'audio':{ 'bitrate':128, 'encoding':'aac',
+                           'sample-rate':44100 } },
+            22:{ 'video':{ 'container':'mp4', 'encoding':'h264',
+                           'max-bitrate':2.9, 'max-dimensions':1280 * 720 },
+                 'audio':{ 'bitrate':96, 'encoding':'aac',
+                           'sample-rate':44100 } },
+            37:{ 'video':{ 'container':'mp4', 'encoding':'h264',
+                           'max-bitrate':2.9, 'max-dimensions':1920 * 1080 },
+                 'audio':{ 'bitrate':152, 'encoding':'aac',
+                           'sample-rate':44100 } },
+            38:{ 'video':{ 'container':'mp4', 'encoding':'h264',
+                           'max-bitrate':5, 'max-dimensions':4096 * 3072 },
+                 'audio':{ 'bitrate':152, 'encoding':'aac',
+                           'sample-rate':44100 } },
+            43:{ 'video':{ 'container':'webm', 'encoding':'vp8',
+                           'max-bitrate':0.5, 'max-dimensions':640 * 360 },
+                 'audio':{ 'bitrate':128, 'encoding':'vorbis',
+                           'sample-rate':44100 } },
+            44:{ 'video':{ 'container':'webm', 'encoding':'vp8',
+                           'max-bitrate':1, 'max-dimensions':854 * 480 },
+                 'audio':{ 'bitrate':128, 'encoding':'vorbis',
+                           'sample-rate':44100 } },
+            45:{ 'video':{ 'container':'webm', 'encoding':'vp8',
+                           'max-bitrate':2, 'max-dimensions':1280 * 720 },
+                 'audio':{ 'bitrate':192, 'encoding':'vorbis',
+                           'sample-rate':44100 } },
+            13:{ 'video':{ 'container':'3gp', 'encoding':'mp4visual',
+                           'max-bitrate':0.5, 'max-dimensions':176 * 144 },
+                 'audio':{ 'bitrate':64, 'encoding':'aac',
+                           'sample-rate':22050 } },
+            17:{ 'video':{ 'container':'3gp', 'encoding':'mp4visual',
+                           'max-bitrate':2, 'max-dimensions':176 * 144 },
+                 'audio':{ 'bitrate':64, 'encoding':'aac',
+                           'sample-rate':22050 } }
+        }
+        itagQualityPreference = {
+            'video':{
+                'container':[ 'mp4', 'webm', 'flv', '3gp' ],
+                'encoding':[ 'h264', 'h263', 'vp8', 'mp4visual' ]
+            }
+        }
+
+        for itag in itags:
+            itags[itag]['video']['container'] = itagQualityPreference['video']['container'].index(itags[itag]['video']['container'])
+            itags[itag]['video']['encoding'] = itagQualityPreference['video']['encoding'].index(itags[itag]['video']['encoding'])
+
+        return sorted(itags, reverse=1, key=lambda x: (itags[x]['video']['max-dimensions'],
+                                                       itags[x]['video']['max-bitrate'],
+                                                       itags[x]['audio']['sample-rate'],
+                                                       itags[x]['audio']['bitrate'],
+                                                       itags[x]['video']['encoding'],
+                                                       itags[x]['video']['container']))
 
     def getVideoItags(self, videoID):
         """Returns the available itags and their associated URLs as a list."""

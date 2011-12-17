@@ -32,6 +32,29 @@ If multiple itags are specified on the command line, yturl will first try to get
 the URL to one of the formats specified on the command line (in order of
 arguments). If none of them are available, it will then select the highest
 quality video available.
+
+Format quality order is determined by the following (where video dimensions
+are the most major factor, and the video container is the least):
+
+.TP
+.B Video dimensions
+The higher the video dimensions, the better the format is considered.
+.TP
+.B Video bitrate
+The higher the video bitrate, the better the format is considered.
+.TP
+.B Audio sample rate
+The higher the audio sample rate, the better the format is considered.
+.TP
+.B Audio bitrate
+The higher the audio bitrate, the better the format is considered.
+.TP
+.B Video encoding
+In order of preference: MPEG-4 AVC (H.264), Sorenson H.263, VP8, MPEG-4 Visual.
+.TP
+.B Video container
+In order of preference: MP4, WebM, FLV, 3GP.
+
 .SH "EXIT STATUS"
 .TP
 .B >4
