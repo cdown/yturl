@@ -144,21 +144,8 @@ class YTURL():
             for key in self.videoIDKeys:
                 if key in urlPost:
                     return urlPost[key][0]
-
-        if url.startswith('http://'):
-            url = url[7:]
-        elif url.startswith('https://'):
-            url = url[8:]
-
-        if url.startswith('www.'):
-            url = url[4:]
-
-        if url.startswith('youtu.be/'):
-            return url[9:]
-        elif url.startswith('youtube.com/v/'):
-            return url[14:]
-
-        return url
+        else:
+            return url.split("/")[-1][:11]
 
 def main():
     if len(sys.argv) == 1:
