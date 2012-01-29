@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
 
-# (c) Christopher Down 2011
+# (c) Christopher Down 2011-2012
 # See the COPYING file for copyright information.
 
 """Prints direct URLs to YouTube media."""
 
-from urllib import urlopen
-from urlparse import parse_qs
-from os.path import basename
+import urllib
+import urlparse
+import os.path
 import sys
 
 __author__ = 'Christopher Down'
-__copyright__ = 'Copyright 2011 %s' % __author__
+__copyright__ = 'Copyright 2011-2012 %s' % __author__
 __license__ = 'BSD'
 __version__ = 1.01
 
@@ -102,10 +102,10 @@ class YTURL():
     def getVideoItags(self, videoID):
         """Returns the available itags and their associated URLs as a list."""
         availableFormats = {}
-        parsedResponse = parse_qs(urlopen(self.youtubeQueryURL % videoID).read())
+        parsedResponse = urlparse.parse_qs(urllib.urlopen(self.youtubeQueryURL % videoID).read())
         if self.videoURLListKey in parsedResponse:
             for videoFormat in parsedResponse[self.videoURLListKey][0].split(','):
-                videoFormat = parse_qs(videoFormat)
+                videoFormat = urlparse.parse_qs(videoFormat)
                 if 'url' in videoFormat and 'itag' in videoFormat:
                     availableFormats[int(videoFormat['itag'][0])] = videoFormat['url'][0]
                 else:
@@ -150,7 +150,7 @@ class YTURL():
         """Strips a YouTube URL to the video ID."""
         if '?' in url:
             url = url[url.index('?') + 1:]
-            urlPost = parse_qs(url)
+            urlPost = urlparse.parse_qs(url)
             for key in self.videoIDKeys:
                 if key in urlPost:
                     return urlPost[key][0]
@@ -172,7 +172,7 @@ class YTURL():
 
 def main():
     if len(sys.argv) == 1:
-        print >> sys.stderr, 'Usage: %s id [itag ...]' % basename(sys.argv[0])
+        print >> sys.stderr, 'Usage: %s id [itag ...]' % os.path.basename(sys.argv[0])
         sys.exit(1)
 
     y = YTURL()
