@@ -163,8 +163,9 @@ def main():
     if availableFormats is not False:
         for itag in y.getPreferredItagOrder(preferredItags):
             if itag in availableFormats:
+                print >> sys.stderr, "Using itag %d." % itag
                 print availableFormats[itag]
-                print >> sys.stderr, "Using itag %d" % itag
+                break
     else:
         print >> sys.stderr, "The YouTube API returned data from which no media URL could be retrieved."
         sys.exit(4)
