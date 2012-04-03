@@ -114,12 +114,9 @@ class YTURL():
             return False
         return availableFormats
 
-    def checkIsValidItag(self, itag):
+    def isValidItag(self, itag):
         """Checks that all arguments are known itags."""
-        if itag not in self.videoItagQualityOrder:
-            return False
-        else:
-            return True
+        return itag in self.videoItagQualityOrder
 
     def getPreferredItagOrder(self, preferredItags):
         """Determines and returns the preferred video itag sorting.
@@ -153,11 +150,10 @@ def main():
         sys.exit(1)
 
     y = YTURL()
-
     videoID = y.stripYouTubeURL(sys.argv[1])
 
     for itag in sys.argv[2:]:
-        if not itag.isdigit() or not y.checkIsValidItag(int(itag)):
+        if not itag.isdigit() or not y.isValidItag(int(itag)):
             print >> sys.stderr, '%s is not a valid itag.' % itag
             sys.exit(3)
 
@@ -168,7 +164,7 @@ def main():
         for itag in y.getPreferredItagOrder(preferredItags):
             if itag in availableFormats:
                 print availableFormats[itag]
-                sys.exit(itag)
+                print >> sys.stderr, "Using itag %d" % itag
     else:
         print >> sys.stderr, "The YouTube API returned data from which no media URL could be retrieved."
         sys.exit(4)
