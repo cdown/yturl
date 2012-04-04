@@ -189,6 +189,13 @@ def main():
     for videoID in videoIDs:
         availableFormats = y.getVideoItags(videoID)
 
+        unknownItags = [ x for x in availableFormats if x not in y.videoItagQualityOrder ]
+        if len(unknownItags) > 0:
+            print >> sys.stderr, "Interesting! There are itags available which this program doesn't know about."
+            print >> sys.stderr, "I'd really appreciate it if you could create a new issue at https://github.com/cdown/yturl/issues."
+            print >> sys.stderr, "Here are the unknown itags: %s" % ', '.join(map(str, unknownItags))
+            print >> sys.stderr, "Thanks!\n"
+
         if availableFormats is not False:
             tempDir = tempfile.gettempdir()
             for itag in y.getPreferredItagOrder(preferredItags):
