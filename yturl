@@ -8,22 +8,32 @@
 
 import urllib
 import urlparse
-import os.path
+import os
 import sys
+import json
+import tempfile
 
 __author__ = 'Christopher Down'
 __copyright__ = 'Copyright 2011-2012 %s' % __author__
 __license__ = 'BSD'
 __version__ = 1.01
 
+class YouTubeAPIError(Exception):
+    pass
+
 class YTURL():
     """Prints direct URLs to YouTube media."""
     def __init__(self):
-        self.youtubeQueryURL = 'http://youtube.com/get_video_info?&video_id=%s&el=detailpage&ps=default&eurl=&gl=US&hl=en'
+        self.youtubeQueryURLs = {
+            "video":'http://youtube.com/get_video_info?&video_id=%s&el=detailpage&ps=default&eurl=&gl=US&hl=en',
+            "playlist":"https://gdata.youtube.com/feeds/api/playlists/%s?v=2&alt=json"
+        }
         self.videoURLListKey = 'url_encoded_fmt_stream_map'
-        self.videoIDKeys = [ 'v', 'video_id' ]
+        self.queryStringKeys = {
+            "video":( "v", "video_id" ),
+            "playlist":( "p", "list" )
+        }
         self.videoItagQualityOrder = self.getItagQualityOrder()
-        self.allowedVideoIDCharacters = '-_abcdefghijklmnopqrstuvwxyz0123456789'
 
     def getItagQualityOrder(self):
         """Returns the itags in order of quality preference."""
@@ -102,7 +112,7 @@ class YTURL():
     def getVideoItags(self, videoID):
         """Returns the available itags and their associated URLs as a list."""
         availableFormats = {}
-        parsedResponse = urlparse.parse_qs(urllib.urlopen(self.youtubeQueryURL % videoID).read())
+        parsedResponse = urlparse.parse_qs(urllib.urlopen(self.youtubeQueryURLs["video"] % videoID).read())
         if self.videoURLListKey in parsedResponse:
             for videoFormat in parsedResponse[self.videoURLListKey][0].split(','):
                 videoFormat = urlparse.parse_qs(videoFormat)
@@ -133,16 +143,26 @@ class YTURL():
         else:
             return self.videoItagQualityOrder
 
-    def stripYouTubeURL(self, url):
-        """Strips a YouTube URL to the video ID."""
+    def parseQueryString(self, url):
+        """Parses a query string, returning both the content type and the ID."""
         if '?' in url:
             url = url[url.index('?') + 1:]
             urlPost = urlparse.parse_qs(url)
-            for key in self.videoIDKeys:
-                if key in urlPost:
-                    return urlPost[key][0]
+            for keyType in self.queryStringKeys:
+                for key in keyType:
+                    if key in urlPost:
+                        return (keyType, urlPost[key][0])
+        bestGuess = url.split("/")[-1]
+        if len(bestGuess) == 11:
+            return ( "video", bestGuess )
         else:
-            return url.split("/")[-1][:11]
+            return ( "playlist", bestGuess )
+
+    def getPlaylistVideoIDs(self, playlistID):
+        print playlistID
+        j = json.load(urllib.urlopen(self.youtubeQueryURLs["playlist"] % playlistID))
+        for entry in j["feed"]["entry"]:
+            yield entry["media$group"]["yt$videoid"]["$t"]
 
 def main():
     if len(sys.argv) == 1:
@@ -150,7 +170,8 @@ def main():
         sys.exit(1)
 
     y = YTURL()
-    videoID = y.stripYouTubeURL(sys.argv[1])
+    
+    contentType, contentID = y.parseQueryString(sys.argv[1])
 
     for itag in sys.argv[2:]:
         if not itag.isdigit() or not y.isValidItag(int(itag)):
@@ -158,17 +179,37 @@ def main():
             sys.exit(3)
 
     preferredItags = map(int, sys.argv[2:])
-    availableFormats = y.getVideoItags(videoID)
 
-    if availableFormats is not False:
-        for itag in y.getPreferredItagOrder(preferredItags):
-            if itag in availableFormats:
-                print >> sys.stderr, "Using itag %d." % itag
-                print availableFormats[itag]
-                break
+    if contentType == "playlist":
+        videoIDs = [ x for x in y.getPlaylistVideoIDs(contentID) ]
     else:
-        print >> sys.stderr, "The YouTube API returned data from which no media URL could be retrieved."
-        sys.exit(4)
+        videoIDs = [ contentID ]
+
+    uris = []
+    for videoID in videoIDs:
+        availableFormats = y.getVideoItags(videoID)
+
+        if availableFormats is not False:
+            tempDir = tempfile.gettempdir()
+            for itag in y.getPreferredItagOrder(preferredItags):
+                if itag in availableFormats:
+                    print >> sys.stderr, "Using itag %d for video ID %s." % (itag, videoID)
+                    if contentType == "playlist":
+                        uris.append(availableFormats[itag])
+                        break
+                    else:
+                        uris.append(availableFormats[itag])
+                        break
+        else:
+            raise YouTubeAPIError("The YouTube API returned data from which no media URL could be retrieved.")
+
+    if contentType == "playlist":
+        filename = os.path.join(tempDir, "playlist-%s" % contentID)
+        with open(filename, "w+") as f:
+            f.write("\n".join(uris) + "\n")
+        print filename
+    else:
+        print uris[0]
 
 if __name__ == '__main__':
     main()
