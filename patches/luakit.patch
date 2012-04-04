@@ -1,0 +1,25 @@
+--- /etc/xdg/luakit/binds.lua	2011-10-30 23:42:40.000000000 +0000
++++ binds.lua	2012-04-04 12:53:48.000000000 +0100
+@@ -171,6 +171,22 @@ add_binds("normal", {
+                                         for i = 1, m.count do w:new_tab(w:search_open(uri)) end
+                                     end, {count = 1}),
+ 
++    -- Play YouTube videos in mplayer using yturl
++    key({}, "v", function (w) 
++        local uri = w.view.hovered_uri or w.view.uri
++        if uri then
++            w:notify("Getting media URI for " .. uri)
++            local exit_status, stdout, stderr = luakit.spawn_sync("yturl " .. uri)
++            w:notify("Video buffering...")
++            if exit_status == 0 then
++                luakit.spawn("mplayer -cache 8192 -cache-min 10 -- " .. stdout)
++                w:notify("Playing video.")
++            else
++                w:warning("yturl error: " .. stderr) 
++            end
++        end 
++    end),
++
+     -- Yanking
+     buf("^yy$",                     function (w)
+                                         local uri = string.gsub(w.view.uri or "", " ", "%%20")
