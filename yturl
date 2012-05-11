@@ -17,7 +17,7 @@ class YouTubeAPIError(Exception):
     pass
 
 class YTURL():
-    """Prints direct URLs to YouTube media."""
+    """Functions to get direct URLs to YouTube media."""
     def getItagQualityOrder(self):
         """Return itags in order of quality preference."""
         itags = {
