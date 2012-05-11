@@ -45,7 +45,7 @@ class YTURL():
             for key in ("v", "video_id"):
                 if key in urlPost:
                     return urlPost[key][0]
-        return url.split("/")[-1]
+        return url.split("/")[-1][11:]
 
     def getVideoItags(self, videoID):
         """Return available itags and their associated URLs as a list."""
