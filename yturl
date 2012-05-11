@@ -1,22 +1,14 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
 
+"""Prints direct URLs to YouTube media."""
+
 # (c) Christopher Down 2011-2012
 # See the COPYING file for copyright information.
 
-"""Prints direct URLs to YouTube media."""
-
-import urllib
-import urlparse
-import os
+from urllib import urlopen
+from urlparse import parse_qs
 import sys
-import json
-import tempfile
-
-__author__ = 'Christopher Down'
-__copyright__ = 'Copyright 2011-2012 %s' % __author__
-__license__ = 'BSD'
-__version__ = 1.01
 
 class YouTubeAPIError(Exception):
     pass
@@ -24,199 +16,72 @@ class YouTubeAPIError(Exception):
 class YTURL():
     """Prints direct URLs to YouTube media."""
     def __init__(self):
-        self.youtubeQueryURLs = {
-            "video":'http://youtube.com/get_video_info?&video_id=%s&el=detailpage&ps=default&eurl=&gl=US&hl=en',
-            "playlist":"https://gdata.youtube.com/feeds/api/playlists/%s?v=2&alt=json"
-        }
-        self.videoURLListKey = 'url_encoded_fmt_stream_map'
-        self.queryStringKeys = {
-            "video":( "v", "video_id" ),
-            "playlist":( "p", "list" )
-        }
+        """Seed itag quality order at runtime."""
         self.videoItagQualityOrder = self.getItagQualityOrder()
 
     def getItagQualityOrder(self):
-        """Returns the itags in order of quality preference."""
+        """Return itags in order of quality preference."""
         itags = {
-            5: { 'video':{ 'container':'flv', 'encoding':'h263',
-                           'max-bitrate':0.25,'max-dimensions':400 * 240 },
-                 'audio':{ 'bitrate':64, 'encoding':'mp3',
-                           'sample-rate':22050 } },
-            6: { 'video':{ 'container':'flv', 'encoding':'h263',
-                           'max-bitrate':0.8, 'max-dimensions':480 * 270 },
-                 'audio':{ 'bitrate':64, 'encoding':'mp3',
-                           'sample-rate':22050 } },
-            34:{ 'video':{ 'container':'flv', 'encoding':'h264',
-                           'max-bitrate':0.5, 'max-dimensions':640 * 360 },
-                 'audio':{ 'bitrate':128, 'encoding':'aac',
-                           'sample-rate':44100 } },
-            35:{ 'video':{ 'container':'flv', 'encoding':'h264',
-                           'max-bitrate':1, 'max-dimensions':854 * 480 },
-                 'audio':{ 'bitrate':128, 'encoding':'aac',
-                           'sample-rate':44100 } },
-            18:{ 'video':{ 'container':'mp4', 'encoding':'h264',
-                           'max-bitrate':0.5, 'max-dimensions':640 * 360 },
-                 'audio':{ 'bitrate':128, 'encoding':'aac',
-                           'sample-rate':44100 } },
-            22:{ 'video':{ 'container':'mp4', 'encoding':'h264',
-                           'max-bitrate':2.9, 'max-dimensions':1280 * 720 },
-                 'audio':{ 'bitrate':96, 'encoding':'aac',
-                           'sample-rate':44100 } },
-            37:{ 'video':{ 'container':'mp4', 'encoding':'h264',
-                           'max-bitrate':2.9, 'max-dimensions':1920 * 1080 },
-                 'audio':{ 'bitrate':152, 'encoding':'aac',
-                           'sample-rate':44100 } },
-            38:{ 'video':{ 'container':'mp4', 'encoding':'h264',
-                           'max-bitrate':5, 'max-dimensions':4096 * 3072 },
-                 'audio':{ 'bitrate':152, 'encoding':'aac',
-                           'sample-rate':44100 } },
-            43:{ 'video':{ 'container':'webm', 'encoding':'vp8',
-                           'max-bitrate':0.5, 'max-dimensions':640 * 360 },
-                 'audio':{ 'bitrate':128, 'encoding':'vorbis',
-                           'sample-rate':44100 } },
-            44:{ 'video':{ 'container':'webm', 'encoding':'vp8',
-                           'max-bitrate':1, 'max-dimensions':854 * 480 },
-                 'audio':{ 'bitrate':128, 'encoding':'vorbis',
-                           'sample-rate':44100 } },
-            45:{ 'video':{ 'container':'webm', 'encoding':'vp8',
-                           'max-bitrate':2, 'max-dimensions':1280 * 720 },
-                 'audio':{ 'bitrate':192, 'encoding':'vorbis',
-                           'sample-rate':44100 } },
-            13:{ 'video':{ 'container':'3gp', 'encoding':'mp4visual',
-                           'max-bitrate':0.5, 'max-dimensions':176 * 144 },
-                 'audio':{ 'bitrate':64, 'encoding':'aac',
-                           'sample-rate':22050 } },
-            17:{ 'video':{ 'container':'3gp', 'encoding':'mp4visual',
-                           'max-bitrate':2, 'max-dimensions':176 * 144 },
-                 'audio':{ 'bitrate':64, 'encoding':'aac',
-                           'sample-rate':22050 } }
+        # itag  v-container v-encoding   v-maxrate v-maxdimensions a-maxrate a-encoding a-samplerate
+            5: ("flv",      "h263",      0.25,     400*240,        64,       "mp3",     22.05),
+            6: ("flv",      "h263",      0.8,      480*270,        64,       "mp3",     22.05),
+            13:("3gp",      "mp4visual", 0.5,      176*144,        64,       "aac",     22.05),
+            17:("3gp",      "mp4visual", 20,       176*144,        64,       "aac",     22.05),
+            18:("mp4",      "h264",      0.5,      640*360,        128,      "aac",     44.1),
+            22:("mp4",      "h264",      2.9,      1280*720,       96,       "aac",     44.1),
+            34:("flv",      "h264",      0.5,      640*360,        128,      "aac",     44.1),
+            35:("flv",      "h264",      1,        854*480,        128,      "aac",     44.1),
+            37:("mp4",      "h264",      2.9,      1920*1080,      152,      "aac",     44.1),
+            38:("mp4",      "h264",      5,        4096*3072,      152,      "aac",     44.1),
+            43:("webm",     "vp8",       0.5,      640*360,        128,      "vorbis",  44.1),
+            44:("webm",     "vp8",       1,        854*480,        128,      "vorbis",  44.1),
+            45:("webm",     "vp8",       2,        1280*720,       192,      "vorbis",  44.1)
         }
-        itagQualityPreference = {
-            'video':{
-                'container':[ 'mp4', 'webm', 'flv', '3gp' ],
-                'encoding':[ 'h264', 'h263', 'vp8', 'mp4visual' ]
-            }
-        }
+        return sorted(itags, reverse=1, key=lambda x: (itags[x][3], itags[x][2], itags[x][6], itags[x][4]))
 
-        for itag in itags:
-            itags[itag]['video']['container'] = itagQualityPreference['video']['container'].index(itags[itag]['video']['container'])
-            itags[itag]['video']['encoding'] = itagQualityPreference['video']['encoding'].index(itags[itag]['video']['encoding'])
-
-        return sorted(itags, reverse=1, key=lambda x: (itags[x]['video']['max-dimensions'],
-                                                       itags[x]['video']['max-bitrate'],
-                                                       itags[x]['audio']['sample-rate'],
-                                                       itags[x]['audio']['bitrate'],
-                                                       itags[x]['video']['encoding'],
-                                                       itags[x]['video']['container']))
+    def stripYouTubeQueryString(self, url):
+        """Strip URL to the video ID contained."""
+        if "?" in url:
+            urlPost = parse_qs(url[url.index("?") + 1:])
+            for key in ( "v", "video_id" ):
+                if key in urlPost:
+                    return urlPost[key][0]
+        return url.split("/")[-1]
 
     def getVideoItags(self, videoID):
-        """Returns the available itags and their associated URLs as a list."""
+        """Return available itags and their associated URLs as a list."""
         availableFormats = {}
-        parsedResponse = urlparse.parse_qs(urllib.urlopen(self.youtubeQueryURLs["video"] % videoID).read())
-        if self.videoURLListKey in parsedResponse:
-            for videoFormat in parsedResponse[self.videoURLListKey][0].split(','):
-                videoFormat = urlparse.parse_qs(videoFormat)
-                if 'url' in videoFormat and 'itag' in videoFormat:
-                    availableFormats[int(videoFormat['itag'][0])] = videoFormat['url'][0]
-                else:
-                    return False
-        else:
-            return False
+        parsedResponse = parse_qs(urlopen("http://youtube.com/get_video_info?&video_id=%s&el=detailpage&ps=default&eurl=&gl=US&hl=en" % videoID).read())
+        if not "url_encoded_fmt_stream_map" in parsedResponse:
+            raise YoutubeAPIError("Missing format map!")
+        for videoFormat in map(parse_qs, parsedResponse["url_encoded_fmt_stream_map"][0].split(",")):
+            availableFormats[int(videoFormat["itag"][0])] = videoFormat["url"][0]
         return availableFormats
 
-    def isValidItag(self, itag):
-        """Checks that all arguments are known itags."""
-        return itag in self.videoItagQualityOrder
-
     def getPreferredItagOrder(self, preferredItags):
-        """Determines and returns the preferred video itag sorting.
-           If argv has a length of 3, this returns a tuple, otherwise, it
-           returns a list."""
-
+        """Return the preferred itag sort."""
         if len(preferredItags) == 1:
             v = self.videoItagQualityOrder
             return zip(*sorted(enumerate(v),key=lambda (i,x):abs(v.index(preferredItags[0])-i)))[1]
         elif len(preferredItags) > 1:
-            for itag in preferredItags:
-                self.videoItagQualityOrder.remove(itag)
             return preferredItags + self.videoItagQualityOrder
-        else:
-            return self.videoItagQualityOrder
-
-    def parseQueryString(self, url):
-        """Parses a query string, returning both the content type and the ID."""
-        if '?' in url:
-            url = url[url.index('?') + 1:]
-            urlPost = urlparse.parse_qs(url)
-            for keyType in self.queryStringKeys:
-                for key in keyType:
-                    if key in urlPost:
-                        return (keyType, urlPost[key][0])
-        bestGuess = url.split("/")[-1]
-        if len(bestGuess) == 11:
-            return ( "video", bestGuess )
-        else:
-            return ( "playlist", bestGuess )
-
-    def getPlaylistVideoIDs(self, playlistID):
-        print playlistID
-        j = json.load(urllib.urlopen(self.youtubeQueryURLs["playlist"] % playlistID))
-        for entry in j["feed"]["entry"]:
-            yield entry["media$group"]["yt$videoid"]["$t"]
+        return self.videoItagQualityOrder
 
 def main():
-    if len(sys.argv) == 1:
-        print >> sys.stderr, 'Usage: %s id [itag ...]' % os.path.basename(sys.argv[0])
-        sys.exit(1)
-
+    """Run main program."""
     y = YTURL()
-    
-    contentType, contentID = y.parseQueryString(sys.argv[1])
-
+    if len(sys.argv) < 2:
+        raise SyntaxError("Usage: yturl id [itag ...]")
     for itag in sys.argv[2:]:
-        if not itag.isdigit() or not y.isValidItag(int(itag)):
-            print >> sys.stderr, '%s is not a valid itag.' % itag
-            sys.exit(3)
+        if not itag.isdigit() or int(itag) not in y.videoItagQualityOrder:
+            raise SyntaxError("%s is not a valid itag." % itag)
+    videoID = y.stripYouTubeQueryString(sys.argv[1])
+    availableFormats = y.getVideoItags(videoID)
+    for itag in y.getPreferredItagOrder(map(int, sys.argv[2:])):
+        if itag in availableFormats:
+            print >> sys.stderr, "Using itag %d." % itag
+            print availableFormats[itag]
+            return True
 
-    preferredItags = map(int, sys.argv[2:])
-
-    if contentType == "playlist":
-        videoIDs = [ x for x in y.getPlaylistVideoIDs(contentID) ]
-    else:
-        videoIDs = [ contentID ]
-
-    uris = []
-    for videoID in videoIDs:
-        availableFormats = y.getVideoItags(videoID)
-
-        unknownItags = [ x for x in availableFormats if x not in y.videoItagQualityOrder ]
-        if len(unknownItags) > 0:
-            print >> sys.stderr, "Interesting! There are itags available which this program doesn't know about."
-            print >> sys.stderr, "I'd really appreciate it if you could create a new issue at https://github.com/cdown/yturl/issues."
-            print >> sys.stderr, "Here are the unknown itags: %s" % ', '.join(map(str, unknownItags))
-            print >> sys.stderr, "Thanks!\n"
-
-        if availableFormats is not False:
-            tempDir = tempfile.gettempdir()
-            for itag in y.getPreferredItagOrder(preferredItags):
-                if itag in availableFormats:
-                    print >> sys.stderr, "Using itag %d for video ID %s." % (itag, videoID)
-                    if contentType == "playlist":
-                        uris.append(availableFormats[itag])
-                        break
-                    else:
-                        uris.append(availableFormats[itag])
-                        break
-        else:
-            raise YouTubeAPIError("The YouTube API returned data from which no media URL could be retrieved.")
-
-    if contentType == "playlist":
-        filename = os.path.join(tempDir, "playlist-%s" % contentID)
-        with open(filename, "w+") as f:
-            f.write("\n".join(uris) + "\n")
-        print filename
-    else:
-        print uris[0]
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
