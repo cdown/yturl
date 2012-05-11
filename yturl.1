@@ -34,46 +34,13 @@ the URL to one of the formats specified on the command line (in order of
 arguments). If none of them are available, it will then select the highest
 quality video available.
 
-Format quality order is determined by the following (where video dimensions
-are the most major factor, and the video container is the least):
+Format quality order is determined by (in order) the maximum video dimensions,
+the maximum video bitrate, the maximum audio bitrate and the maximum audio
+sample rate.
 
-.TP
-.B Video dimensions
-The higher the video dimensions, the better the format is considered.
-.TP
-.B Video bitrate
-The higher the video bitrate, the better the format is considered.
-.TP
-.B Audio sample rate
-The higher the audio sample rate, the better the format is considered.
-.TP
-.B Audio bitrate
-The higher the audio bitrate, the better the format is considered.
-.TP
-.B Video encoding
-In order of preference: MPEG-4 AVC (H.264), Sorenson H.263, VP8, MPEG-4 Visual.
-.TP
-.B Video container
-In order of preference: MP4, WebM, FLV, 3GP.
-
-.SH "EXIT STATUS"
-.TP
-.B 0
-Successful operation.
-.TP
-.B 1
-Insufficient arguments.
-.TP
-.B 2
-Invalid video ID.
-.TP
-.B 3
-Invalid itag(s).
-.TP
-.B 4
-Invalid response from YouTube API.
 .SH BUGS
 Please report any bugs to https://github.com/cdown/yturl/issues.
+
 .SH COPYRIGHT
 Copyright 2011\-2012 Christopher Down <iofc.org@christopher.down>.
 
