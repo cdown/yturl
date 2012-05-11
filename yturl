@@ -40,7 +40,7 @@ class YTURL():
             44: (854*480,     1.00,     128,      44.1),
             45: (1280*720,    2.00,     192,      44.1),
         }
-        return sorted(itags, reverse=1, key=lambda x: (itags[x]))
+        return sorted(itags, reverse=1, key=lambda x: itags[x])
 
     def stripYouTubeQueryString(self, url):
         """Strip URL to the video ID contained."""
