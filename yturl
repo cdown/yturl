@@ -18,10 +18,6 @@ class YouTubeAPIError(Exception):
 
 class YTURL():
     """Prints direct URLs to YouTube media."""
-    def __init__(self):
-        """Seed itag quality order at runtime."""
-        self.videoItagQualityOrder = self.getItagQualityOrder()
-
     def getItagQualityOrder(self):
         """Return itags in order of quality preference."""
         itags = {
@@ -62,26 +58,27 @@ class YTURL():
             availableFormats[int(videoFormat["itag"][0])] = videoFormat["url"][0]
         return availableFormats
 
-    def getPreferredItagOrder(self, preferredItags):
+    def getPreferredItagOrder(self, preferredItags, videoItagQualityOrder):
         """Return the preferred itag sort."""
         if len(preferredItags) == 1:
-            v = self.videoItagQualityOrder
-            return zip(*sorted(enumerate(v),key=lambda (i,x):abs(v.index(preferredItags[0])-i)))[1]
+            return zip(*sorted(enumerate(videoItagQualityOrder),
+                       key=lambda (i,x):abs(videoItagQualityOrder.index(preferredItags[0])-i)))[1]
         elif len(preferredItags) > 1:
-            return preferredItags + self.videoItagQualityOrder
-        return self.videoItagQualityOrder
+            return preferredItags + videoItagQualityOrder
+        return videoItagQualityOrder
 
 def main():
     """Run main program."""
     y = YTURL()
     if len(sys.argv) < 2:
         raise SyntaxError("Usage: yturl id [itag ...]")
+    videoItagQualityOrder = y.getItagQualityOrder()
     for itag in sys.argv[2:]:
-        if not itag.isdigit() or int(itag) not in y.videoItagQualityOrder:
+        if not itag.isdigit() or int(itag) not in videoItagQualityOrder:
             raise SyntaxError("%s is not a valid itag." % itag)
     videoID = y.stripYouTubeQueryString(sys.argv[1])
     availableFormats = y.getVideoItags(videoID)
-    for itag in y.getPreferredItagOrder(map(int, sys.argv[2:])):
+    for itag in y.getPreferredItagOrder(map(int, sys.argv[2:]), videoItagQualityOrder):
         if itag in availableFormats:
             print >> sys.stderr, "Using itag %d." % itag
             print availableFormats[itag]
