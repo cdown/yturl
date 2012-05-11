@@ -25,22 +25,22 @@ class YTURL():
     def getItagQualityOrder(self):
         """Return itags in order of quality preference."""
         itags = {
-         #  itag v-container v-encoding   v-maxrate v-maxdimensions a-maxrate a-encoding a-samplerate
-            5:  ("flv",      "h263",      0.25,     400*240,        64,       "mp3",     22.05),
-            6:  ("flv",      "h263",      0.8,      480*270,        64,       "mp3",     22.05),
-            13: ("3gp",      "mp4visual", 0.5,      176*144,        64,       "aac",     22.05),
-            17: ("3gp",      "mp4visual", 20,       176*144,        64,       "aac",     22.05),
-            18: ("mp4",      "h264",      0.5,      640*360,        128,      "aac",     44.1),
-            22: ("mp4",      "h264",      2.9,      1280*720,       96,       "aac",     44.1),
-            34: ("flv",      "h264",      0.5,      640*360,        128,      "aac",     44.1),
-            35: ("flv",      "h264",      1,        854*480,        128,      "aac",     44.1),
-            37: ("mp4",      "h264",      2.9,      1920*1080,      152,      "aac",     44.1),
-            38: ("mp4",      "h264",      5,        4096*3072,      152,      "aac",     44.1),
-            43: ("webm",     "vp8",       0.5,      640*360,        128,      "vorbis",  44.1),
-            44: ("webm",     "vp8",       1,        854*480,        128,      "vorbis",  44.1),
-            45: ("webm",     "vp8",       2,        1280*720,       192,      "vorbis",  44.1)
+         #  itag v-dimensions v-bitrate a-bitrate a-samplerate
+            5:  (400*240,     0.25,     64,       22.05),
+            6:  (480*270,     0.80,     64,       22.05),
+            13: (176*144,     0.50,     64,       22.05),
+            17: (176*144,     2.00,     64,       22.05),
+            18: (640*360,     0.50,     128,      44.1),
+            22: (1280*720,    2.90,     96,       44.1),
+            34: (640*360,     0.50,     128,      44.1),
+            35: (854*480,     1.00,     128,      44.1),
+            37: (1920*1080,   2.90,     152,      44.1),
+            38: (4096*3072,   5.00,     152,      44.1),
+            43: (640*360,     0.50,     128,      44.1),
+            44: (854*480,     1.00,     128,      44.1),
+            45: (1280*720,    2.00,     192,      44.1),
         }
-        return sorted(itags, reverse=1, key=lambda x: (itags[x][3],itags[x][2],itags[x][4],itags[x][6]))
+        return sorted(itags, reverse=1, key=lambda x: (itags[x][0],itags[x][1],itags[x][2],itags[x][3]))
 
     def stripYouTubeQueryString(self, url):
         """Strip URL to the video ID contained."""
