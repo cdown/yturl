@@ -13,6 +13,7 @@ import sys
 __version__ = 1.02
 
 class YouTubeAPIError(Exception):
+    """Raised when the YouTube API returns something that we don't understand."""
     pass
 
 class YTURL():
@@ -24,28 +25,28 @@ class YTURL():
     def getItagQualityOrder(self):
         """Return itags in order of quality preference."""
         itags = {
-        # itag  v-container v-encoding   v-maxrate v-maxdimensions a-maxrate a-encoding a-samplerate
-            5: ("flv",      "h263",      0.25,     400*240,        64,       "mp3",     22.05),
-            6: ("flv",      "h263",      0.8,      480*270,        64,       "mp3",     22.05),
-            13:("3gp",      "mp4visual", 0.5,      176*144,        64,       "aac",     22.05),
-            17:("3gp",      "mp4visual", 20,       176*144,        64,       "aac",     22.05),
-            18:("mp4",      "h264",      0.5,      640*360,        128,      "aac",     44.1),
-            22:("mp4",      "h264",      2.9,      1280*720,       96,       "aac",     44.1),
-            34:("flv",      "h264",      0.5,      640*360,        128,      "aac",     44.1),
-            35:("flv",      "h264",      1,        854*480,        128,      "aac",     44.1),
-            37:("mp4",      "h264",      2.9,      1920*1080,      152,      "aac",     44.1),
-            38:("mp4",      "h264",      5,        4096*3072,      152,      "aac",     44.1),
-            43:("webm",     "vp8",       0.5,      640*360,        128,      "vorbis",  44.1),
-            44:("webm",     "vp8",       1,        854*480,        128,      "vorbis",  44.1),
-            45:("webm",     "vp8",       2,        1280*720,       192,      "vorbis",  44.1)
+         #  itag v-container v-encoding   v-maxrate v-maxdimensions a-maxrate a-encoding a-samplerate
+            5:  ("flv",      "h263",      0.25,     400*240,        64,       "mp3",     22.05),
+            6:  ("flv",      "h263",      0.8,      480*270,        64,       "mp3",     22.05),
+            13: ("3gp",      "mp4visual", 0.5,      176*144,        64,       "aac",     22.05),
+            17: ("3gp",      "mp4visual", 20,       176*144,        64,       "aac",     22.05),
+            18: ("mp4",      "h264",      0.5,      640*360,        128,      "aac",     44.1),
+            22: ("mp4",      "h264",      2.9,      1280*720,       96,       "aac",     44.1),
+            34: ("flv",      "h264",      0.5,      640*360,        128,      "aac",     44.1),
+            35: ("flv",      "h264",      1,        854*480,        128,      "aac",     44.1),
+            37: ("mp4",      "h264",      2.9,      1920*1080,      152,      "aac",     44.1),
+            38: ("mp4",      "h264",      5,        4096*3072,      152,      "aac",     44.1),
+            43: ("webm",     "vp8",       0.5,      640*360,        128,      "vorbis",  44.1),
+            44: ("webm",     "vp8",       1,        854*480,        128,      "vorbis",  44.1),
+            45: ("webm",     "vp8",       2,        1280*720,       192,      "vorbis",  44.1)
         }
-        return sorted(itags, reverse=1, key=lambda x: (itags[x][3], itags[x][2], itags[x][4], itags[x][6]))
+        return sorted(itags, reverse=1, key=lambda x: (itags[x][3],itags[x][2],itags[x][4],itags[x][6]))
 
     def stripYouTubeQueryString(self, url):
         """Strip URL to the video ID contained."""
         if "?" in url:
-            urlPost = parse_qs(url[url.index("?") + 1:])
-            for key in ( "v", "video_id" ):
+            urlPost = parse_qs(url[url.index("?")+1:])
+            for key in ("v", "video_id"):
                 if key in urlPost:
                     return urlPost[key][0]
         return url.split("/")[-1]
@@ -55,7 +56,7 @@ class YTURL():
         availableFormats = {}
         parsedResponse = parse_qs(urlopen("http://youtube.com/get_video_info?&video_id=%s&el=detailpage&ps=default&eurl=&gl=US&hl=en" % videoID).read())
         if not "url_encoded_fmt_stream_map" in parsedResponse:
-            raise YoutubeAPIError("Missing format map!")
+            raise YoutubeAPIError("Missing format map")
         for videoFormat in map(parse_qs, parsedResponse["url_encoded_fmt_stream_map"][0].split(",")):
             availableFormats[int(videoFormat["itag"][0])] = videoFormat["url"][0]
         return availableFormats
@@ -84,6 +85,7 @@ def main():
             print >> sys.stderr, "Using itag %d." % itag
             print availableFormats[itag]
             return True
+    raise YouTubeAPIError("No local itags available!")
 
 if __name__ == "__main__":
     main()
