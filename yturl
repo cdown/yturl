@@ -53,7 +53,7 @@ class YTURL():
         parsedResponse = parse_qs(urlopen("http://youtube.com/get_video_info?&video_id=%s" \
                                           "&el=detailpage&ps=default&eurl=&gl=US&hl=en" % videoID).read())
         if not "url_encoded_fmt_stream_map" in parsedResponse:
-            raise YoutubeAPIError("Missing format map")
+            raise YouTubeAPIError("No format map returned by API (bad ID?)")
         for videoFormat in map(parse_qs, parsedResponse["url_encoded_fmt_stream_map"][0].split(",")):
             availableFormats[int(videoFormat["itag"][0])] = videoFormat["url"][0]
         return availableFormats
@@ -83,7 +83,7 @@ def main():
             print >> sys.stderr, "Using itag %d." % itag
             print availableFormats[itag]
             return True
-    raise YouTubeAPIError("No local itags available!")
+    raise YouTubeAPIError("No local itags available")
 
 if __name__ == "__main__":
     main()
