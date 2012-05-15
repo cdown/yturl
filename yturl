@@ -22,19 +22,19 @@ class YTURL():
         """Return itags in order of quality preference."""
         itags = {
          #  itag v-dimensions v-bitrate a-bitrate a-samplerate
-            5:  (400*240,     0.25,     64,       22.05),
-            6:  (480*270,     0.80,     64,       22.05),
-            13: (176*144,     0.50,     64,       22.05),
-            17: (176*144,     2.00,     64,       22.05),
-            18: (640*360,     0.50,     128,      44.1),
-            22: (1280*720,    2.90,     96,       44.1),
-            34: (640*360,     0.50,     128,      44.1),
-            35: (854*480,     1.00,     128,      44.1),
-            37: (1920*1080,   2.90,     152,      44.1),
-            38: (4096*3072,   5.00,     152,      44.1),
-            43: (640*360,     0.50,     128,      44.1),
-            44: (854*480,     1.00,     128,      44.1),
-            45: (1280*720,    2.00,     192,      44.1),
+            "5":  (400*240,     0.25,     64,       22.05),
+            "6":  (480*270,     0.80,     64,       22.05),
+            "13": (176*144,     0.50,     64,       22.05),
+            "17": (176*144,     2.00,     64,       22.05),
+            "18": (640*360,     0.50,     128,      44.1),
+            "22": (1280*720,    2.90,     96,       44.1),
+            "34": (640*360,     0.50,     128,      44.1),
+            "35": (854*480,     1.00,     128,      44.1),
+            "37": (1920*1080,   2.90,     152,      44.1),
+            "38": (4096*3072,   5.00,     152,      44.1),
+            "43": (640*360,     0.50,     128,      44.1),
+            "44": (854*480,     1.00,     128,      44.1),
+            "45": (1280*720,    2.00,     192,      44.1),
         }
         return sorted(itags, reverse=1, key=lambda x: itags[x])
 
@@ -54,7 +54,7 @@ class YTURL():
                                           "&el=detailpage&ps=default&eurl=&gl=US&hl=en" % videoID).read())
         try:
             for videoFormat in map(parse_qs, parsedResponse["url_encoded_fmt_stream_map"][0].split(",")):
-                availableFormats[int(videoFormat["itag"][0])] = videoFormat["url"][0]
+                availableFormats[videoFormat["itag"][0]] = videoFormat["url"][0]
         except KeyError, e:
             raise YouTubeAPIError("API output missing required key: %s (bad ID?)" % e)
         return availableFormats
@@ -75,13 +75,13 @@ def main():
     y = YTURL()
     videoItagQualityOrder = y.getItagQualityOrder()
     for itag in sys.argv[2:]:
-        if not itag.isdigit() or int(itag) not in videoItagQualityOrder:
+        if not itag.isdigit() or itag not in videoItagQualityOrder:
             raise SyntaxError("%s is not a valid itag." % itag)
     videoID = y.stripYouTubeQueryString(sys.argv[1])
     availableFormats = y.getVideoItags(videoID)
-    for itag in y.getPreferredItagOrder(map(int, sys.argv[2:]), videoItagQualityOrder):
+    for itag in y.getPreferredItagOrder(sys.argv[2:], videoItagQualityOrder):
         if itag in availableFormats:
-            print >> sys.stderr, "Using itag %d." % itag
+            print >> sys.stderr, "Using itag %s." % itag
             print availableFormats[itag]
             return True
     raise YouTubeAPIError("No local itags available")
