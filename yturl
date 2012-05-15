@@ -21,7 +21,7 @@ class YTURL():
     def getItagQualityOrder(self):
         """Return itags in order of quality preference."""
         itags = {
-         #  itag v-dimensions v-bitrate a-bitrate a-samplerate
+        #   itag v-dimensions v-bitrate a-bitrate a-samplerate
             "5":  (400*240,     0.25,     64,       22.05),
             "6":  (480*270,     0.80,     64,       22.05),
             "13": (176*144,     0.50,     64,       22.05),
@@ -38,7 +38,7 @@ class YTURL():
         }
         return sorted(itags, reverse=1, key=lambda x: itags[x])
 
-    def stripYouTubeQueryString(self, url):
+    def stripToYouTubeVideoID(self, url):
         """Strip URL to the video ID contained."""
         if "?" in url:
             urlPost = parse_qs(url[url.index("?")+1:])
@@ -77,7 +77,7 @@ def main():
     for itag in sys.argv[2:]:
         if not itag.isdigit() or itag not in videoItagQualityOrder:
             raise SyntaxError("%s is not a valid itag." % itag)
-    videoID = y.stripYouTubeQueryString(sys.argv[1])
+    videoID = y.stripToYouTubeVideoID(sys.argv[1])
     availableFormats = y.getVideoItags(videoID)
     for itag in y.getPreferredItagOrder(sys.argv[2:], videoItagQualityOrder):
         if itag in availableFormats:
