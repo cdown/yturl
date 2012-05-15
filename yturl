@@ -21,7 +21,7 @@ class YTURL():
     def getItagQualityOrder(self):
         """Return itags in order of quality preference."""
         itags = {
-        #   itag v-dimensions v-bitrate a-bitrate a-samplerate
+        #   itag   v-dimensions v-bitrate a-bitrate a-samplerate
             "5":  (400*240,     0.25,     64,       22.05),
             "6":  (480*270,     0.8,      64,       22.05),
             "13": (176*144,     0.5,      64,       22.05),
