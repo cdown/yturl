@@ -74,7 +74,7 @@ def main():
     videoItagQualityOrder = y.getItagQualityOrder()
     for itag in sys.argv[2:]:
         if itag not in videoItagQualityOrder:
-            raise SyntaxError("%s is not a valid itag." % itag)
+            raise ValueError("%s is not a valid itag." % itag)
     videoID = y.stripToYouTubeVideoID(sys.argv[1])
     availableFormats = y.getAvailableVideoItags(videoID)
     for itag in y.getPreferredItagOrder(sys.argv[2:], videoItagQualityOrder):
