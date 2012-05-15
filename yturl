@@ -40,12 +40,10 @@ class YTURL():
 
     def stripToYouTubeVideoID(self, url):
         """Strip URL to the video ID contained."""
-        if "?" in url:
-            urlPost = parse_qs(url[url.index("?")+1:])
-            for key in ("v", "video_id"):
-                if key in urlPost:
-                    return urlPost[key][0]
-        return url.split("/")[-1][:11]
+        try:
+            return parse_qs(url[url.index("?")+1:])["v"][0]
+        except (ValueError, KeyError):
+            return url.split("/")[-1][:11]
 
     def getAvailableVideoItags(self, videoID):
         """Return available itags and their associated URLs as a list."""
