@@ -62,9 +62,7 @@ class YTURL():
         if len(preferredItags) == 1:
             return zip(*sorted(enumerate(videoItagQualityOrder),
                        key=lambda (i,x):abs(videoItagQualityOrder.index(preferredItags[0])-i)))[1]
-        elif len(preferredItags) > 1:
-            return preferredItags + videoItagQualityOrder
-        return videoItagQualityOrder
+        return preferredItags + videoItagQualityOrder
 
 def main():
     """Run main program."""
