@@ -79,7 +79,7 @@ def main():
             print >> sys.stderr, "Using itag %s." % itag
             print availableFormats[itag]
             return True
-    raise YouTubeAPIError("No local itags available")
+    raise YouTubeAPIError("No locally known itags available remotely")
 
 if __name__ == "__main__":
     main()
