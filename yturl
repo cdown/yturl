@@ -47,12 +47,14 @@ class YTURL():
 
     def getAvailableVideoItags(self, videoID):
         """Return available itags and their associated URLs as a list."""
-        apiData = urlopen("http://youtube.com/get_video_info?" +
-                          urlencode({"video_id":videoID, "el":"detailpage"}))
+        apiData = parse_qs(urlopen("http://youtube.com/get_video_info?" +
+                                   urlencode({"video_id":videoID, "el":"detailpage"})).read())
         try:
-            for videoFormat in map(parse_qs, parse_qs(apiData.read())["url_encoded_fmt_stream_map"][0].split(",")):
+            for videoFormat in map(parse_qs, apiData["url_encoded_fmt_stream_map"][0].split(",")):
                 yield videoFormat["itag"][0], videoFormat["url"][0]
         except KeyError, e:
+            if apiData["status"][0] == "fail" and "reason" in apiData:
+                raise YouTubeAPIError("API returned failure: %s" % apiData["reason"][0])
             raise YouTubeAPIError("API output missing required key: %s (bad ID?)" % e)
 
     def getPreferredItagOrder(self, preferredItags, videoItagQualityOrder):
