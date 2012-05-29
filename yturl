@@ -6,7 +6,7 @@
 # (c) Christopher Down 2011-2012
 # See the COPYING file for copyright information.
 
-from urllib import urlopen
+from urllib import urlopen, urlencode
 from urlparse import parse_qs
 import sys
 
@@ -48,10 +48,10 @@ class YTURL():
     def getAvailableVideoItags(self, videoID):
         """Return available itags and their associated URLs as a list."""
         availableFormats = {}
+        apiData = urlopen("http://youtube.com/get_video_info?" +
+                          urlencode({"video_id":videoID, "el":"detailpage"}))
         try:
-            for videoFormat in map(parse_qs, parse_qs(urlopen("http://youtube.com/get_video_info?&video_id=%s" \
-                                                              "&el=detailpage&ps=default&eurl=&gl=US&hl=en" \
-                                                              % videoID).read())["url_encoded_fmt_stream_map"][0].split(",")):
+            for videoFormat in map(parse_qs, parse_qs(apiData.read())["url_encoded_fmt_stream_map"][0].split(",")):
                 availableFormats[videoFormat["itag"][0]] = videoFormat["url"][0]
         except KeyError, e:
             raise YouTubeAPIError("API output missing required key: %s (bad ID?)" % e)
