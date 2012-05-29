@@ -42,7 +42,7 @@ class YTURL():
         """Strip URL to the video ID contained."""
         try:
             return parse_qs(url[url.index("?")+1:])["v"][0][:11]
-        except (ValueError, KeyError):
+        except ValueError, KeyError:
             return url.split("/")[-1][:11]
 
     def getAvailableVideoItags(self, videoID):
@@ -57,12 +57,11 @@ class YTURL():
                 raise YouTubeAPIError("API returned failure: %s" % apiData["reason"][0])
             raise YouTubeAPIError("API output missing required key: %s (bad ID?)" % e)
 
-    def getPreferredItagOrder(self, preferredItags, videoItagQualityOrder):
-        """Return the preferred itag sort."""
-        if len(preferredItags) == 1:
-            return zip(*sorted(enumerate(videoItagQualityOrder),
-                       key=lambda (i,x):abs(videoItagQualityOrder.index(preferredItags[0])-i)))[1]
-        return preferredItags + videoItagQualityOrder
+    def getDesiredItagOrder(self, desired, quality):
+        """Return the desired itag sorting."""
+        if len(desired) == 1:
+            return zip(*sorted(enumerate(quality), key=lambda (i,x):abs(quality.index(desired[0])-i)))[1]
+        return desired + quality
 
 def main():
     """Run main program."""
@@ -75,7 +74,7 @@ def main():
             raise ValueError("%s is not a valid itag." % itag)
     videoID = y.stripToYouTubeVideoID(sys.argv[1])
     availableFormats = dict(y.getAvailableVideoItags(videoID))
-    for itag in y.getPreferredItagOrder(sys.argv[2:], videoItagQualityOrder):
+    for itag in y.getDesiredItagOrder(sys.argv[2:], videoItagQualityOrder):
         if itag in availableFormats:
             print >> sys.stderr, "Using itag %s." % itag
             print availableFormats[itag]
