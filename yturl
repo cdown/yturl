@@ -42,7 +42,7 @@ class YTURL():
         """Strip URL to the video ID contained."""
         try:
             return parse_qs(url[url.index("?")+1:])["v"][0][:11]
-        except ValueError, KeyError:
+        except (ValueError, KeyError):
             return url.split("/")[-1][:11]
 
     def getAvailableVideoItags(self, videoID):
