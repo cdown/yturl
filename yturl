@@ -45,9 +45,7 @@ class YTURL():
             for videoFormat in map(parse_qs, apiData["url_encoded_fmt_stream_map"][0].split(",")):
                 yield videoFormat["itag"][0], "%s&signature=%s" % (videoFormat["url"][0], videoFormat["sig"][0])
         except KeyError, e:
-            if apiData["status"][0] == "fail" and "reason" in apiData:
-                raise YouTubeAPIError("API returned failure: %s" % apiData["reason"][0])
-            raise YouTubeAPIError("API output missing required key: %s (bad ID?)" % e)
+            raise YouTubeAPIError("API returned failure: %s" % apiData["reason"][0])
 
     def getDesiredItagOrder(self, desired, quality):
         """Return the desired itag sorting."""
