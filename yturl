@@ -1,16 +1,8 @@
 #!/usr/bin/env python
-# vim: set fileencoding=utf-8 :
-
-"""Prints direct URLs to YouTube media."""
-
-# (c) Christopher Down 2011-2012
-# See the COPYING file for copyright information.
 
 from urllib import urlopen, urlencode
 from urlparse import parse_qs
 import sys
-
-__version__ = 1.05
 
 class YouTubeAPIError(Exception):
     """Raised when the YouTube API returns something that we don't understand."""
