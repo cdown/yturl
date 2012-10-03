@@ -2,7 +2,7 @@
 
 from urllib import urlopen, urlencode
 from urlparse import parse_qs
-import sys
+from sys import argv
 
 class YouTubeAPIError(Exception):
     """Raised when the YouTube API returns something that we don't understand."""
@@ -56,11 +56,11 @@ class YTURL():
         return desired + quality
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
+    if len(argv) < 2:
         raise SyntaxError("Usage: yturl id [itag ...]")
     y = YTURL()
     videoItagQualityOrder = y.getItagQualityOrder()
-    if not set(sys.argv[2:]).issubset(videoItagQualityOrder):
-        raise ValueError("Invalid itag(s): %s" % ", ".join(set(sys.argv[2:]).difference(videoItagQualityOrder)))
-    availableItags = dict(y.getAvailableVideoItags(y.stripToYouTubeVideoID(sys.argv[1])))
-    print availableItags[sorted(set(y.getDesiredItagOrder(sys.argv[2:], videoItagQualityOrder)) & set(availableItags), key=int, reverse=True)[0]]
+    if not set(argv[2:]).issubset(videoItagQualityOrder):
+        raise ValueError("Invalid itag(s): %s" % ", ".join(set(argv[2:]).difference(videoItagQualityOrder)))
+    availableItags = dict(y.getAvailableVideoItags(y.stripToYouTubeVideoID(argv[1])))
+    print availableItags[sorted(set(y.getDesiredItagOrder(argv[2:], videoItagQualityOrder)) & set(availableItags), key=int, reverse=True)[0]]
