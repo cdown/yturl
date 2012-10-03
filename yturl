@@ -63,23 +63,17 @@ class YTURL():
             return zip(*sorted(enumerate(quality), key=lambda (i,x):abs(quality.index(desired[0])-i)))[1]
         return desired + quality
 
-def main():
-    """Run main program."""
+if __name__ == "__main__":
     if len(sys.argv) < 2:
         raise SyntaxError("Usage: yturl id [itag ...]")
     y = YTURL()
     videoItagQualityOrder = y.getItagQualityOrder()
-    for itag in sys.argv[2:]:
-        if itag not in videoItagQualityOrder:
-            raise ValueError("%s is not a valid itag." % itag)
-    videoID = y.stripToYouTubeVideoID(sys.argv[1])
-    availableFormats = dict(y.getAvailableVideoItags(videoID))
+    if not set(sys.argv[2:]).issubset(videoItagQualityOrder):
+        raise ValueError("Invalid itag(s): %s" % ", ".join(set(sys.argv[2:]).difference(videoItagQualityOrder)))
+    availableFormats = dict(y.getAvailableVideoItags(y.stripToYouTubeVideoID(sys.argv[1])))
     for itag in y.getDesiredItagOrder(sys.argv[2:], videoItagQualityOrder):
         if itag in availableFormats:
             print >> sys.stderr, "Using itag %s." % itag
             print availableFormats[itag]
-            return True
+            sys.exit(0)
     raise YouTubeAPIError("No locally known itags available remotely")
-
-if __name__ == "__main__":
-    main()
