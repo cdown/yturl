@@ -62,10 +62,5 @@ if __name__ == "__main__":
     videoItagQualityOrder = y.getItagQualityOrder()
     if not set(sys.argv[2:]).issubset(videoItagQualityOrder):
         raise ValueError("Invalid itag(s): %s" % ", ".join(set(sys.argv[2:]).difference(videoItagQualityOrder)))
-    availableFormats = dict(y.getAvailableVideoItags(y.stripToYouTubeVideoID(sys.argv[1])))
-    for itag in y.getDesiredItagOrder(sys.argv[2:], videoItagQualityOrder):
-        if itag in availableFormats:
-            print >> sys.stderr, "Using itag %s." % itag
-            print availableFormats[itag]
-            sys.exit(0)
-    raise YouTubeAPIError("No locally known itags available remotely")
+    availableItags = dict(y.getAvailableVideoItags(y.stripToYouTubeVideoID(sys.argv[1])))
+    print availableItags[sorted(set(y.getDesiredItagOrder(sys.argv[2:], videoItagQualityOrder)) & set(availableItags), key=int, reverse=True)[0]]
