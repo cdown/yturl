@@ -42,8 +42,7 @@ class YTURL():
         apiData = parse_qs(urlopen("http://youtube.com/get_video_info?" +
                                    urlencode({"video_id":videoID, "el":"detailpage"})).read())
         try:
-            for videoFormat in map(parse_qs, apiData["url_encoded_fmt_stream_map"][0].split(",")):
-                yield videoFormat["itag"][0], "%s&signature=%s" % (videoFormat["url"][0], videoFormat["sig"][0])
+            return dict((x["itag"][0], "%s&signature=%s" % (x["url"][0], x["sig"][0])) for x in map(parse_qs, apiData["url_encoded_fmt_stream_map"][0].split(","))) 
         except KeyError:
             raise YouTubeAPIError("API returned failure: %s" % apiData["reason"][0])
 
@@ -60,5 +59,5 @@ if __name__ == "__main__":
     videoItagQualityOrder = y.getItagQualityOrder()
     if not set(argv[2:]).issubset(videoItagQualityOrder):
         raise ValueError("Invalid itag(s): %s" % ", ".join(set(argv[2:]).difference(videoItagQualityOrder)))
-    availableItags = dict(y.getAvailableVideoItags(y.stripToYouTubeVideoID(argv[1])))
+    availableItags = y.getAvailableVideoItags(y.stripToYouTubeVideoID(argv[1]))
     print availableItags[sorted(set(y.getDesiredItagOrder(argv[2:], videoItagQualityOrder)) & set(availableItags), key=int, reverse=True)[0]]
