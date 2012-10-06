@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from urllib import urlopen, urlencode
+from urllib import urlopen
 from urlparse import parse_qs
 from sys import argv
 
@@ -39,8 +39,7 @@ class YTURL():
 
     def getAvailableVideoItags(self, videoID):
         """Return available itags and their associated URLs as a list."""
-        apiData = parse_qs(urlopen("http://youtube.com/get_video_info?" +
-                                   urlencode({"video_id":videoID, "el":"detailpage"})).read())
+        apiData = parse_qs(urlopen("http://youtube.com/get_video_info?video_id=" + videoID).read())
         try:
             return dict((x["itag"][0], "%s&signature=%s" % (x["url"][0], x["sig"][0])) for x in map(parse_qs, apiData["url_encoded_fmt_stream_map"][0].split(","))) 
         except KeyError:
@@ -60,4 +59,4 @@ if __name__ == "__main__":
     if not set(argv[2:]).issubset(videoItagQualityOrder):
         raise ValueError("Invalid itag(s): %s" % ", ".join(set(argv[2:]).difference(videoItagQualityOrder)))
     availableItags = y.getAvailableVideoItags(y.stripToYouTubeVideoID(argv[1]))
-    print availableItags[sorted(set(y.getDesiredItagOrder(argv[2:], videoItagQualityOrder)) & set(availableItags), key=int, reverse=True)[0]]
+    print availableItags[[x for x in y.getDesiredItagOrder(argv[2:], videoItagQualityOrder) if x in availableItags][0]]
