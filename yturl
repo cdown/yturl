@@ -2,7 +2,7 @@
 
 from urllib import urlopen
 from urlparse import parse_qs
-from sys import argv
+from sys import argv, stderr
 
 class YouTubeAPIError(Exception):
     """Raised when the YouTube API returns something that we don't understand."""
@@ -41,7 +41,8 @@ class YTURL():
         """Return available itags and their associated URLs as a list."""
         apiData = parse_qs(urlopen("http://youtube.com/get_video_info?video_id=" + videoID).read())
         try:
-            return dict((x["itag"][0], "%s&signature=%s" % (x["url"][0], x["sig"][0])) for x in map(parse_qs, apiData["url_encoded_fmt_stream_map"][0].split(","))) 
+            for fmt in (parse_qs(x) for x in apiData["url_encoded_fmt_stream_map"][0].split(",")):
+                yield fmt["itag"][0], "%s&signature=%s" % (fmt["url"][0], fmt["sig"][0]) 
         except KeyError:
             raise YouTubeAPIError("API returned failure: %s" % apiData["reason"][0])
 
@@ -58,5 +59,11 @@ if __name__ == "__main__":
     videoItagQualityOrder = y.getItagQualityOrder()
     if not set(argv[2:]).issubset(videoItagQualityOrder):
         raise ValueError("Invalid itag(s): %s" % ", ".join(set(argv[2:]).difference(videoItagQualityOrder)))
-    availableItags = y.getAvailableVideoItags(y.stripToYouTubeVideoID(argv[1]))
-    print availableItags[[x for x in y.getDesiredItagOrder(argv[2:], videoItagQualityOrder) if x in availableItags][0]]
+    availableItags = dict(y.getAvailableVideoItags(y.stripToYouTubeVideoID(argv[1])))
+    for fmt in y.getDesiredItagOrder(argv[2:], videoItagQualityOrder):
+        if fmt in availableItags:
+            print >> stderr, "Using itag %s." % fmt 
+            print availableItags[fmt]
+            break
+    else:
+        print >> stderr, "No locally known itags available. Unknown itags: %s" % ", ".join(availableItags) 
