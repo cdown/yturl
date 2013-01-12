@@ -65,7 +65,7 @@ class YTURL():
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print "Usage: %s video-id [itag1 ... itagN]" % os.path.basename(sys.argv[0])
-        sys.exit(1)
+        sys.exit(os.EX_USAGE)
     
     y = YTURL()
     
