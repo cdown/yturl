@@ -33,18 +33,24 @@ class YTURL():
     def stripToYouTubeVideoID(self, url):
         """Strip URL to the video ID contained."""
         try:
-            parsed = urlparse.urlparse(url).query
-            return urlparse.parse_qs(parsed)["v"][0][:11]
+            parsedURL = urlparse.urlparse(url).query
+            return urlparse.parse_qs(parsedURL)["v"][0][:11]
         except (ValueError, KeyError):
             return url.split("/")[-1][:11]
 
     def getAvailableVideoItags(self, videoID):
         """Return available itags and their associated URLs as a list."""
-        apiData = urlparse.parse_qs(urllib.urlopen("http://youtube.com/get_video_info?video_id=" + videoID).read())
+        apiResponse = urllib.urlopen("http://youtube.com/get_video_info?video_id=" + videoID)
+        parsedResponse = urlparse.parse_qs(apiResponse.read())
+        
         try:
-            for fmt in (urlparse.parse_qs(x) for x in apiData["url_encoded_fmt_stream_map"][0].split(",")):
-                yield fmt["itag"][0], "%s&signature=%s" % (fmt["url"][0], fmt["sig"][0]) 
-        except KeyError:
+            for videoFormat in parsedResponse["url_encoded_fmt_stream_map"][0].split(","):
+                parsedFormat = urlparse.parse_qs(videoFormat)
+                yield (
+                    parsedFormat["itag"][0],
+                    "%s&signature=%s" % (parsedFormat["url"][0], parsedFormat["sig"][0])
+                )
+        except (KeyError, IndexError):
             raise YouTubeAPIError("API returned failure: %s" % apiData["reason"][0])
 
     def getDesiredItagOrder(self, desired, quality):
