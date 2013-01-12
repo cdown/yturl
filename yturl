@@ -51,7 +51,7 @@ class YTURL():
                     "%s&signature=%s" % (parsedFormat["url"][0], parsedFormat["sig"][0])
                 )
         except (KeyError, IndexError):
-            raise YouTubeAPIError("API returned failure: %s" % apiData["reason"][0])
+            raise YouTubeAPIError("API returned failure: %s" % parsedResponse["reason"][0])
 
     def getDesiredItagOrder(self, userItags, qualityOrder):
         """Return the desired itag sorting."""
