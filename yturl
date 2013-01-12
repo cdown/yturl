@@ -42,7 +42,6 @@ class YTURL():
         """Return available itags and their associated URLs as a list."""
         apiResponse = urllib.urlopen("http://youtube.com/get_video_info?video_id=" + videoID)
         parsedResponse = urlparse.parse_qs(apiResponse.read())
-        
         try:
             for videoFormat in parsedResponse["url_encoded_fmt_stream_map"][0].split(","):
                 parsedFormat = urlparse.parse_qs(videoFormat)
@@ -53,11 +52,14 @@ class YTURL():
         except (KeyError, IndexError):
             raise YouTubeAPIError("API returned failure: %s" % apiData["reason"][0])
 
-    def getDesiredItagOrder(self, desired, quality):
+    def getDesiredItagOrder(self, userSpecified, qualityOrder):
         """Return the desired itag sorting."""
-        if len(desired) == 1:
-            return zip(*sorted(enumerate(quality), key=lambda (i,x):abs(quality.index(desired[0])-i)))[1]
-        return desired + quality
+        if len(userSpecified) == 1:
+            return zip(*sorted(
+                enumerate(qualityOrder),
+                key=lambda (i, x): abs(qualityOrder.index(userSpecified[0]) - i))
+            )[1]
+        return userSpecified + qualityOrder
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
