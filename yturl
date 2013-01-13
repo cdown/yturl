@@ -77,9 +77,10 @@ if __name__ == "__main__":
     videoID = y.stripToYouTubeVideoID(args.videoID)
     qualityOrder = y.getItagQualityOrder()
     availableItags = dict(y.getAvailableVideoItags(videoID))
+    unknownItags = filter(lambda x: x not in qualityOrder, userItags)
     
-    if not set(userItags).issubset(qualityOrder):
-        raise ValueError("Invalid itag(s):" + ", ".join(set(userItags).difference(qualityOrder)))
+    if unknownItags:
+        raise ValueError("Invalid itag(s): " + ", ".join(unknownItags))
     for itag in y.getDesiredItagOrder(userItags, qualityOrder):
         if itag in availableItags:
             print availableItags[itag]
