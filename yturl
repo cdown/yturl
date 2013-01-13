@@ -81,10 +81,11 @@ if __name__ == "__main__":
     
     if unknownItags:
         raise ValueError("Invalid itag(s): " + ", ".join(unknownItags))
-    for itag in y.getDesiredItagOrder(userItags, qualityOrder):
-        if itag in availableItags:
-            print availableItags[itag]
-            print >> sys.stderr, "Using itag %s." % itag 
-            break
+
+    desiredItagOrder = y.getDesiredItagOrder(userItags, qualityOrder)
+    desiredItag = filter(lambda x: x in availableItags, desiredItagOrder)
+    if desiredItag:
+        print availableItags[desiredItag[0]]
+        print >> sys.stderr, "Using itag %s." % desiredItag[0]
     else:
         print >> sys.stderr, "No locally known itags available."
