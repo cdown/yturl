@@ -61,7 +61,7 @@ class YTURL():
         if len(userItags) == 1:
             return zip(*sorted(
                 enumerate(qualityOrder),
-                key=lambda (i, x): abs(qualityOrder.index(userItags[0]) - i))
+                key=lambda (i, _): abs(qualityOrder.index(userItags[0]) - i))
             )[1]
         return userItags + qualityOrder
 
