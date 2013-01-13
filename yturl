@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
+"""Gets direct URLs to YouTube media."""
+
+import argparse
 import os
 import sys
 import urllib
 import urlparse
-
-EX_USAGE = getattr(os, "EX_USAGE", 64)
 
 class YouTubeAPIError(Exception):
     """Raised when the YouTube API returns something that we don't understand."""
@@ -65,14 +66,15 @@ class YTURL():
         return userItags + qualityOrder
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print "Usage: %s video-id [itag1 ... itagN]" % os.path.basename(sys.argv[0])
-        sys.exit(EX_USAGE)
-    
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("videoID", help="The YouTube video ID, or a URL containing it")
+    parser.add_argument("itag", help="An itag format specification, see http://goo.gl/uEIuR", nargs="*")
+    args = parser.parse_args()
+
     y = YTURL()
-    
-    userItags = sys.argv[2:]
-    videoID = y.stripToYouTubeVideoID(sys.argv[1])
+
+    userItags = args.itag
+    videoID = y.stripToYouTubeVideoID(args.videoID)
     qualityOrder = y.getItagQualityOrder()
     availableItags = dict(y.getAvailableVideoItags(videoID))
     
