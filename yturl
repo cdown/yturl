@@ -44,7 +44,7 @@ class YTURL():
 
     def getAvailableVideoItags(self, videoID):
         """Return available itags and their associated URLs as a list."""
-        apiResponse = urllib.urlopen("http://youtube.com/get_video_info?video_id=" + videoID)
+        apiResponse = urllib.urlopen("http://youtube.com/get_video_info?hl=en&video_id=" + videoID)
         parsedResponse = urlparse.parse_qs(apiResponse.read())
         try:
             for mediaFormat in parsedResponse["url_encoded_fmt_stream_map"][0].split(","):
