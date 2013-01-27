@@ -4,10 +4,10 @@ from distutils.core import setup
 
 setup(
     name = "yturl",
-    version = "20130126",
+    version = "20130127",
     description = "A simple media URL grabber for YouTube.",
     author = "Chris Down",
-    author_email = "chris@illco.de",
-    url = "http://illco.de",
+    author_email = "chris@chrisdown.name",
+    url = "http://chrisdown.name",
     scripts = ( "yturl", )
 )
