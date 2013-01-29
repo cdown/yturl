@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
     name = "yturl",
-    version = "20130127",
+    version = "1.13",
     description = "Get direct URLs to YouTube videos.",
     author = "Chris Down",
     author_email = "chris@chrisdown.name",
