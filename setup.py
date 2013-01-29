@@ -5,7 +5,7 @@ from distutils.core import setup
 setup(
     name = "yturl",
     version = "20130127",
-    description = "A simple media URL grabber for YouTube.",
+    description = "Get direct URLs to YouTube videos.",
     author = "Chris Down",
     author_email = "chris@chrisdown.name",
     url = "http://chrisdown.name",

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Gets direct URLs to YouTube media."""
+"""Get direct URLs to YouTube videos."""
 
 import argparse
 import os
@@ -78,7 +78,7 @@ if __name__ == "__main__":
     qualityOrder = y.getItagQualityOrder()
     availableItags = dict(y.getAvailableVideoItags(videoID))
     unknownItags = filter(lambda x: x not in qualityOrder, userItags)
-    
+
     if unknownItags:
         raise ValueError("Invalid itag(s): " + ", ".join(unknownItags))
 
