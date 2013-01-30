@@ -6,30 +6,23 @@ import argparse
 import sys
 import urllib
 import urlparse
+import json
+
+class ItagLoadError(Exception):
+    """Raised when we can't get our local itag database."""
+    pass
 
 class YouTubeAPIError(Exception):
     """Raised when the YouTube API returns unknown data."""
     pass
 
-def getItagQualityOrder():
-    """Return itags in order of quality preference."""
-    itags = {
-    #   itag   v-dimensions v-bitrate a-bitrate a-samplerate
-        "5":  (400*240,     0.25,     64,       22.05),
-        "6":  (480*270,     0.8,      64,       22.05),
-        "13": (176*144,     0.5,      64,       22.05),
-        "17": (176*144,     2,        64,       22.05),
-        "18": (640*360,     0.5,      128,      44.1),
-        "22": (1280*720,    2.9,      96,       44.1),
-        "34": (640*360,     0.5,      128,      44.1),
-        "35": (854*480,     1,        128,      44.1),
-        "37": (1920*1080,   2.9,      152,      44.1),
-        "38": (4096*3072,   5,        152,      44.1),
-        "43": (640*360,     0.5,      128,      44.1),
-        "44": (854*480,     1,        128,      44.1),
-        "45": (1280*720,    2,        192,      44.1),
-    }
-    return sorted(itags, reverse=True, key=lambda x: itags[x])
+def getItagQualityOrder(itags):
+    return sorted(itags, reverse=True, key=lambda x: (
+        itags[x]["video"]["dimensions"]["width"] * itags[x]["video"]["dimensions"]["height"],
+        itags[x]["video"]["bitrate"],
+        itags[x]["audio"]["bitrate"],
+        itags[x]["audio"]["samplerate"]
+    ))
 
 def stripToYouTubeVideoID(url):
     """Strip URL to the video ID contained."""
@@ -74,11 +67,24 @@ if __name__ == "__main__":
         help="A format specification, see http://goo.gl/uEIuR",
         nargs="*"
     )
+    parser.add_argument(
+        "-c", "--config",
+        help="The path to an alternative configuration file.",
+        default="/etc/yturl/itags"
+    )
     args = parser.parse_args()
+
+    try:
+        with open(args.config) as f:
+            knownItags = json.load(f)
+    except (IOError, OSError), e:
+        raise ItagLoadError("Can't load itags file %s: %s" %
+            (args.config, e.args[1])
+        )
 
     userItags = args.itag
     videoID = stripToYouTubeVideoID(args.videoID)
-    qualityItags = getItagQualityOrder()
+    qualityItags = getItagQualityOrder(knownItags)
     availableItags = dict(getAvailableVideoItags(videoID))
     unknownItags = [ x for x in userItags if x not in qualityItags ]
 
