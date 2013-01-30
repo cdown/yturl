@@ -7,7 +7,7 @@ NAME
 
 
 SYNOPSIS
-       yturl videoID [itag [itag ...]]
+       yturl [-i ITAGFILE] videoid [itag [itag ...]]
 
 
 EXAMPLES
@@ -17,7 +17,7 @@ EXAMPLES
 
 
 ARGUMENTS
-       videoID
+       videoid
               The video ID to get information about. This can also be a URL in
               a recognised format. Any official  YouTube  URL  (including  one
               from  alternative services like youtu.be) should be successfully
@@ -29,21 +29,27 @@ ARGUMENTS
               SELECTION").
 
 
+OPTIONS
+       -i, --itag-file ITAGFILE
+              Alternative  itag  data  file  to  use.  By  default, yturl uses
+              /etc/yturl/itags.
+
+
 QUALITY SELECTION
-       If  no itags are specified on the command line, yturl will get a URL to
+       If no itags are specified on the command line, yturl will get a URL  to
        the highest quality format available.
 
-       If a single itag is specified on the command line, yturl  will  attempt
-       to  get  the URL to a video in that format, or failing that, as closely
+       If  a  single itag is specified on the command line, yturl will attempt
+       to get the URL to a video in that format, or failing that,  as  closely
        resembling that format as is available.
 
-       If multiple itags are specified on the command line, yturl  will  first
-       try  to get the URL to one of the formats specified on the command line
-       (in order of arguments). If none of them are available,  it  will  then
+       If  multiple  itags are specified on the command line, yturl will first
+       try to get the URL to one of the formats specified on the command  line
+       (in  order  of  arguments). If none of them are available, it will then
        select the highest quality video available.
 
-       Format  quality  order  is  determined  by (in order) the maximum video
-       dimensions, the maximum video bitrate, the maximum  audio  bitrate  and
+       Format quality order is determined by  (in  order)  the  maximum  video
+       dimensions,  the  maximum  video bitrate, the maximum audio bitrate and
        the maximum audio sample rate.
 
 

@@ -5,7 +5,8 @@ yturl - get direct URLs to YouTube videos
 
 .SH SYNOPSIS
 yturl
-.I videoID
+.RI [-i " ITAGFILE" ]
+.I videoid
 .RI [ itag
 .RI [ itag
 \&...]]
@@ -18,7 +19,7 @@ mplayer "$(yturl 'http://www.youtube.com/watch?v=KxaCOHT0pmI')"
 
 .SH ARGUMENTS
 .TP
-.I videoID
+.I videoid
 The video ID to get information about. This can also be a URL in a recognised
 format. Any official YouTube URL (including one from alternative services like
 youtu.be) should be successfully parsed, as well as many more unofficial
@@ -27,6 +28,11 @@ services (although these are not guaranteed).
 .I itag
 The itag(s) to use. Depending on the number of itags specified, different
 format selection methods may be used (see "QUALITY SELECTION").
+
+.SH OPTIONS
+.TP
+.RI "-i, --itag-file " ITAGFILE
+Alternative itag data file to use. By default, yturl uses /etc/yturl/itags.
 
 .SH "QUALITY SELECTION"
 If no itags are specified on the command line, yturl will get a URL to the

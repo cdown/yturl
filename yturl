@@ -17,8 +17,10 @@ class YouTubeAPIError(Exception):
     pass
 
 def getItagQualityOrder(itags):
+    """Return a sorted two-tuple denoting the default itag quality order."""
     return sorted(itags, reverse=True, key=lambda x: (
-        itags[x]["video"]["dimensions"]["width"] * itags[x]["video"]["dimensions"]["height"],
+        itags[x]["video"]["dimensions"]["width"] *
+        itags[x]["video"]["dimensions"]["height"],
         itags[x]["video"]["bitrate"],
         itags[x]["audio"]["bitrate"],
         itags[x]["audio"]["samplerate"]
@@ -68,14 +70,15 @@ if __name__ == "__main__":
         nargs="*"
     )
     parser.add_argument(
-        "-c", "--config",
-        help="The path to an alternative configuration file.",
+        "-i", "--itag-file",
+        dest="itagFile",
+        help="The path to an alternative itag data file.",
         default="/etc/yturl/itags"
     )
     args = parser.parse_args()
 
     try:
-        with open(args.config) as f:
+        with open(args.itagFile) as f:
             knownItags = json.load(f)
     except (IOError, OSError), e:
         raise ItagLoadError("Can't load itags file %s: %s" %
