@@ -3,89 +3,92 @@
 """Get direct URLs to YouTube videos."""
 
 import argparse
-import os
 import sys
 import urllib
 import urlparse
 
 class YouTubeAPIError(Exception):
-    """Raised when the YouTube API returns something that we don't understand."""
+    """Raised when the YouTube API returns unknown data."""
     pass
 
-class YTURL():
-    """Functions to get direct URLs to YouTube media."""
-    def getItagQualityOrder(self):
-        """Return itags in order of quality preference."""
-        itags = {
-        #   itag   v-dimensions v-bitrate a-bitrate a-samplerate
-            "5":  (400*240,     0.25,     64,       22.05),
-            "6":  (480*270,     0.8,      64,       22.05),
-            "13": (176*144,     0.5,      64,       22.05),
-            "17": (176*144,     2,        64,       22.05),
-            "18": (640*360,     0.5,      128,      44.1),
-            "22": (1280*720,    2.9,      96,       44.1),
-            "34": (640*360,     0.5,      128,      44.1),
-            "35": (854*480,     1,        128,      44.1),
-            "37": (1920*1080,   2.9,      152,      44.1),
-            "38": (4096*3072,   5,        152,      44.1),
-            "43": (640*360,     0.5,      128,      44.1),
-            "44": (854*480,     1,        128,      44.1),
-            "45": (1280*720,    2,        192,      44.1),
-        }
-        return sorted(itags, reverse=True, key=lambda x: itags[x])
+def getItagQualityOrder():
+    """Return itags in order of quality preference."""
+    itags = {
+    #   itag   v-dimensions v-bitrate a-bitrate a-samplerate
+        "5":  (400*240,     0.25,     64,       22.05),
+        "6":  (480*270,     0.8,      64,       22.05),
+        "13": (176*144,     0.5,      64,       22.05),
+        "17": (176*144,     2,        64,       22.05),
+        "18": (640*360,     0.5,      128,      44.1),
+        "22": (1280*720,    2.9,      96,       44.1),
+        "34": (640*360,     0.5,      128,      44.1),
+        "35": (854*480,     1,        128,      44.1),
+        "37": (1920*1080,   2.9,      152,      44.1),
+        "38": (4096*3072,   5,        152,      44.1),
+        "43": (640*360,     0.5,      128,      44.1),
+        "44": (854*480,     1,        128,      44.1),
+        "45": (1280*720,    2,        192,      44.1),
+    }
+    return sorted(itags, reverse=True, key=lambda x: itags[x])
 
-    def stripToYouTubeVideoID(self, url):
-        """Strip URL to the video ID contained."""
-        try:
-            parsedURL = urlparse.urlparse(url).query
-            return urlparse.parse_qs(parsedURL)["v"][0][:11]
-        except (ValueError, KeyError):
-            return url.split("/")[-1][:11]
+def stripToYouTubeVideoID(url):
+    """Strip URL to the video ID contained."""
+    try:
+        parsed = urlparse.urlparse(url).query
+        return urlparse.parse_qs(parsed)["v"][0][:11]
+    except (ValueError, KeyError):
+        return url.split("/")[-1][:11]
 
-    def getAvailableVideoItags(self, videoID):
-        """Return available itags and their associated URLs as a list."""
-        apiResponse = urllib.urlopen("http://youtube.com/get_video_info?hl=en&video_id=" + videoID)
-        parsedResponse = urlparse.parse_qs(apiResponse.read())
-        try:
-            for mediaFormat in parsedResponse["url_encoded_fmt_stream_map"][0].split(","):
-                parsedFormat = urlparse.parse_qs(mediaFormat)
-                yield (
-                    parsedFormat["itag"][0],
-                    "%s&signature=%s" % (parsedFormat["url"][0], parsedFormat["sig"][0])
-                )
-        except (KeyError, IndexError):
-            raise YouTubeAPIError("API returned failure: %s" % parsedResponse["reason"][0])
+def getAvailableVideoItags(videoID):
+    """Return available itags and their associated URLs as a list."""
+    url = "http://youtube.com/get_video_info?hl=en&video_id=" + videoID
+    res = urllib.urlopen(url)
+    res = urlparse.parse_qs(res.read())
+    try:
+        for fmt in res["url_encoded_fmt_stream_map"][0].split(","):
+            fmt = urlparse.parse_qs(fmt)
+            yield (
+                fmt["itag"][0],
+                "%s&signature=%s" % (fmt["url"][0], fmt["sig"][0])
+            )
+    except (KeyError, IndexError):
+        raise YouTubeAPIError("API returned failure: %s" % res["reason"][0])
 
-    def getDesiredItagOrder(self, userItags, qualityOrder):
-        """Return the desired itag sorting."""
-        if len(userItags) == 1:
-            return zip(*sorted(
-                enumerate(qualityOrder),
-                key=lambda (i, _): abs(qualityOrder.index(userItags[0]) - i))
-            )[1]
-        return userItags + qualityOrder
+def getDesiredItagOrder(userItags, qualityItags):
+    """Return the desired itag sorting."""
+    if len(userItags) == 1:
+        return zip(*sorted(
+            enumerate(qualityItags),
+            key=lambda (i, _): abs(qualityItags.index(userItags[0]) - i))
+        )[1]
+    return userItags + qualityItags
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("videoID", help="The YouTube video ID, or a URL containing it")
-    parser.add_argument("itag", help="An itag format specification, see http://goo.gl/uEIuR", nargs="*")
+    parser.add_argument(
+        "videoID",
+        help="The YouTube video ID, or a URL containing it"
+    )
+    parser.add_argument(
+        "itag",
+        help="A format specification, see http://goo.gl/uEIuR",
+        nargs="*"
+    )
     args = parser.parse_args()
 
-    y = YTURL()
-
     userItags = args.itag
-    videoID = y.stripToYouTubeVideoID(args.videoID)
-    qualityOrder = y.getItagQualityOrder()
-    availableItags = dict(y.getAvailableVideoItags(videoID))
-    unknownItags = filter(lambda x: x not in qualityOrder, userItags)
+    videoID = stripToYouTubeVideoID(args.videoID)
+    qualityItags = getItagQualityOrder()
+    availableItags = dict(getAvailableVideoItags(videoID))
+    unknownItags = [ x for x in userItags if x not in qualityItags ]
 
     if unknownItags:
         raise ValueError("Invalid itag(s): " + ", ".join(unknownItags))
 
-    desiredItagOrder = y.getDesiredItagOrder(userItags, qualityOrder)
-    desiredItag = filter(lambda x: x in availableItags, desiredItagOrder)
+    desiredItagOrder = getDesiredItagOrder(userItags, qualityItags)
+    desiredItag = [ x for x in desiredItagOrder if x in availableItags ]
     if desiredItag:
         print availableItags[desiredItag[0]]
         print >> sys.stderr, "Using itag %s." % desiredItag[0]
     else:
-        print >> sys.stderr, "No locally known itags available."
+        print >> sys.stderr, "No local itags available."

@@ -7,7 +7,7 @@ man:
 	PAGER=cat MANWIDTH=80 man ./yturl.1 > README
 
 lint:
-	pylint yturl
+	pylint yturl -d C0103
 
 clean:
 	rm README
