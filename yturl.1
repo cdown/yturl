@@ -1,7 +1,7 @@
 .TH YTURL 1
 
 .SH NAME
-yturl \- get direct URLs to YouTube videos
+yturl - get direct URLs to YouTube videos
 
 .SH SYNOPSIS
 .BI yturl " videoid"
@@ -9,9 +9,11 @@ yturl \- get direct URLs to YouTube videos
 .I itag
 \&... ]
 
-.SH DESCRIPTION
-.B yturl
-is a simple media URL grabber for YouTube.
+.SH EXAMPLES
+Watch a video of Bill Gates jumping over a chair:
+.P
+.RS
+mplayer "$(yturl 'http://www.youtube.com/watch?v=KxaCOHT0pmI')"
 
 .SH ARGUMENTS
 .TP
