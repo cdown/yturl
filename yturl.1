@@ -4,10 +4,11 @@
 yturl - get direct URLs to YouTube videos
 
 .SH SYNOPSIS
-.BI yturl " videoid"
-[
-.I itag
-\&... ]
+yturl
+.I videoID
+.RI [ itag
+.RI [ itag
+\&...]]
 
 .SH EXAMPLES
 Watch a video of Bill Gates jumping over a chair:
@@ -17,7 +18,7 @@ mplayer "$(yturl 'http://www.youtube.com/watch?v=KxaCOHT0pmI')"
 
 .SH ARGUMENTS
 .TP
-.I videoid
+.I videoID
 The video ID to get information about. This can also be a URL in a recognised
 format. Any official YouTube URL (including one from alternative services like
 youtu.be) should be successfully parsed, as well as many more unofficial
