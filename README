@@ -7,7 +7,7 @@ NAME
 
 
 SYNOPSIS
-       yturl videoid [ itag ... ]
+       yturl videoID [itag [itag ...]]
 
 
 EXAMPLES
@@ -17,7 +17,7 @@ EXAMPLES
 
 
 ARGUMENTS
-       videoid
+       videoID
               The video ID to get information about. This can also be a URL in
               a recognised format. Any official  YouTube  URL  (including  one
               from  alternative services like youtu.be) should be successfully
