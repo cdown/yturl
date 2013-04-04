@@ -1,4 +1,4 @@
-YTURL(1)                                                              YTURL(1)
+YTURL(1)                    General Commands Manual                   YTURL(1)
 
 
 
@@ -7,7 +7,7 @@ NAME
 
 
 SYNOPSIS
-       yturl [-i ITAGFILE] videoid [itag [itag ...]]
+       yturl videoid [itag [itag ...]]
 
 
 EXAMPLES

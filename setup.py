@@ -11,9 +11,6 @@ setup(
     url = "http://chrisdown.name",
     scripts = ( "yturl", ),
     data_files = (
-        ( "etc/yturl", (
-            "configs/itags",
-        )),
         ( "usr/share/man/man1", (
             "yturl.1",
         ))
