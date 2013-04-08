@@ -16,7 +16,7 @@ class YouTubeAPIError(Exception):
     pass
 
 class InvalidItagError(Exception):
-    """Raised when the YouTube API returns unknown data."""
+    """Raised when we get a locally unknown itag."""
     pass
 
 class YTURL(object):
