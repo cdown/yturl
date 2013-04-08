@@ -24,6 +24,8 @@ quite easily write a shell wrapper:
         mplayer "$(yturl "$@")"
     }
 
+Then just use it in the same way you would use `yturl`, calling it with `yt`.
+
 # Quality selection
 
 If no itags are specified on the command line, yturl will get a URL to the
