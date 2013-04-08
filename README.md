@@ -7,10 +7,14 @@
 # Examples
 
 Watch a video of Bill Gates jumping over a chair in the highest quality
-possible (`-q high` is implicit, you may also want to look at mplayer's
+possible (`-q medium` is implicit, you may also want to look at mplayer's
 `-cache` option):
 
     mplayer "$(yturl 'http://www.youtube.com/watch?v=KxaCOHT0pmI')"
+
+Download the same video, using the highest quality format:
+
+    curl -o bill "$(yturl -q high 'http://www.youtube.com/watch?v=KxaCOHT0pmI')"
 
 Download the same video, at the closest possible quality to itag 38:
 

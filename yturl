@@ -81,6 +81,8 @@ class YTURL(object):
     def parseQualityGroup(self, name):
         if name == "low":
             return self.itags[-1]
+        elif name == "medium":
+            return self.itags[int(len(self.itags)/2)]
         elif name == "high":
             return self.itags[0]
         else:
@@ -103,7 +105,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-q", "--quality",
         help='specify quality, can be "low", "high", or an itag (see http://goo.gl/uEIuR)',
-        default="high"
+        default="medium"
     )
     parser.add_argument(
         "url",
