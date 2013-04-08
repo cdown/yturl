@@ -7,90 +7,115 @@ import sys
 import urllib
 import urlparse
 
+class UnknownQualityGroup(Exception):
+    """Raised when an unknown quality group is passed."""
+    pass
+
 class YouTubeAPIError(Exception):
     """Raised when the YouTube API returns unknown data."""
     pass
 
-def getItagQualityOrder():
-    """Return itags in order of quality preference."""
-    itags = {
-    #   itag   v-dimensions v-bitrate a-bitrate a-samplerate
-        "5":  (400*240,     0.25,     64,       22.05),
-        "6":  (480*270,     0.8,      64,       22.05),
-        "13": (176*144,     0.5,      64,       22.05),
-        "17": (176*144,     2,        64,       22.05),
-        "18": (640*360,     0.5,      128,      44.1),
-        "22": (1280*720,    2.9,      96,       44.1),
-        "34": (640*360,     0.5,      128,      44.1),
-        "35": (854*480,     1,        128,      44.1),
-        "36": (320*240,     0.17,     38,       44.1),
-        "37": (1920*1080,   2.9,      152,      44.1),
-        "38": (4096*3072,   5,        152,      44.1),
-        "43": (640*360,     0.5,      128,      44.1),
-        "44": (854*480,     1,        128,      44.1),
-        "45": (1280*720,    2,        192,      44.1),
-        "46": (1920*1080,   2,        192,      44.1),
-    }
-    return sorted(itags, reverse=True, key=lambda x: itags[x])
+class YTURL(object):
+    """Get direct URLs to YouTube videos."""
+    def __init__(self, quality, url):
+        self.itags = self.getDefaultItagQualityOrder()
+        self.quality = quality
+        self.url = url
+        self.videoIDLength = 11
 
-def stripToYouTubeVideoID(url):
-    """Strip URL to the video ID contained."""
-    try:
-        parsed = urlparse.urlparse(url).query
-        return urlparse.parse_qs(parsed)["v"][0][:11]
-    except (ValueError, KeyError):
-        return url.split("/")[-1][:11]
+    def getDefaultItagQualityOrder(self):
+        """Return itags in order of quality preference."""
+        itags = {
+        #   itag   v-dimensions v-bitrate a-bitrate a-samplerate
+            "5":  (400*240,     0.25,     64,       22.05),
+            "6":  (480*270,     0.8,      64,       22.05),
+            "13": (176*144,     0.5,      64,       22.05),
+            "17": (176*144,     2,        64,       22.05),
+            "18": (640*360,     0.5,      128,      44.1),
+            "22": (1280*720,    2.9,      96,       44.1),
+            "34": (640*360,     0.5,      128,      44.1),
+            "35": (854*480,     1,        128,      44.1),
+            "36": (320*240,     0.17,     38,       44.1),
+            "37": (1920*1080,   2.9,      152,      44.1),
+            "38": (4096*3072,   5,        152,      44.1),
+            "43": (640*360,     0.5,      128,      44.1),
+            "44": (854*480,     1,        128,      44.1),
+            "45": (1280*720,    2,        192,      44.1),
+            "46": (1920*1080,   2,        192,      44.1),
+        }
+        return sorted(itags, reverse=True, key=lambda x: itags[x])
 
-def getAvailableVideoItags(videoID):
-    """Return available itags and their associated URLs as a list."""
-    url = "http://youtube.com/get_video_info?hl=en&video_id=" + videoID
-    res = urllib.urlopen(url)
-    res = urlparse.parse_qs(res.read())
-    try:
-        for fmt in res["url_encoded_fmt_stream_map"][0].split(","):
-            fmt = urlparse.parse_qs(fmt)
-            yield (
-                fmt["itag"][0],
-                "%s&signature=%s" % (fmt["url"][0], fmt["sig"][0])
-            )
-    except (KeyError, IndexError):
-        raise YouTubeAPIError("API returned failure: %s" % res["reason"][0])
+    def stripToVideoID(self, url):
+        """Strip URL to the video ID contained."""
+        try:
+            parsed = urlparse.urlparse(url).query
+            return urlparse.parse_qs(parsed)["v"][0][:self.videoIDLength]
+        except (ValueError, KeyError):
+            return url.split("/")[-1][:self.videoIDLength]
 
-def getDesiredItagOrder(userItags, qualityItags):
-    """Return the desired itag sorting."""
-    if len(userItags) == 1:
+    def getAvailableVideoItags(self, videoID):
+        """Return available itags and their associated URLs as a list."""
+        url = "http://youtube.com/get_video_info?hl=en&video_id=" + videoID
+        res = urllib.urlopen(url)
+        res = urlparse.parse_qs(res.read())
+        try:
+            for fmt in res["url_encoded_fmt_stream_map"][0].split(","):
+                fmt = urlparse.parse_qs(fmt)
+                yield (
+                    fmt["itag"][0],
+                    "%s&signature=%s" % (fmt["url"][0], fmt["sig"][0])
+                )
+        except (KeyError, IndexError):
+            raise YouTubeAPIError(res["reason"][0])
+
+    def getDesiredItagOrder(self, desiredItag):
+        """Return the desired itag sorting."""
+        if desiredItag not in self.itags:
+            raise ValueError("Invalid itag: %d" % desiredItag)
+
         return zip(*sorted(
-            enumerate(qualityItags),
-            key=lambda (i, _): abs(qualityItags.index(userItags[0]) - i))
+            enumerate(self.itags),
+            key=lambda (i, _): abs(self.itags.index(desiredItag) - i))
         )[1]
-    return userItags + qualityItags
+
+    def parseQualityGroup(self, name):
+        if name == "low":
+            return self.itags[-1]
+        elif name == "high":
+            return self.itags[0]
+        else:
+            try:
+                int(name)
+                return name
+            except ValueError:
+                raise UnknownQualityGroup(name)
+
+    def getURL(self):
+        itag = self.parseQualityGroup(self.quality)
+        videoID = self.stripToVideoID(self.url)
+        availableItags = dict(self.getAvailableVideoItags(videoID))
+        desiredItagOrder = self.getDesiredItagOrder(itag)
+        desiredItag = filter(lambda x: x in availableItags, desiredItagOrder)
+        return desiredItag[0], availableItags[desiredItag[0]]
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "videoID",
-        help="The YouTube video ID, or a URL containing it"
+        "-q", "--quality",
+        help="Whether to use low or high quality. Can also be an itag. Defaults to high.",
+        default="high"
     )
     parser.add_argument(
-        "itag",
-        help="A format specification, see http://goo.gl/uEIuR",
-        nargs="*"
+        "url",
+        help="The YouTube video ID, or a URL containing it"
     )
     args = parser.parse_args()
 
-    userItags = args.itag
-    videoID = stripToYouTubeVideoID(args.videoID)
-    qualityItags = getItagQualityOrder()
-    availableItags = dict(getAvailableVideoItags(videoID))
-    unknownItags = [ x for x in userItags if x not in qualityItags ]
-
-    if unknownItags:
-        raise ValueError("Invalid itag(s): " + ", ".join(unknownItags))
-
-    desiredItagOrder = getDesiredItagOrder(userItags, qualityItags)
-    desiredItag = [ x for x in desiredItagOrder if x in availableItags ]
-    if desiredItag:
-        print availableItags[desiredItag[0]]
-        print >> sys.stderr, "Using itag %s." % desiredItag[0]
-    else:
+    y = YTURL(args.quality, args.url)
+    try:
+        itag, url = y.getURL()
+    except ValueError:
         print >> sys.stderr, "No local itags available."
+
+    print >> sys.stderr, "Using itag %s." % itag
+    print url
