@@ -71,7 +71,7 @@ class YTURL(object):
     def getDesiredItagOrder(self, desiredItag):
         """Return the desired itag sorting."""
         if desiredItag not in self.itags:
-            raise ValueError("Invalid itag: %d" % desiredItag)
+            raise ValueError("Invalid itag: %s" % desiredItag)
 
         return zip(*sorted(
             enumerate(self.itags),
