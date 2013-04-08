@@ -1,10 +1,28 @@
 `yturl` gets direct media URLs to YouTube media.
 
+# Basic syntax
+
+    yturl "video ID or a URL" [itag [itag ...]]
+
 # Examples
 
-Watch a video of Bill Gates jumping over a chair:
+Watch a video of Bill Gates jumping over a chair (you may also want to look at
+mplayer's `-cache` option):
 
     mplayer "$(yturl 'http://www.youtube.com/watch?v=KxaCOHT0pmI')"
+
+Download the same video, at the closest possible quality to itag 38:
+
+    curl -o bill "$(yturl 'http://www.youtube.com/watch?v=KxaCOHT0pmI' 38)"
+
+# Making life easier
+
+If you find yourself frequently watching videos in mplayer using yturl, you can
+quite easily write a shell wrapper:
+
+    yt() {
+        mplayer "$(yturl "$@")"
+    }
 
 # Quality selection
 
