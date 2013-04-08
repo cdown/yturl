@@ -15,6 +15,10 @@ class YouTubeAPIError(Exception):
     """Raised when the YouTube API returns unknown data."""
     pass
 
+class InvalidItagError(Exception):
+    """Raised when the YouTube API returns unknown data."""
+    pass
+
 class YTURL(object):
     """Get direct URLs to YouTube videos."""
     def __init__(self, quality, url):
@@ -71,7 +75,7 @@ class YTURL(object):
     def getDesiredItagOrder(self, desiredItag):
         """Return the desired itag sorting."""
         if desiredItag not in self.itags:
-            raise ValueError("Invalid itag: %s" % desiredItag)
+            raise InvalidItagError(desiredItag)
 
         return zip(*sorted(
             enumerate(self.itags),
