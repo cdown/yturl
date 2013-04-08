@@ -102,12 +102,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "-q", "--quality",
-        help="Whether to use low or high quality. Can also be an itag. Defaults to high.",
+        help='specify quality, can be "low", "high", or an itag (see http://goo.gl/uEIuR)',
         default="high"
     )
     parser.add_argument(
         "url",
-        help="The YouTube video ID, or a URL containing it"
+        help="a YouTube url (or bare video ID)"
     )
     args = parser.parse_args()
 
