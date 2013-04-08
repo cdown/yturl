@@ -12,15 +12,15 @@ possible (`-q medium` is implicit, you may also want to look at mplayer's
 
     mplayer "$(yturl 'http://www.youtube.com/watch?v=KxaCOHT0pmI')"
 
-Download the same video, using the highest quality format:
+Download the same video, using the highest quality format available:
 
     curl -o bill "$(yturl -q high 'http://www.youtube.com/watch?v=KxaCOHT0pmI')"
 
-Download the same video, at the closest possible quality to itag 38:
+Download the same video, at the closest available quality to itag 38:
 
     curl -o bill "$(yturl -q 38 'http://www.youtube.com/watch?v=KxaCOHT0pmI')"
 
-Download the same video, using the lowest quality format:
+Download the same video, using the lowest quality format available:
 
     curl -o bill "$(yturl -q low 'http://www.youtube.com/watch?v=KxaCOHT0pmI')"
 
