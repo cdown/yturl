@@ -113,6 +113,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "url",
+        metavar="videoID/url",
         help="a YouTube url (or bare video ID)"
     )
     args = parser.parse_args()
