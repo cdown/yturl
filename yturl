@@ -83,6 +83,7 @@ class YTURL(object):
         )[1]
 
     def parseQualityGroup(self, name):
+        """Parse string based quality groups into their itag equivalents."""
         if name == "low":
             return self.itags[-1]
         elif name == "medium":
@@ -97,6 +98,7 @@ class YTURL(object):
                 raise UnknownQualityGroup(name)
 
     def getURL(self):
+        """Get an itag and its corresponding URL for a YouTube video."""
         itag = self.parseQualityGroup(self.quality)
         videoID = self.stripToVideoID(self.url)
         availableItags = dict(self.getAvailableVideoItags(videoID))
