@@ -102,7 +102,10 @@ class YTURL(object):
         availableItags = dict(self.getAvailableVideoItags(videoID))
         desiredItagOrder = self.getDesiredItagOrder(itag)
         desiredItag = filter(lambda x: x in availableItags, desiredItagOrder)
-        return desiredItag[0], availableItags[desiredItag[0]]
+        try:
+            return desiredItag[0], availableItags[desiredItag[0]]
+        except IndexError:
+            return None, None
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
@@ -119,9 +122,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     y = YTURL(args.quality, args.url)
-    try:
-        itag, url = y.getURL()
-    except ValueError:
+    itag, url = y.getURL()
+    if not itag:
         print >> sys.stderr, "No local itags available."
         sys.exit(1)
 
