@@ -54,7 +54,7 @@ class YTURL(object):
         try:
             parsed = urlparse.urlparse(url).query
             return urlparse.parse_qs(parsed)["v"][0][:self.videoIDLength]
-        except (ValueError, KeyError):
+        except (IndexError, ValueError, KeyError):
             return url.split("/")[-1][:self.videoIDLength]
 
     def getAvailableVideoItags(self, videoID):
