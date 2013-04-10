@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/cdown/yturl.png?branch=master)](https://travis-ci.org/cdown/yturl)
+
 `yturl` gets direct media URLs to YouTube media.
 
 # Basic syntax
