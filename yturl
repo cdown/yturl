@@ -57,10 +57,13 @@ class YTURL(object):
         except (IndexError, ValueError, KeyError):
             return url.split("/")[-1][:self.videoIDLength]
 
-    def getAvailableVideoItags(self, videoID):
+    def getAvailableVideoItags(self, videoID, f=None):
         """Return available itags and their associated URLs as a list."""
-        url = "http://youtube.com/get_video_info?hl=en&video_id=" + videoID
-        res = urllib.urlopen(url)
+        if f == None:
+            url = "http://youtube.com/get_video_info?hl=en&video_id=" + videoID
+            res = urllib.urlopen(url)
+        else:
+            res = f
         res = urlparse.parse_qs(res.read())
         try:
             for fmt in res["url_encoded_fmt_stream_map"][0].split(","):
