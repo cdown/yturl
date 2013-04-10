@@ -16,6 +16,7 @@ class DatabaseUnitTests(unittest.TestCase):
     def testURLStripping(self):
         self.assertTrue(y.stripToVideoID("http://www.youtube.com/watch?feature=player_embedded&v=gEl6TXrkZnk") == "gEl6TXrkZnk")
         self.assertTrue(y.stripToVideoID("youtu.be/gEl6TXrkZnk#foo") == "gEl6TXrkZnk")
+        self.assertTrue(y.stripToVideoID("youtu.be/gEl6TXrkZnkfoo") == "gEl6TXrkZnk")
 
 if __name__ == "__main__":
     unittest.main()
