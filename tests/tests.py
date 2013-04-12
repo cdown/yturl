@@ -21,7 +21,7 @@ def testDesiredItagOrder():
     assert y.getDesiredItagOrder("18") == ('18', '43', '34', '35', '6', '44', '5', '45', '36', '22', '17', '46', '13', '37', '38')
 
 def testAvailableItags():
-    with open(os.path.join(os.path.dirname(__file__), "api_output")) as f:
+    with open(os.path.join(os.path.dirname(__file__), "api_output"), "rb") as f:
         avail = y.getAvailableVideoItags(None, f)
         assert list(avail) == \
             [('43',
