@@ -8,9 +8,8 @@
 
 # Examples
 
-Watch a video of Bill Gates jumping over a chair in the highest quality
-possible (`-q medium` is implicit, you may also want to look at mplayer's
-`-cache` option):
+Watch a video of Bill Gates jumping over a chair (`-q medium` is implicit, you
+may also want to look at mplayer's `-cache` option):
 
     mplayer "$(yturl 'http://www.youtube.com/watch?v=KxaCOHT0pmI')"
 
