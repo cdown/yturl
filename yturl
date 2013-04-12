@@ -129,8 +129,8 @@ if __name__ == "__main__":
     y = YTURL(args.quality, args.url)
     itag, url = y.getURL()
     if not itag:
-        print >> sys.stderr, "No local itags available."
+        print("No local itags available.", file=sys.stderr)
         sys.exit(1)
 
-    print >> sys.stderr, "Using itag %s." % itag
-    print url
+    print("Using itag %s." % itag, file=sys.stderr)
+    print(url)
