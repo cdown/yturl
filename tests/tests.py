@@ -18,7 +18,6 @@ def testURLStripping():
     assert y.stripToVideoID("youtu.be/gEl6TXrkZnkfoo") == "gEl6TXrkZnk"
 
 def testDesiredItagOrder():
-    print(y.getDesiredItagOrder("18"))
     assert y.getDesiredItagOrder("18") == ('18', '34', '6', '43', '5', '35', '36', '44', '17', '45', '13', '22', '46', '37', '38')
 
 def testAvailableItags():
