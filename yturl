@@ -82,7 +82,7 @@ class YTURL(object):
 
         return zip(*sorted(
             enumerate(self.itags),
-            key=lambda (i, _): abs(self.itags.index(desiredItag) - i))
+            key=lambda i, _: abs(self.itags.index(desiredItag) - i))
         )[1]
 
     def parseQualityGroup(self, name):
