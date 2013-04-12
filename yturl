@@ -4,8 +4,12 @@
 
 import argparse
 import sys
-import urllib
-import urlparse
+try:
+    from urllib.request import urlopen
+    from urllib.parse import parse_qs, urlparse
+except:
+    from urllib import urlopen
+    from urlparse import parse_qs, urlparse
 
 class UnknownQualityGroup(Exception):
     """Raised when an unknown quality group is passed."""
@@ -52,8 +56,8 @@ class YTURL(object):
     def stripToVideoID(self, url):
         """Strip URL to the video ID contained."""
         try:
-            parsed = urlparse.urlparse(url).query
-            return urlparse.parse_qs(parsed)["v"][0][:self.videoIDLength]
+            parsed = urlparse(url).query
+            return parse_qs(parsed)["v"][0][:self.videoIDLength]
         except (IndexError, ValueError, KeyError):
             return url.split("/")[-1][:self.videoIDLength]
 
@@ -61,13 +65,13 @@ class YTURL(object):
         """Return available itags and their associated URLs as a list."""
         if f == None:
             url = "http://youtube.com/get_video_info?hl=en&video_id=" + videoID
-            res = urllib.urlopen(url)
+            res = urlopen(url)
         else:
             res = f
-        res = urlparse.parse_qs(res.read())
+        res = parse_qs(res.read().decode("utf8"))
         try:
             for fmt in res["url_encoded_fmt_stream_map"][0].split(","):
-                fmt = urlparse.parse_qs(fmt)
+                fmt = parse_qs(fmt)
                 yield (
                     fmt["itag"][0],
                     "%s&signature=%s" % (fmt["url"][0], fmt["sig"][0])
