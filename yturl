@@ -86,10 +86,10 @@ class YTURL(object):
         if desiredItag not in self.itags:
             raise InvalidItagError(desiredItag)
 
-        return zip(*sorted(
+        return list(zip(*sorted(
             enumerate(self.itags),
             key=lambda x: abs(self.itags.index(desiredItag) - x[0]))
-        )[1]
+        ))[1]
 
     def parseQualityGroup(self, name):
         """Parse string based quality groups into their itag equivalents."""
