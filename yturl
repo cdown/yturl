@@ -112,7 +112,7 @@ class YTURL(object):
         videoID = self.stripToVideoID(self.url)
         availableItags = dict(self.getAvailableVideoItags(videoID))
         desiredItagOrder = self.getDesiredItagOrder(itag)
-        desiredItag = filter(lambda x: x in availableItags, desiredItagOrder)
+        desiredItag = [ x for x in desiredItagOrder if x in availableItags ]
         try:
             return desiredItag[0], availableItags[desiredItag[0]]
         except IndexError:
