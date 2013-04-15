@@ -27,43 +27,32 @@ class InvalidItagError(Exception):
 
 class YTURL(object):
     """Get direct URLs to YouTube videos."""
-    def __init__(self, quality, url, test=False):
-        self.itags = self.getDefaultItagQualityOrder(test)
+    def __init__(self, quality, url):
+        self.itags = self.getDefaultItagQualityOrder()
         self.quality = quality
         self.url = url
         self.videoIDLength = 11
 
-    def getDefaultItagQualityOrder(self, test=False):
+    def getDefaultItagQualityOrder(self):
         """Return itags in order of quality preference."""
         itags = {
         #   itag   v-dimensions v-bitrate a-bitrate a-samplerate
-            "5":  [400*240,     0.25,     64,       22.05],
-            "6":  [480*270,     0.8,      64,       22.05],
-            "13": [176*144,     0.5,      64,       22.05],
-            "17": [176*144,     2,        64,       22.05],
-            "18": [640*360,     0.5,      128,      44.1],
-            "22": [1280*720,    2.9,      96,       44.1],
-            "34": [640*360,     0.5,      128,      44.1],
-            "35": [854*480,     1,        128,      44.1],
-            "36": [320*240,     0.17,     38,       44.1],
-            "37": [1920*1080,   2.9,      152,      44.1],
-            "38": [4096*3072,   5,        152,      44.1],
-            "43": [640*360,     0.5,      128,      44.1],
-            "44": [854*480,     1,        128,      44.1],
-            "45": [1280*720,    2,        192,      44.1],
-            "46": [1920*1080,   2,        192,      44.1],
+            "5":  (400*240,     0.25,     64,       22.05),
+            "6":  (480*270,     0.8,      64,       22.05),
+            "13": (176*144,     0.5,      64,       22.05),
+            "17": (176*144,     2,        64,       22.05),
+            "18": (640*360,     0.5,      128,      44.1),
+            "22": (1280*720,    2.9,      96,       44.1),
+            "34": (640*360,     0.5,      128,      44.1),
+            "35": (854*480,     1,        128,      44.1),
+            "36": (320*240,     0.17,     38,       44.1),
+            "37": (1920*1080,   2.9,      152,      44.1),
+            "38": (4096*3072,   5,        152,      44.1),
+            "43": (640*360,     0.5,      128,      44.1),
+            "44": (854*480,     1,        128,      44.1),
+            "45": (1280*720,    2,        192,      44.1),
+            "46": (1920*1080,   2,        192,      44.1),
         }
-
-        if test:
-            # Python 3 changed the way sorting works for functionally identical
-            # objects. We add the itag at the end to make them unique so that
-            # the sorting order is always the same, which means we can easily
-            # test that the function works as expected. This is not required in
-            # normal use, because we don't care which order identical itags are
-            # returned in relative to each other.
-            for itag in itags:
-                itags[itag].append(itag)
-
         return sorted(itags, reverse=True, key=lambda x: itags[x])
 
     def stripToVideoID(self, url):
