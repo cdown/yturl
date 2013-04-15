@@ -20,10 +20,11 @@ def testURLStripping():
 def testDesiredItagOrder():
     itagOrder = y.getDesiredItagOrder("18")
     assert itagOrder[0] == "18"
-    assert itagOrder.index("43") < len(itagOrder) / 3
-    assert itagOrder.index("34") < len(itagOrder) / 3
+    assert itagOrder.index("43") < len(itagOrder) / 2
+    assert itagOrder.index("34") < len(itagOrder) / 2
     assert itagOrder.index("46") > len(itagOrder) / 2
-    assert itagOrder.index("36") > len(itagOrder) / 2
+    assert itagOrder.index("13") > len(itagOrder) / 2
+    assert itagOrder.index("38") > len(itagOrder) / 2
 
 def testAvailableItags():
     with open(os.path.join(os.path.dirname(__file__), "api_output"), "rb") as f:
