@@ -5,7 +5,7 @@ import os
 import imp
 
 yturl = imp.load_source("yturl", os.path.join(os.path.dirname(__file__), "../yturl"))
-y = yturl.YTURL("medium", "KxaCOHT0pmI", test=True)
+y = yturl.YTURL("medium", "KxaCOHT0pmI")
 
 def testCorrectItagOrder():
     itagOrder = y.getDefaultItagQualityOrder()
@@ -18,7 +18,12 @@ def testURLStripping():
     assert y.stripToVideoID("youtu.be/gEl6TXrkZnkfoo") == "gEl6TXrkZnk"
 
 def testDesiredItagOrder():
-    assert y.getDesiredItagOrder("18") == ('18', '34', '6', '43', '5', '35', '36', '44', '17', '45', '13', '22', '46', '37', '38')
+    itagOrder = y.getDesiredItagOrder("18")
+    assert itagOrder[0] == "18"
+    assert itagOrder.index("43") < len(itagOrder) / 3
+    assert itagOrder.index("34") < len(itagOrder) / 3
+    assert itagOrder.index("46") > len(itagOrder) / 2
+    assert itagOrder.index("36") > len(itagOrder) / 2
 
 def testAvailableItags():
     with open(os.path.join(os.path.dirname(__file__), "api_output"), "rb") as f:
