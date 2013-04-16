@@ -9,8 +9,7 @@ y = yturl.YTURL("medium", "KxaCOHT0pmI")
 
 def testCorrectItagOrder():
     itagOrder = y.getDefaultItagQualityOrder()
-    assert itagOrder.index("5") > itagOrder.index("46")
-    assert itagOrder.index("13") > itagOrder.index("17")
+    assert itagOrder == ['38', '37', '46', '22', '45', '44', '35', '43', '34', '18', '6', '5', '36', '17', '13']
 
 def testURLStripping():
     assert y.stripToVideoID("http://www.youtube.com/watch?feature=player_embedded&v=gEl6TXrkZnk") == "gEl6TXrkZnk"
@@ -19,12 +18,7 @@ def testURLStripping():
 
 def testDesiredItagOrder():
     itagOrder = y.getDesiredItagOrder("18")
-    assert itagOrder[0] == "18"
-    assert itagOrder.index("43") < len(itagOrder) / 2
-    assert itagOrder.index("34") < len(itagOrder) / 2
-    assert itagOrder.index("46") > len(itagOrder) / 2
-    assert itagOrder.index("13") > len(itagOrder) / 2
-    assert itagOrder.index("38") > len(itagOrder) / 2
+    assert itagOrder == ('18', '34', '6', '43', '5', '35', '36', '44', '17', '45', '13', '22', '46', '37', '38')
 
 def testAvailableItags():
     with open(os.path.join(os.path.dirname(__file__), "api_output"), "rb") as f:
