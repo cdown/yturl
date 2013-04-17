@@ -5,20 +5,30 @@ import os
 import imp
 
 yturl = imp.load_source("yturl", os.path.join(os.path.dirname(__file__), "../yturl"))
-y = yturl.YTURL("medium", "KxaCOHT0pmI")
+y = yturl.YTURL("medium", "KxaCOHT0pmI", "normal")
+x = yturl.YTURL("medium", "KxaCOHT0pmI", "3d")
 
-def testCorrectItagOrder():
+def testItagOrder():
     itagOrder = y.getDefaultItagQualityOrder()
     assert itagOrder == ['38', '37', '46', '22', '45', '44', '35', '43', '34', '18', '6', '5', '36', '17', '13']
+
+def testDesiredItagOrder():
+    desiredItagOrder = y.getDesiredItagOrder("18")
+    assert desiredItagOrder == ('18', '34', '6', '43', '5', '35', '36', '44', '17', '45', '13', '22', '46', '37', '38')
+
+def test3DItagOrder():
+    itagOrder = x.getDefaultItagQualityOrder()
+    assert itagOrder == ['84', '102', '85', '101', '100', '82', '83']
+
+def test3DDesiredItagOrder():
+    desiredItagOrder = x.getDesiredItagOrder("100")
+    assert desiredItagOrder == ('100', '101', '82', '85', '83', '102', '84')
 
 def testURLStripping():
     assert y.stripToVideoID("http://www.youtube.com/watch?feature=player_embedded&v=gEl6TXrkZnk") == "gEl6TXrkZnk"
     assert y.stripToVideoID("youtu.be/gEl6TXrkZnk#foo") == "gEl6TXrkZnk"
     assert y.stripToVideoID("youtu.be/gEl6TXrkZnkfoo") == "gEl6TXrkZnk"
 
-def testDesiredItagOrder():
-    itagOrder = y.getDesiredItagOrder("18")
-    assert itagOrder == ('18', '34', '6', '43', '5', '35', '36', '44', '17', '45', '13', '22', '46', '37', '38')
 
 def testAvailableItags():
     with open(os.path.join(os.path.dirname(__file__), "api_output"), "rb") as f:
