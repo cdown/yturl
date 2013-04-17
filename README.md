@@ -4,7 +4,7 @@
 
 # Basic syntax
 
-    yturl [-q QUALITY] videoID/URL
+    yturl [-h] [-q QUALITY] [--3d] videoID/url
 
 # Examples
 
