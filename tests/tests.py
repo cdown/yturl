@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 
-try:
+try: # pragma: no cover
     from urllib.request import urlopen
-except:
+except: # pragma: no cover
     from urllib import urlopen
 import os
 import imp
