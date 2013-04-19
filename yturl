@@ -5,7 +5,6 @@
 from __future__ import print_function
 
 import argparse
-import cgi
 import sys
 try:
     from urllib.request import urlopen
@@ -25,21 +24,6 @@ class YouTubeAPIError(Exception):
 class InvalidItagError(Exception):
     """Raised when we get a locally unknown itag."""
     pass
-
-def _getEncoding(response):
-    contentType = response.info().get("content-type")
-
-    if not contentType:
-        return None
-
-    contentType, params = cgi.parse_header(contentType)
-
-    if "charset" in params:
-        return params["charset"].strip("'\"")
-    elif "text" in contentType:
-        return "ISO-8859-1"
-    else:
-        return "utf8"
 
 class YTURL(object):
     """Get direct URLs to YouTube videos."""
@@ -101,11 +85,9 @@ class YTURL(object):
         if f == None:
             url = "http://youtube.com/get_video_info?hl=en&video_id=" + videoID
             res = urlopen(url)
-            encoding = _getEncoding(res)
         else:
             res = f
-            encoding = "utf8"
-        res = parse_qs(res.read().decode(encoding))
+        res = parse_qs(res.read().decode("utf8"))
         try:
             for fmt in res["url_encoded_fmt_stream_map"][0].split(","):
                 fmt = parse_qs(fmt)
