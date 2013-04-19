@@ -14,7 +14,7 @@ except:
     from urllib import urlopen
     from urlparse import parse_qs, urlparse
 
-class UnknownQualityGroup(Exception):
+class UnknownQualityGroupError(Exception):
     """Raised when an unknown quality group is passed."""
     pass
 
@@ -139,7 +139,7 @@ class YTURL(object):
                 int(name)
                 return name
             except ValueError:
-                raise UnknownQualityGroup(name)
+                raise UnknownQualityGroupError(name)
 
     def getURL(self):
         """Get an itag and its corresponding URL for a YouTube video."""

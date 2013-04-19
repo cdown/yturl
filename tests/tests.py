@@ -6,6 +6,7 @@ except:
     from urllib import urlopen
 import os
 import imp
+from nose.tools import assert_raises
 
 yturl = imp.load_source("yturl", os.path.join(os.path.dirname(__file__), "../yturl"))
 y = yturl.YTURL("medium", "KxaCOHT0pmI", "normal")
@@ -54,3 +55,11 @@ def testAvailableItagsReal():
     url = itags["5"]
     r = urlopen(url)
     assert r.getcode() == 200
+
+def testQualityGroupParse():
+    parse = y.parseQualityGroup
+    order = y.getDefaultItagQualityOrder()
+
+    assert_raises(yturl.UnknownQualityGroupError, parse, "nonexistent")
+    assert parse("18") == "18"
+    assert order.index(parse("low")) > order.index(parse("medium")) > order.index(parse("high"))
