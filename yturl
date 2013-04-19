@@ -135,7 +135,7 @@ class YTURL(object):
         except IndexError:
             return None, None
 
-if __name__ == "__main__":
+if __name__ == "__main__": # pragma: no cover
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "-q", "--quality",
