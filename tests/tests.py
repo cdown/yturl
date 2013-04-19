@@ -20,6 +20,9 @@ def testDesiredItagOrder():
     desiredItagOrder = y.getDesiredItagOrder("18")
     assert desiredItagOrder == ('18', '34', '6', '43', '5', '35', '36', '44', '17', '45', '13', '22', '46', '37', '38')
 
+def testBadItag():
+    assert_raises(yturl.InvalidItagError, y.getDesiredItagOrder, "-1")
+
 def test3DItagOrder():
     itagOrder = x.getDefaultItagQualityOrder()
     assert itagOrder == ['84', '102', '85', '101', '100', '82', '83']
