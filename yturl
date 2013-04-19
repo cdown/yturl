@@ -6,10 +6,10 @@ from __future__ import print_function
 
 import argparse
 import sys
-try:
+try: # pragma: no cover
     from urllib.request import urlopen
     from urllib.parse import parse_qs, urlparse
-except:
+except: # pragma: no cover
     from urllib import urlopen
     from urlparse import parse_qs, urlparse
 
@@ -132,10 +132,10 @@ class YTURL(object):
         desiredItag = [ x for x in desiredItagOrder if x in availableItags ]
         try:
             return desiredItag[0], availableItags[desiredItag[0]]
-        except IndexError:
+        except IndexError: # pragma: no cover
             return None, None
 
-if __name__ == "__main__":
+if __name__ == "__main__": # pragma: no cover
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "-q", "--quality",

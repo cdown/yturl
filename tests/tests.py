@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 
-try:
+try: # pragma: no cover
     from urllib.request import urlopen
-except:
+except: # pragma: no cover
     from urllib import urlopen
 import os
 import imp
@@ -10,7 +10,7 @@ from nose.tools import assert_raises
 
 yturl = imp.load_source("yturl", os.path.join(os.path.dirname(__file__), "../yturl"))
 y = yturl.YTURL("medium", "KxaCOHT0pmI", "normal")
-x = yturl.YTURL("medium", "KxaCOHT0pmI", "3d")
+x = yturl.YTURL("medium", "XDCG-mPkRhg", "3d")
 
 def testItagOrder():
     itagOrder = y.getDefaultItagQualityOrder()
@@ -19,6 +19,9 @@ def testItagOrder():
 def testDesiredItagOrder():
     desiredItagOrder = y.getDesiredItagOrder("18")
     assert desiredItagOrder == ('18', '34', '6', '43', '5', '35', '36', '44', '17', '45', '13', '22', '46', '37', '38')
+
+def testBadItag():
+    assert_raises(yturl.InvalidItagError, y.getDesiredItagOrder, "-1")
 
 def test3DItagOrder():
     itagOrder = x.getDefaultItagQualityOrder()
@@ -34,7 +37,7 @@ def testURLStripping():
     assert y.stripToVideoID("youtu.be/gEl6TXrkZnkfoo") == "gEl6TXrkZnk"
 
 def testAvailableItags():
-    with open(os.path.join(os.path.dirname(__file__), "api_output"), "rb") as f:
+    with open(os.path.join(os.path.dirname(__file__), "api_output/good"), "rb") as f:
         avail = y.getAvailableVideoItags(None, f)
         assert list(avail) == \
             [('43',
@@ -63,3 +66,12 @@ def testQualityGroupParse():
     assert_raises(yturl.UnknownQualityGroupError, parse, "nonexistent")
     assert parse("18") == "18"
     assert order.index(parse("low")) > order.index(parse("medium")) > order.index(parse("high"))
+
+def testEmbedRestriction():
+    with open(os.path.join(os.path.dirname(__file__), "api_output/embed_restricted"), "rb") as f:
+        avail = y.getAvailableVideoItags(None, f)
+        assert_raises(yturl.YouTubeAPIError, list, avail)
+
+def testMainOperation():
+    y.getURL()
+    x.getURL()
