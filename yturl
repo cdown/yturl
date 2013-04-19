@@ -132,7 +132,7 @@ class YTURL(object):
         desiredItag = [ x for x in desiredItagOrder if x in availableItags ]
         try:
             return desiredItag[0], availableItags[desiredItag[0]]
-        except IndexError:
+        except IndexError: # pragma: no cover
             return None, None
 
 if __name__ == "__main__": # pragma: no cover

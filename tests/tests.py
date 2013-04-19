@@ -10,7 +10,7 @@ from nose.tools import assert_raises
 
 yturl = imp.load_source("yturl", os.path.join(os.path.dirname(__file__), "../yturl"))
 y = yturl.YTURL("medium", "KxaCOHT0pmI", "normal")
-x = yturl.YTURL("medium", "KxaCOHT0pmI", "3d")
+x = yturl.YTURL("medium", "XDCG-mPkRhg", "3d")
 
 def testItagOrder():
     itagOrder = y.getDefaultItagQualityOrder()
@@ -71,3 +71,7 @@ def testEmbedRestriction():
     with open(os.path.join(os.path.dirname(__file__), "api_output/embed_restricted"), "rb") as f:
         avail = y.getAvailableVideoItags(None, f)
         assert_raises(yturl.YouTubeAPIError, list, avail)
+
+def testMainOperation():
+    y.getURL()
+    x.getURL()
