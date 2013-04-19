@@ -34,7 +34,7 @@ def testURLStripping():
     assert y.stripToVideoID("youtu.be/gEl6TXrkZnkfoo") == "gEl6TXrkZnk"
 
 def testAvailableItags():
-    with open(os.path.join(os.path.dirname(__file__), "api_output"), "rb") as f:
+    with open(os.path.join(os.path.dirname(__file__), "api_output/good"), "rb") as f:
         avail = y.getAvailableVideoItags(None, f)
         assert list(avail) == \
             [('43',
@@ -63,3 +63,8 @@ def testQualityGroupParse():
     assert_raises(yturl.UnknownQualityGroupError, parse, "nonexistent")
     assert parse("18") == "18"
     assert order.index(parse("low")) > order.index(parse("medium")) > order.index(parse("high"))
+
+def testEmbedRestriction():
+    with open(os.path.join(os.path.dirname(__file__), "api_output/embed_restricted"), "rb") as f:
+        avail = y.getAvailableVideoItags(None, f)
+        assert_raises(yturl.YouTubeAPIError, list, avail)
