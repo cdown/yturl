@@ -73,5 +73,9 @@ def testEmbedRestriction():
         assert_raises(yturl.YouTubeAPIError, list, avail)
 
 def testMainOperation():
-    y.getURL()
-    x.getURL()
+    assert all(y.getURL())
+    assert all(x.getURL())
+
+def testBad3D():
+    x = yturl.YTURL("high", "http://www.youtube.com/watch?v=8TCxE0bWQeQ", "3d")
+    assert not any(x.getURL())
