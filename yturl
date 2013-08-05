@@ -18,12 +18,16 @@ except ImportError:  # Python 2 fallback
 max_video_id_length = 11
 
 class UnknownQualityGroupError(Exception):
-    """Raised when an unknown quality group is passed."""
+    """
+    Raised when an unknown quality group is passed.
+    """
     pass
 
 
 class YouTubeAPIError(Exception):
-    """Raised when the YouTube API returns unknown data."""
+    """
+    Raised when the YouTube API returns unknown data.
+    """
     pass
 
 
@@ -91,6 +95,7 @@ def strip_to_video_id(url):
 
     return video_id
 
+
 def itag_order(desired_itag, known_itags):
     """
     Return the desired itag sorting.
@@ -104,6 +109,7 @@ def itag_order(desired_itag, known_itags):
         enumerate(known_itags),
         key=lambda x: abs(known_itags.index(desired_itag) - x[0]))
     ))[1]
+
 
 def available_itags(video_id, test_file_handle=None):
     """
@@ -138,8 +144,16 @@ def available_itags(video_id, test_file_handle=None):
         failure_reason = res_data["reason"][0]
         raise YouTubeAPIError(failure_reason)
 
+
 def parse_quality_group(name, known_itags):
-    """Parse string based quality groups into their itag equivalents."""
+    """
+    Parse string based quality groups into their itag equivalents.
+
+    :param name: the name of the quality group to be parsed
+    :param known_itags: a list of locally known itags
+    :returns: if a group, the appropriate itag, if an itag, the same itag
+    """
+
     if name == "low":
         return known_itags[-1]
     elif name == "medium":
