@@ -33,14 +33,14 @@ class InvalidItagError(Exception):
 
 class YTURL(object):
     """Get direct URLs to YouTube videos."""
-    def __init__(self, quality, url, itagType):
-        self.itagType = itagType
-        self.itags = self.getDefaultItagQualityOrder()
+    def __init__(self, quality, url, video_type):
+        self.video_type = video_type
+        self.itags = self.default_quality_order()
         self.quality = quality
         self.url = url
-        self.videoIDLength = 11
+        self.max_video_id_length = 11
 
-    def getDefaultItagQualityOrder(self):
+    def default_quality_order(self):
         """Return itags in order of quality preference."""
         itags = {
             "normal": {
@@ -73,23 +73,23 @@ class YTURL(object):
         }
 
         return sorted(
-            itags[self.itagType],
+            itags[self.video_type],
             reverse=True,
-            key=lambda x: itags[self.itagType][x]
+            key=lambda x: itags[self.video_type][x]
         )
 
-    def stripToVideoID(self, url):
+    def strip_to_video_id(self, url):
         """Strip URL to the video ID contained."""
         try:
             parsed = urlparse(url).query
-            return parse_qs(parsed)["v"][0][:self.videoIDLength]
+            return parse_qs(parsed)["v"][0][:self.max_video_id_length]
         except (IndexError, ValueError, KeyError):
-            return url.split("/")[-1][:self.videoIDLength]
+            return url.split("/")[-1][:self.max_video_id_length]
 
-    def getAvailableVideoItags(self, videoID, f=None):
+    def available_itags(self, video_id, f=None):
         """Return available itags and their associated URLs as a list."""
         if f is None:
-            url = "http://youtube.com/get_video_info?hl=en&video_id=" + videoID
+            url = "http://youtube.com/get_video_info?hl=en&video_id=" + video_id
             res = urlopen(url)
         else:
             res = f
@@ -104,17 +104,17 @@ class YTURL(object):
         except (KeyError, IndexError):
             raise YouTubeAPIError(res["reason"][0])
 
-    def getDesiredItagOrder(self, desiredItag):
+    def get_itag_order(self, itag):
         """Return the desired itag sorting."""
-        if desiredItag not in self.itags:
-            raise InvalidItagError(desiredItag)
+        if itag not in self.itags:
+            raise InvalidItagError(itag)
 
         return list(zip(*sorted(
             enumerate(self.itags),
-            key=lambda x: abs(self.itags.index(desiredItag) - x[0]))
+            key=lambda x: abs(self.itags.index(itag) - x[0]))
         ))[1]
 
-    def parseQualityGroup(self, name):
+    def parse_quality_group(self, name):
         """Parse string based quality groups into their itag equivalents."""
         if name == "low":
             return self.itags[-1]
@@ -129,15 +129,15 @@ class YTURL(object):
             except ValueError:
                 raise UnknownQualityGroupError(name)
 
-    def getURL(self):
+    def get_itag_url(self):
         """Get an itag and its corresponding URL for a YouTube video."""
-        itag = self.parseQualityGroup(self.quality)
-        videoID = self.stripToVideoID(self.url)
-        availableItags = dict(self.getAvailableVideoItags(videoID))
-        desiredItagOrder = self.getDesiredItagOrder(itag)
-        desiredItag = [x for x in desiredItagOrder if x in availableItags]
+        itag = self.parse_quality_group(self.quality)
+        video_id = self.strip_to_video_id(self.url)
+        avail_itags = dict(self.available_itags(video_id))
+        itag_order = self.get_itag_order(itag)
+        itag = [x for x in itag_order if x in avail_itags]
         try:
-            return desiredItag[0], availableItags[desiredItag[0]]
+            return itag[0], avail_itags[itag[0]]
         except IndexError:
             return None, None
 
@@ -150,24 +150,24 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--3d",
-        dest="threedimensions",
+        dest="three_dimensions",
         action="store_true",
         help="Return 3D video only",
     )
     parser.add_argument(
         "url",
-        metavar="videoID/url",
+        metavar="video_id/url",
         help="a YouTube url (or bare video ID)"
     )
     args = parser.parse_args()
 
-    if args.threedimensions:
-        itagType = "3d"
+    if args.three_dimensions:
+        video_type = "3d"
     else:
-        itagType = "normal"
+        video_type = "normal"
 
-    y = YTURL(args.quality, args.url, itagType)
-    itag, url = y.getURL()
+    y = YTURL(args.quality, args.url, video_type)
+    itag, url = y.get_itag_url()
     if not itag:
         print("No local itags available.", file=sys.stderr)
         if args.threedimensions:
