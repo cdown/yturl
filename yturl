@@ -11,7 +11,7 @@ import sys
 try:
     from urllib.request import urlopen
     from urllib.parse import parse_qs, urlparse
-except:
+except ImportError:  # Python 2 fallback
     from urllib import urlopen
     from urlparse import parse_qs, urlparse
 
