@@ -13,8 +13,6 @@ known_itags = {
     "normal": yturl.default_itag_order("normal"),
     "3d": yturl.default_itag_order("3d"),
 }
-y = yturl.YTURL("medium", "KxaCOHT0pmI", "normal")
-x = yturl.YTURL("medium", "XDCG-mPkRhg", "3d")
 
 def testItagOrder():
     itagOrder = yturl.default_itag_order("normal")
@@ -75,11 +73,3 @@ def testEmbedRestriction():
     with open(os.path.join(os.path.dirname(__file__), "api_output/embed_restricted"), "rb") as f:
         avail = yturl.available_itags(None, f)
         assert_raises(yturl.YouTubeAPIError, list, avail)
-
-def testMainOperation():
-    assert all(y.get_itag_url())
-    assert all(x.get_itag_url())
-
-def testBad3D():
-    x = yturl.YTURL("high", "http://www.youtube.com/watch?v=8TCxE0bWQeQ", "3d")
-    assert not any(x.get_itag_url())
