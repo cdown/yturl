@@ -1,29 +1,35 @@
 #!/usr/bin/env python
 
-"""Get direct URLs to YouTube videos."""
+"""
+Print direct URLs to YouTube videos.
+"""
 
 from __future__ import print_function
-
 import argparse
 import sys
-try: # pragma: no cover
+
+try:
     from urllib.request import urlopen
     from urllib.parse import parse_qs, urlparse
-except: # pragma: no cover
+except:
     from urllib import urlopen
     from urlparse import parse_qs, urlparse
+
 
 class UnknownQualityGroupError(Exception):
     """Raised when an unknown quality group is passed."""
     pass
 
+
 class YouTubeAPIError(Exception):
     """Raised when the YouTube API returns unknown data."""
     pass
 
+
 class InvalidItagError(Exception):
     """Raised when we get a locally unknown itag."""
     pass
+
 
 class YTURL(object):
     """Get direct URLs to YouTube videos."""
@@ -37,7 +43,7 @@ class YTURL(object):
     def getDefaultItagQualityOrder(self):
         """Return itags in order of quality preference."""
         itags = {
-            "normal":{
+            "normal": {
             #   itag    v-dimensions v-bitrate a-bitrate a-samplerate v-encoding
                 "5":   (400*240,     0.25,     64,       22.05,       "h263"),
                 "6":   (480*270,     0.8,      64,       22.05,       "h263"),
@@ -55,7 +61,7 @@ class YTURL(object):
                 "45":  (1280*720,    2,        192,      44.1,        "vp8"),
                 "46":  (1920*1080,   2,        192,      44.1,        "vp8"),
             },
-            "3d":{
+            "3d": {
                 "82":  (640*360,     0.5,      96,       44.1,        "h264"),
                 "83":  (320*240,     0.5,      96,       44.1,        "h264"),
                 "84":  (1280*720,    2.9,      152,      44.1,        "h264"),
@@ -82,7 +88,7 @@ class YTURL(object):
 
     def getAvailableVideoItags(self, videoID, f=None):
         """Return available itags and their associated URLs as a list."""
-        if f == None:
+        if f is None:
             url = "http://youtube.com/get_video_info?hl=en&video_id=" + videoID
             res = urlopen(url)
         else:
@@ -129,13 +135,13 @@ class YTURL(object):
         videoID = self.stripToVideoID(self.url)
         availableItags = dict(self.getAvailableVideoItags(videoID))
         desiredItagOrder = self.getDesiredItagOrder(itag)
-        desiredItag = [ x for x in desiredItagOrder if x in availableItags ]
+        desiredItag = [x for x in desiredItagOrder if x in availableItags]
         try:
             return desiredItag[0], availableItags[desiredItag[0]]
         except IndexError:
             return None, None
 
-if __name__ == "__main__": # pragma: no cover
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "-q", "--quality",
