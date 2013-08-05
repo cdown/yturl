@@ -154,26 +154,6 @@ def parse_quality_group(name, known_itags):
         else:
             return name
 
-class YTURL(object):
-    """Get direct URLs to YouTube videos."""
-    def __init__(self, quality, url, video_type):
-        self.video_type = video_type
-        self.itags = default_itag_order(self.video_type)
-        self.quality = quality
-        self.url = url
-
-    def get_itag_url(self):
-        """Get an itag and its corresponding URL for a YouTube video."""
-        itag = parse_quality_group(self.quality, self.itags)
-        video_id = strip_to_video_id(self.url)
-        avail_itags = dict(available_itags(video_id))
-        itags = itag_order(itag, self.itags)
-        itag = [x for x in itags if x in avail_itags]
-        try:
-            return itag[0], avail_itags[itag[0]]
-        except IndexError:
-            return None, None
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -199,13 +179,31 @@ if __name__ == "__main__":
     else:
         video_type = "normal"
 
-    y = YTURL(args.quality, args.url, video_type)
-    itag, url = y.get_itag_url()
-    if not itag:
+    video_id = strip_to_video_id(args.url)
+    known_itags = default_itag_order(video_type)
+
+    try:
+        desired_itag = parse_quality_group(args.quality, known_itags)
+    except UnknownQualityGroupError:
+        print("Unknown quality: " + args.quality, file=sys.stderr)
+        sys.exit(2)
+
+
+    try:
+        avail_itags = dict(available_itags(video_id))
+    except YouTubeAPIError as e:
+        print("The YouTube API returned an error: " + str(e), file=sys.stderr)
+
+    ordered_itags = itag_order(desired_itag, known_itags)
+    suitable_itags = [x for x in ordered_itags if x in avail_itags]
+
+    if suitable_itags:
+        used_itag = suitable_itags[0]
+        used_url = avail_itags[used_itag]
+        print("Using itag %s." % used_itag, file=sys.stderr)
+        print(used_url)
+    else:
         print("No local itags available.", file=sys.stderr)
         if args.threedimensions:
             print("Perhaps you requested 3D on a non-3D video?", file=sys.stderr)
         sys.exit(1)
-
-    print("Using itag %s." % itag, file=sys.stderr)
-    print(url)
