@@ -1,172 +1,225 @@
 #!/usr/bin/env python
 
-"""Get direct URLs to YouTube videos."""
+"""
+Print direct URLs to YouTube videos.
+"""
 
 from __future__ import print_function
-
 import argparse
 import sys
-try: # pragma: no cover
+
+try:
     from urllib.request import urlopen
     from urllib.parse import parse_qs, urlparse
-except: # pragma: no cover
+except ImportError:  # Python 2 fallback
     from urllib import urlopen
     from urlparse import parse_qs, urlparse
 
+
+max_video_id_length = 11
+
+
 class UnknownQualityGroupError(Exception):
-    """Raised when an unknown quality group is passed."""
+    """
+    Raised when an unknown quality group is passed.
+    """
     pass
+
 
 class YouTubeAPIError(Exception):
-    """Raised when the YouTube API returns unknown data."""
+    """
+    Raised when the YouTube API returns unknown data.
+    """
     pass
 
-class InvalidItagError(Exception):
-    """Raised when we get a locally unknown itag."""
-    pass
 
-class YTURL(object):
-    """Get direct URLs to YouTube videos."""
-    def __init__(self, quality, url, itagType):
-        self.itagType = itagType
-        self.itags = self.getDefaultItagQualityOrder()
-        self.quality = quality
-        self.url = url
-        self.videoIDLength = 11
+def default_itag_order(video_type):
+    """
+    Return itags in order of quality preference.
 
-    def getDefaultItagQualityOrder(self):
-        """Return itags in order of quality preference."""
-        itags = {
-            "normal":{
-            #   itag    v-dimensions v-bitrate a-bitrate a-samplerate v-encoding
-                "5":   (400*240,     0.25,     64,       22.05,       "h263"),
-                "6":   (480*270,     0.8,      64,       22.05,       "h263"),
-                "13":  (176*144,     0.5,      64,       22.05,       "mp4v"),
-                "17":  (176*144,     2,        64,       22.05,       "mp4v"),
-                "18":  (640*360,     0.5,      96,       44.1,        "h264"),
-                "22":  (1280*720,    2.9,      192,      44.1,        "h264"),
-                "34":  (640*360,     0.5,      128,      44.1,        "h264"),
-                "35":  (854*480,     1,        128,      44.1,        "h264"),
-                "36":  (320*240,     0.17,     38,       44.1,        "mp4v"),
-                "37":  (1920*1080,   2.9,      192,      44.1,        "h264"),
-                "38":  (4096*3072,   5,        192,      44.1,        "h264"),
-                "43":  (640*360,     0.5,      128,      44.1,        "vp8"),
-                "44":  (854*480,     1,        128,      44.1,        "vp8"),
-                "45":  (1280*720,    2,        192,      44.1,        "vp8"),
-                "46":  (1920*1080,   2,        192,      44.1,        "vp8"),
-            },
-            "3d":{
-                "82":  (640*360,     0.5,      96,       44.1,        "h264"),
-                "83":  (320*240,     0.5,      96,       44.1,        "h264"),
-                "84":  (1280*720,    2.9,      152,      44.1,        "h264"),
-                "85":  (960*540,     2.9,      152,      44.1,        "h264"),
-                "100": (640*360,     0.5,      128,      44.1,        "vp8"),
-                "101": (640*360,     0.5,      192,      44.1,        "vp8"),
-                "102": (1280*720,    2,        192,      44.1,        "vp8"),
-            }
+    :param video_type: normal or 3d video
+    :returns: itags sorted in default order
+    """
+
+    itags = {
+        "normal": {
+        #   itag    v-dimensions v-bitrate a-bitrate a-samplerate v-encoding
+            "5":   (400*240,     0.25,     64,       22.05,       "h263"),
+            "6":   (480*270,     0.8,      64,       22.05,       "h263"),
+            "13":  (176*144,     0.5,      64,       22.05,       "mp4v"),
+            "17":  (176*144,     2,        64,       22.05,       "mp4v"),
+            "18":  (640*360,     0.5,      96,       44.1,        "h264"),
+            "22":  (1280*720,    2.9,      192,      44.1,        "h264"),
+            "34":  (640*360,     0.5,      128,      44.1,        "h264"),
+            "35":  (854*480,     1,        128,      44.1,        "h264"),
+            "36":  (320*240,     0.17,     38,       44.1,        "mp4v"),
+            "37":  (1920*1080,   2.9,      192,      44.1,        "h264"),
+            "38":  (4096*3072,   5,        192,      44.1,        "h264"),
+            "43":  (640*360,     0.5,      128,      44.1,        "vp8"),
+            "44":  (854*480,     1,        128,      44.1,        "vp8"),
+            "45":  (1280*720,    2,        192,      44.1,        "vp8"),
+            "46":  (1920*1080,   2,        192,      44.1,        "vp8"),
+        },
+        "3d": {
+            "82":  (640*360,     0.5,      96,       44.1,        "h264"),
+            "83":  (320*240,     0.5,      96,       44.1,        "h264"),
+            "84":  (1280*720,    2.9,      152,      44.1,        "h264"),
+            "85":  (960*540,     2.9,      152,      44.1,        "h264"),
+            "100": (640*360,     0.5,      128,      44.1,        "vp8"),
+            "101": (640*360,     0.5,      192,      44.1,        "vp8"),
+            "102": (1280*720,    2,        192,      44.1,        "vp8"),
         }
+    }
 
-        return sorted(
-            itags[self.itagType],
-            reverse=True,
-            key=lambda x: itags[self.itagType][x]
-        )
+    sorted_itags = sorted(
+        itags[video_type],
+        reverse=True,
+        key=lambda x: itags[video_type][x]
+    )
 
-    def stripToVideoID(self, url):
-        """Strip URL to the video ID contained."""
+    return sorted_itags
+
+
+def strip_to_video_id(url):
+    """
+    Strip a URL to its video ID.
+
+    :param url: a url containing a video ID
+    :returns: the video ID
+    """
+
+    url_params = parse_qs(urlparse(url).query)
+
+    if "v" in url_params:
+        video_id = url_params["v"][0][:max_video_id_length]
+    else:
+        video_id = url.split("/")[-1][:max_video_id_length]
+
+    return video_id
+
+
+def itag_order(desired_itag, known_itags):
+    """
+    Return the desired itag sorting.
+
+    :param desired_itag: the itag to sort based upon
+    :param known_itags: locally known itags (sorted)
+    :returns: the preferential order of itags
+    """
+
+    return list(zip(*sorted(
+        enumerate(known_itags),
+        key=lambda x: abs(known_itags.index(desired_itag) - x[0]))
+    ))[1]
+
+
+def available_itags(video_id, test_file_handle=None):
+    """
+    Return available itags and their associated URLs as a list.
+
+    :param video_id: the video ID to get itags for
+    :param test_file_handle: read from file handle (for testing)
+    """
+
+    if test_file_handle is None:
+        url = "http://youtube.com/get_video_info?hl=en&video_id=" + video_id
+        res_handle = urlopen(url)
+    else:
+        res_handle = test_file_handle
+
+    res_data = parse_qs(res_handle.read().decode("utf8"))
+
+    if "url_encoded_fmt_stream_map" in res_data:
+        stream_maps_raw = res_data["url_encoded_fmt_stream_map"][0]
+        stream_maps = stream_maps_raw.split(",")
+
+        for stream_map in stream_maps:
+            stream_map = parse_qs(stream_map)
+            base_url = stream_map["url"][0]
+            signature = stream_map["sig"][0]
+
+            yield (
+                stream_map["itag"][0],
+                base_url + "&signature=" + signature,
+            )
+    else:
+        failure_reason = res_data["reason"][0]
+        raise YouTubeAPIError(failure_reason)
+
+
+def parse_quality_group(name, known_itags):
+    """
+    Parse string based quality groups into their itag equivalents.
+
+    :param name: the name of the quality group to be parsed
+    :param known_itags: a list of locally known itags
+    :returns: if a group, the appropriate itag, if an itag, the same itag
+    """
+
+    if name == "low":
+        return known_itags[-1]
+    elif name == "medium":
+        return known_itags[int(len(known_itags)/2)]
+    elif name == "high":
+        return known_itags[0]
+    else:
         try:
-            parsed = urlparse(url).query
-            return parse_qs(parsed)["v"][0][:self.videoIDLength]
-        except (IndexError, ValueError, KeyError):
-            return url.split("/")[-1][:self.videoIDLength]
-
-    def getAvailableVideoItags(self, videoID, f=None):
-        """Return available itags and their associated URLs as a list."""
-        if f == None:
-            url = "http://youtube.com/get_video_info?hl=en&video_id=" + videoID
-            res = urlopen(url)
+            int(name)
+        except ValueError:
+            raise UnknownQualityGroupError(name)
         else:
-            res = f
-        res = parse_qs(res.read().decode("utf8"))
-        try:
-            for fmt in res["url_encoded_fmt_stream_map"][0].split(","):
-                fmt = parse_qs(fmt)
-                yield (
-                    fmt["itag"][0],
-                    "%s&signature=%s" % (fmt["url"][0], fmt["sig"][0])
-                )
-        except (KeyError, IndexError):
-            raise YouTubeAPIError(res["reason"][0])
+            return name
 
-    def getDesiredItagOrder(self, desiredItag):
-        """Return the desired itag sorting."""
-        if desiredItag not in self.itags:
-            raise InvalidItagError(desiredItag)
 
-        return list(zip(*sorted(
-            enumerate(self.itags),
-            key=lambda x: abs(self.itags.index(desiredItag) - x[0]))
-        ))[1]
-
-    def parseQualityGroup(self, name):
-        """Parse string based quality groups into their itag equivalents."""
-        if name == "low":
-            return self.itags[-1]
-        elif name == "medium":
-            return self.itags[int(len(self.itags)/2)]
-        elif name == "high":
-            return self.itags[0]
-        else:
-            try:
-                int(name)
-                return name
-            except ValueError:
-                raise UnknownQualityGroupError(name)
-
-    def getURL(self):
-        """Get an itag and its corresponding URL for a YouTube video."""
-        itag = self.parseQualityGroup(self.quality)
-        videoID = self.stripToVideoID(self.url)
-        availableItags = dict(self.getAvailableVideoItags(videoID))
-        desiredItagOrder = self.getDesiredItagOrder(itag)
-        desiredItag = [ x for x in desiredItagOrder if x in availableItags ]
-        try:
-            return desiredItag[0], availableItags[desiredItag[0]]
-        except IndexError:
-            return None, None
-
-if __name__ == "__main__": # pragma: no cover
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "-q", "--quality",
-        help='specify quality, can be "low", "medium", "high", or an itag (see http://goo.gl/uEIuR)',
+        help='"low", "medium", "high", or an itag, see http://goo.gl/uEIuR',
         default="medium"
     )
     parser.add_argument(
         "--3d",
-        dest="threedimensions",
+        dest="three_dimensions",
         action="store_true",
         help="Return 3D video only",
     )
     parser.add_argument(
         "url",
-        metavar="videoID/url",
+        metavar="video_id/url",
         help="a YouTube url (or bare video ID)"
     )
     args = parser.parse_args()
 
-    if args.threedimensions:
-        itagType = "3d"
+    if args.three_dimensions:
+        video_type = "3d"
     else:
-        itagType = "normal"
+        video_type = "normal"
 
-    y = YTURL(args.quality, args.url, itagType)
-    itag, url = y.getURL()
-    if not itag:
+    video_id = strip_to_video_id(args.url)
+    known_itags = default_itag_order(video_type)
+
+    try:
+        desired_itag = parse_quality_group(args.quality, known_itags)
+    except UnknownQualityGroupError:
+        print("Unknown quality: " + args.quality, file=sys.stderr)
+        sys.exit(2)
+
+    try:
+        avail_itags = dict(available_itags(video_id))
+    except YouTubeAPIError as e:
+        print("The YouTube API returned an error: " + str(e), file=sys.stderr)
+
+    ordered_itags = itag_order(desired_itag, known_itags)
+    suitable_itags = [x for x in ordered_itags if x in avail_itags]
+
+    if suitable_itags:
+        used_itag = suitable_itags[0]
+        used_url = avail_itags[used_itag]
+        print("Using itag %s." % used_itag, file=sys.stderr)
+        print(used_url)
+    else:
         print("No local itags available.", file=sys.stderr)
         if args.threedimensions:
-            print("Perhaps you requested 3D on a non-3D video?", file=sys.stderr)
+            print("Maybe you requested 3D on a non-3D video?", file=sys.stderr)
         sys.exit(1)
-
-    print("Using itag %s." % itag, file=sys.stderr)
-    print(url)

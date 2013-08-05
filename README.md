@@ -1,10 +1,5 @@
-[![Build Status](https://travis-ci.org/cdown/yturl.png?branch=master)](https://travis-ci.org/cdown/yturl)
-
-`yturl` gets direct media URLs to YouTube media.
-
-# Basic syntax
-
-    yturl [-h] [-q QUALITY] [--3d] videoID/url
+yturl gets direct media URLs to YouTube media, allowing you to play them in
+your favourite media player, download them, or do whatever you like.
 
 # Examples
 
@@ -25,7 +20,7 @@ Download the same video, using the lowest quality format available:
 
     curl -o bill "$(yturl -q low 'http://www.youtube.com/watch?v=KxaCOHT0pmI')"
 
-# Making life easier
+# Use with a media player
 
 If you find yourself frequently watching videos in mplayer using yturl, you can
 quite easily write a shell wrapper:
@@ -34,4 +29,6 @@ quite easily write a shell wrapper:
         mplayer "$(yturl "$@")"
     }
 
-Then just use it in the same way you would use `yturl`, calling it with `yt`.
+Then just use it in the same way you would use `yturl`, calling it with `yt`
+instead. Obviously you can substitute mplayer as appropriate with your media
+player of choice.
