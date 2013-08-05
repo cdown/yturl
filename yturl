@@ -135,8 +135,24 @@ def available_itags(video_id, test_file_handle=None):
                 base_url + "&signature=" + signature,
             )
     else:
-        failure_reason = res["reason"][0]
+        failure_reason = res_data["reason"][0]
         raise YouTubeAPIError(failure_reason)
+
+def parse_quality_group(name, known_itags):
+    """Parse string based quality groups into their itag equivalents."""
+    if name == "low":
+        return known_itags[-1]
+    elif name == "medium":
+        return known_itags[int(len(known_itags)/2)]
+    elif name == "high":
+        return known_itags[0]
+    else:
+        try:
+            int(name)
+        except ValueError:
+            raise UnknownQualityGroupError(name)
+        else:
+            return name
 
 class YTURL(object):
     """Get direct URLs to YouTube videos."""
@@ -146,28 +162,9 @@ class YTURL(object):
         self.quality = quality
         self.url = url
 
-
-
-
-
-    def parse_quality_group(self, name):
-        """Parse string based quality groups into their itag equivalents."""
-        if name == "low":
-            return self.itags[-1]
-        elif name == "medium":
-            return self.itags[int(len(self.itags)/2)]
-        elif name == "high":
-            return self.itags[0]
-        else:
-            try:
-                int(name)
-                return name
-            except ValueError:
-                raise UnknownQualityGroupError(name)
-
     def get_itag_url(self):
         """Get an itag and its corresponding URL for a YouTube video."""
-        itag = self.parse_quality_group(self.quality)
+        itag = parse_quality_group(self.quality, self.itags)
         video_id = strip_to_video_id(self.url)
         avail_itags = dict(available_itags(video_id))
         itags = itag_order(itag, self.itags)
