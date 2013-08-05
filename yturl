@@ -209,6 +209,7 @@ if __name__ == "__main__":
         avail_itags = dict(available_itags(video_id))
     except YouTubeAPIError as e:
         print("The YouTube API returned an error: " + str(e), file=sys.stderr)
+        sys.exit(3)
 
     ordered_itags = itag_order(desired_itag, known_itags)
     suitable_itags = [x for x in ordered_itags if x in avail_itags]
