@@ -15,6 +15,7 @@ except ImportError:  # Python 2 fallback
     from urllib import urlopen
     from urlparse import parse_qs, urlparse
 
+max_video_id_length = 11
 
 class UnknownQualityGroupError(Exception):
     """Raised when an unknown quality group is passed."""
@@ -76,6 +77,25 @@ def default_itag_order(video_type):
 
     return sorted_itags
 
+
+def strip_to_video_id(url):
+    """
+    Strip a URL to its video ID.
+
+    :param url: a url containing a video ID
+    :returns: the video ID
+    """
+
+    url_params = parse_qs(urlparse(url).query)
+
+    if "v" in url_params:
+        video_id = url_params["v"][0][:max_video_id_length]
+    else:
+        video_id = url.split("/")[-1][:max_video_id_length]
+
+    return video_id
+
+
 class YTURL(object):
     """Get direct URLs to YouTube videos."""
     def __init__(self, quality, url, video_type):
@@ -83,16 +103,8 @@ class YTURL(object):
         self.itags = default_itag_order(self.video_type)
         self.quality = quality
         self.url = url
-        self.max_video_id_length = 11
 
 
-    def strip_to_video_id(self, url):
-        """Strip URL to the video ID contained."""
-        try:
-            parsed = urlparse(url).query
-            return parse_qs(parsed)["v"][0][:self.max_video_id_length]
-        except (IndexError, ValueError, KeyError):
-            return url.split("/")[-1][:self.max_video_id_length]
 
     def available_itags(self, video_id, f=None):
         """Return available itags and their associated URLs as a list."""
@@ -140,7 +152,7 @@ class YTURL(object):
     def get_itag_url(self):
         """Get an itag and its corresponding URL for a YouTube video."""
         itag = self.parse_quality_group(self.quality)
-        video_id = self.strip_to_video_id(self.url)
+        video_id = strip_to_video_id(self.url)
         avail_itags = dict(self.available_itags(video_id))
         itag_order = self.get_itag_order(itag)
         itag = [x for x in itag_order if x in avail_itags]

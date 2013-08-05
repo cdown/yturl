@@ -32,9 +32,9 @@ def test3DDesiredItagOrder():
     assert itag_order == ('100', '101', '82', '85', '83', '102', '84')
 
 def testURLStripping():
-    assert y.strip_to_video_id("http://www.youtube.com/watch?feature=player_embedded&v=gEl6TXrkZnk") == "gEl6TXrkZnk"
-    assert y.strip_to_video_id("youtu.be/gEl6TXrkZnk#foo") == "gEl6TXrkZnk"
-    assert y.strip_to_video_id("youtu.be/gEl6TXrkZnkfoo") == "gEl6TXrkZnk"
+    assert yturl.strip_to_video_id("http://www.youtube.com/watch?feature=player_embedded&v=gEl6TXrkZnk") == "gEl6TXrkZnk"
+    assert yturl.strip_to_video_id("youtu.be/gEl6TXrkZnk#foo") == "gEl6TXrkZnk"
+    assert yturl.strip_to_video_id("youtu.be/gEl6TXrkZnkfoo") == "gEl6TXrkZnk"
 
 def testAvailableItags():
     with open(os.path.join(os.path.dirname(__file__), "api_output/good"), "rb") as f:
