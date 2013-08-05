@@ -121,15 +121,22 @@ def available_itags(video_id, test_file_handle=None):
 
     res_data = parse_qs(res_handle.read().decode("utf8"))
 
-    try:
-        for fmt in res_data["url_encoded_fmt_stream_map"][0].split(","):
-            fmt = parse_qs(fmt)
+    if "url_encoded_fmt_stream_map" in res_data:
+        stream_maps_raw = res_data["url_encoded_fmt_stream_map"][0]
+        stream_maps = stream_maps_raw.split(",")
+
+        for stream_map in stream_maps:
+            stream_map = parse_qs(stream_map)
+            base_url = stream_map["url"][0]
+            signature = stream_map["sig"][0]
+
             yield (
-                fmt["itag"][0],
-                "%s&signature=%s" % (fmt["url"][0], fmt["sig"][0])
+                stream_map["itag"][0],
+                base_url + "&signature=" + signature,
             )
-    except (KeyError, IndexError):
-        raise YouTubeAPIError(res["reason"][0])
+    else:
+        failure_reason = res["reason"][0]
+        raise YouTubeAPIError(failure_reason)
 
 class YTURL(object):
     """Get direct URLs to YouTube videos."""
