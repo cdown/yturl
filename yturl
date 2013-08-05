@@ -170,6 +170,7 @@ def parse_quality_group(name, known_itags):
         else:
             return name
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
