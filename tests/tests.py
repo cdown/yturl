@@ -9,6 +9,10 @@ import imp
 from nose.tools import assert_raises
 
 yturl = imp.load_source("yturl", os.path.join(os.path.dirname(__file__), "../yturl"))
+known_itags = {
+    "normal": yturl.default_itag_order("normal"),
+    "3d": yturl.default_itag_order("3d"),
+}
 y = yturl.YTURL("medium", "KxaCOHT0pmI", "normal")
 x = yturl.YTURL("medium", "XDCG-mPkRhg", "3d")
 
@@ -17,18 +21,18 @@ def testItagOrder():
     assert itagOrder == ['38', '37', '46', '22', '45', '44', '35', '43', '34', '18', '6', '5', '36', '17', '13']
 
 def testDesiredItagOrder():
-    itag_order = y.get_itag_order("18")
+    itag_order = yturl.itag_order("18", known_itags["normal"])
     assert itag_order == ('18', '34', '6', '43', '5', '35', '36', '44', '17', '45', '13', '22', '46', '37', '38')
 
 def testBadItag():
-    assert_raises(yturl.InvalidItagError, y.get_itag_order, "-1")
+    assert_raises(ValueError, yturl.itag_order, "-1", known_itags["normal"])
 
 def test3DItagOrder():
     itagOrder = yturl.default_itag_order("3d")
     assert itagOrder == ['84', '102', '85', '101', '100', '82', '83']
 
 def test3DDesiredItagOrder():
-    itag_order = x.get_itag_order("100")
+    itag_order = yturl.itag_order("100", known_itags["3d"])
     assert itag_order == ('100', '101', '82', '85', '83', '102', '84')
 
 def testURLStripping():

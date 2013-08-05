@@ -27,10 +27,6 @@ class YouTubeAPIError(Exception):
     pass
 
 
-class InvalidItagError(Exception):
-    """Raised when we get a locally unknown itag."""
-    pass
-
 def default_itag_order(video_type):
     """
     Return itags in order of quality preference.
@@ -95,6 +91,19 @@ def strip_to_video_id(url):
 
     return video_id
 
+def itag_order(desired_itag, known_itags):
+    """
+    Return the desired itag sorting.
+
+    :param desired_itag: the itag to sort based upon
+    :param known_itags: locally known itags (sorted)
+    :returns: the preferential order of itags
+    """
+
+    return list(zip(*sorted(
+        enumerate(known_itags),
+        key=lambda x: abs(known_itags.index(desired_itag) - x[0]))
+    ))[1]
 
 class YTURL(object):
     """Get direct URLs to YouTube videos."""
@@ -124,15 +133,6 @@ class YTURL(object):
         except (KeyError, IndexError):
             raise YouTubeAPIError(res["reason"][0])
 
-    def get_itag_order(self, itag):
-        """Return the desired itag sorting."""
-        if itag not in self.itags:
-            raise InvalidItagError(itag)
-
-        return list(zip(*sorted(
-            enumerate(self.itags),
-            key=lambda x: abs(self.itags.index(itag) - x[0]))
-        ))[1]
 
     def parse_quality_group(self, name):
         """Parse string based quality groups into their itag equivalents."""
@@ -154,8 +154,8 @@ class YTURL(object):
         itag = self.parse_quality_group(self.quality)
         video_id = strip_to_video_id(self.url)
         avail_itags = dict(self.available_itags(video_id))
-        itag_order = self.get_itag_order(itag)
-        itag = [x for x in itag_order if x in avail_itags]
+        itags = itag_order(itag, self.itags)
+        itag = [x for x in itags if x in avail_itags]
         try:
             return itag[0], avail_itags[itag[0]]
         except IndexError:
