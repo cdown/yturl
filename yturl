@@ -15,7 +15,9 @@ except ImportError:  # Python 2 fallback
     from urllib import urlopen
     from urlparse import parse_qs, urlparse
 
+
 max_video_id_length = 11
+
 
 class UnknownQualityGroupError(Exception):
     """
@@ -172,7 +174,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "-q", "--quality",
-        help='specify quality, can be "low", "medium", "high", or an itag (see http://goo.gl/uEIuR)',
+        help='"low", "medium", "high", or an itag, see http://goo.gl/uEIuR',
         default="medium"
     )
     parser.add_argument(
@@ -202,7 +204,6 @@ if __name__ == "__main__":
         print("Unknown quality: " + args.quality, file=sys.stderr)
         sys.exit(2)
 
-
     try:
         avail_itags = dict(available_itags(video_id))
     except YouTubeAPIError as e:
@@ -219,5 +220,5 @@ if __name__ == "__main__":
     else:
         print("No local itags available.", file=sys.stderr)
         if args.threedimensions:
-            print("Perhaps you requested 3D on a non-3D video?", file=sys.stderr)
+            print("Maybe you requested 3D on a non-3D video?", file=sys.stderr)
         sys.exit(1)
