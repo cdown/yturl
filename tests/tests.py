@@ -13,7 +13,7 @@ y = yturl.YTURL("medium", "KxaCOHT0pmI", "normal")
 x = yturl.YTURL("medium", "XDCG-mPkRhg", "3d")
 
 def testItagOrder():
-    itagOrder = y.default_quality_order()
+    itagOrder = yturl.default_itag_order("normal")
     assert itagOrder == ['38', '37', '46', '22', '45', '44', '35', '43', '34', '18', '6', '5', '36', '17', '13']
 
 def testDesiredItagOrder():
@@ -24,7 +24,7 @@ def testBadItag():
     assert_raises(yturl.InvalidItagError, y.get_itag_order, "-1")
 
 def test3DItagOrder():
-    itagOrder = x.default_quality_order()
+    itagOrder = yturl.default_itag_order("3d")
     assert itagOrder == ['84', '102', '85', '101', '100', '82', '83']
 
 def test3DDesiredItagOrder():
@@ -61,7 +61,7 @@ def testAvailableItagsReal():
 
 def testQualityGroupParse():
     parse = y.parse_quality_group
-    order = y.default_quality_order()
+    order = yturl.default_itag_order("normal")
 
     assert_raises(yturl.UnknownQualityGroupError, parse, "nonexistent")
     assert parse("18") == "18"
