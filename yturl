@@ -135,11 +135,13 @@ def available_itags(video_id, test_file_handle=None):
 
         for stream_map in stream_maps:
             stream_map = parse_qs(stream_map)
+
+            itag = stream_map["itag"][0]
             base_url = stream_map["url"][0]
             signature = stream_map["sig"][0]
 
             yield (
-                stream_map["itag"][0],
+                itag,
                 base_url + "&signature=" + signature,
             )
     else:
