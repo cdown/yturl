@@ -221,6 +221,6 @@ if __name__ == "__main__":
         print(used_url)
     else:
         print("No local itags available.", file=sys.stderr)
-        if args.threedimensions:
+        if args.three_dimensions:
             print("Maybe you requested 3D on a non-3D video?", file=sys.stderr)
         sys.exit(1)
