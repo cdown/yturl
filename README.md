@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/cdown/yturl.png?branch=master)](https://travis-ci.org/cdown/yturl)
+[![PyPI](https://pypip.in/v/yturl/badge.png)](https://pypi.python.org/pypi/yturl)
+
 yturl gets direct media URLs to YouTube media, allowing you to play them in
 your favourite media player, download them, or do whatever you like.
 
