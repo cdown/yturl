@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
     name = "yturl",
-    version = "1.15.4",
+    version = "1.15.5",
     description = "Prints direct URLs to YouTube videos.",
     url = "https://github.com/cdown/yturl",
 
