@@ -19,13 +19,6 @@ except ImportError:  # Python 2 fallback
 max_video_id_length = 11
 
 
-class UnknownQualityGroupError(Exception):
-    """
-    Raised when an unknown quality group is passed.
-    """
-    pass
-
-
 class YouTubeAPIError(Exception):
     """
     Raised when the YouTube API returns unknown data.
@@ -139,7 +132,7 @@ def parse_quality_group(name, known_itags):
 
     :param name: the name of the quality group to be parsed
     :param known_itags: a list of locally known itags
-    :returns: if a group, the appropriate itag, if an itag, the same itag
+    :returns: the associated itag, or None if the group is unknown
     """
 
     if name == "low":
@@ -152,7 +145,7 @@ def parse_quality_group(name, known_itags):
         try:
             int(name)
         except ValueError:
-            raise UnknownQualityGroupError(name)
+            return None
         else:
             return name
 
@@ -174,9 +167,8 @@ if __name__ == "__main__":
     video_id = strip_to_video_id(args.url)
     known_itags = default_itag_order()
 
-    try:
-        desired_itag = parse_quality_group(args.quality, known_itags)
-    except UnknownQualityGroupError:
+    desired_itag = parse_quality_group(args.quality, known_itags)
+    if desired_itag is None:
         print("Unknown quality: " + args.quality, file=sys.stderr)
         sys.exit(2)
 
