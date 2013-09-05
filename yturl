@@ -77,11 +77,9 @@ def strip_to_video_id(url):
     url_params = parse_qs(urlparse(url).query)
 
     if "v" in url_params:
-        video_id = url_params["v"][0]
+        return url_params["v"][0]
     else:
-        video_id = url.split("/")[-1]
-
-    return video_id
+        return url.split("/")[-1]
 
 
 def itag_order(desired_itag, known_itags):
