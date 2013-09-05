@@ -41,6 +41,7 @@ def default_itag_order():
     """
 
     itags = {
+    #   itag    v-dimensions v-bitrate a-bitrate a-samplerate v-encoding
         "5":   (400*240,     0.25,     64,       22.05,       "h263"),
         "6":   (480*270,     0.8,      64,       22.05,       "h263"),
         "13":  (176*144,     0.5,      64,       22.05,       "mp4v"),
