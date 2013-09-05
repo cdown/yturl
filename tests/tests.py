@@ -9,29 +9,17 @@ import imp
 from nose.tools import assert_raises
 
 yturl = imp.load_source("yturl", os.path.join(os.path.dirname(__file__), "../yturl"))
-known_itags = {
-    "normal": yturl.default_itag_order("normal"),
-    "3d": yturl.default_itag_order("3d"),
-}
+known_itags = yturl.default_itag_order()
 
 def testItagOrder():
-    itagOrder = yturl.default_itag_order("normal")
-    assert itagOrder == ['38', '37', '46', '22', '45', '44', '35', '43', '34', '18', '6', '5', '36', '17', '13']
+    assert known_itags == ['38', '37', '46', '22', '45', '44', '35', '43', '34', '18', '6', '5', '36', '17', '13']
 
 def testDesiredItagOrder():
-    itag_order = yturl.itag_order("18", known_itags["normal"])
+    itag_order = yturl.itag_order("18", known_itags)
     assert itag_order == ('18', '34', '6', '43', '5', '35', '36', '44', '17', '45', '13', '22', '46', '37', '38')
 
 def testBadItag():
-    assert_raises(ValueError, yturl.itag_order, "-1", known_itags["normal"])
-
-def test3DItagOrder():
-    itagOrder = yturl.default_itag_order("3d")
-    assert itagOrder == ['84', '102', '85', '101', '100', '82', '83']
-
-def test3DDesiredItagOrder():
-    itag_order = yturl.itag_order("100", known_itags["3d"])
-    assert itag_order == ('100', '101', '82', '85', '83', '102', '84')
+    assert_raises(ValueError, yturl.itag_order, "-1", known_itags)
 
 def testURLStripping():
     assert yturl.strip_to_video_id("http://www.youtube.com/watch?feature=player_embedded&v=gEl6TXrkZnk") == "gEl6TXrkZnk"
@@ -62,12 +50,12 @@ def testAvailableItagsReal():
     assert r.getcode() == 200
 
 def testQualityGroupParse():
-    parse = yturl.parse_quality_group
-    order = yturl.default_itag_order("normal")
+    parse = yturl.quality_group
 
-    assert_raises(yturl.UnknownQualityGroupError, parse, "nonexistent", known_itags["normal"])
-    assert parse("18", known_itags["normal"]) == "18"
-    assert order.index(parse("low", known_itags["normal"])) > order.index(parse("medium", known_itags["normal"])) > order.index(parse("high", known_itags["normal"]))
+    assert parse("18", known_itags) == "18"
+    assert known_itags.index(parse("high", known_itags)) == 0
+    assert known_itags.index(parse("medium", known_itags)) == len(known_itags) // 2
+    assert known_itags.index(parse("low", known_itags)) == len(known_itags) - 1
 
 def testEmbedRestriction():
     with open(os.path.join(os.path.dirname(__file__), "api_output/embed_restricted"), "rb") as f:

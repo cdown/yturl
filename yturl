@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 
 """
-Print direct URLs to YouTube videos.
+Usage: yturl [options] <url>
+
+Options:
+  -h, --help             This help text.
+  -q, --quality QUALITY  The video quality, either an itag or low/medium/high.
 """
 
 from __future__ import print_function
-import argparse
+from docopt import docopt
 import sys
 
 try:
@@ -16,16 +20,6 @@ except ImportError:  # Python 2 fallback
     from urlparse import parse_qs, urlparse
 
 
-max_video_id_length = 11
-
-
-class UnknownQualityGroupError(Exception):
-    """
-    Raised when an unknown quality group is passed.
-    """
-    pass
-
-
 class YouTubeAPIError(Exception):
     """
     Raised when the YouTube API returns unknown data.
@@ -33,51 +27,37 @@ class YouTubeAPIError(Exception):
     pass
 
 
-def default_itag_order(video_type):
+def default_itag_order():
     """
     Return itags in order of quality preference.
 
-    :param video_type: normal or 3d video
     :returns: itags sorted in default order
     """
 
     itags = {
-        "normal": {
-        #   itag    v-dimensions v-bitrate a-bitrate a-samplerate v-encoding
-            "5":   (400*240,     0.25,     64,       22.05,       "h263"),
-            "6":   (480*270,     0.8,      64,       22.05,       "h263"),
-            "13":  (176*144,     0.5,      64,       22.05,       "mp4v"),
-            "17":  (176*144,     2,        64,       22.05,       "mp4v"),
-            "18":  (640*360,     0.5,      96,       44.1,        "h264"),
-            "22":  (1280*720,    2.9,      192,      44.1,        "h264"),
-            "34":  (640*360,     0.5,      128,      44.1,        "h264"),
-            "35":  (854*480,     1,        128,      44.1,        "h264"),
-            "36":  (320*240,     0.17,     38,       44.1,        "mp4v"),
-            "37":  (1920*1080,   2.9,      192,      44.1,        "h264"),
-            "38":  (4096*3072,   5,        192,      44.1,        "h264"),
-            "43":  (640*360,     0.5,      128,      44.1,        "vp8"),
-            "44":  (854*480,     1,        128,      44.1,        "vp8"),
-            "45":  (1280*720,    2,        192,      44.1,        "vp8"),
-            "46":  (1920*1080,   2,        192,      44.1,        "vp8"),
-        },
-        "3d": {
-            "82":  (640*360,     0.5,      96,       44.1,        "h264"),
-            "83":  (320*240,     0.5,      96,       44.1,        "h264"),
-            "84":  (1280*720,    2.9,      152,      44.1,        "h264"),
-            "85":  (960*540,     2.9,      152,      44.1,        "h264"),
-            "100": (640*360,     0.5,      128,      44.1,        "vp8"),
-            "101": (640*360,     0.5,      192,      44.1,        "vp8"),
-            "102": (1280*720,    2,        192,      44.1,        "vp8"),
-        }
+    #   itag    v-dimensions v-bitrate a-bitrate a-samplerate v-encoding
+        "5":   (400*240,     0.25,     64,       22.05,       "h263"),
+        "6":   (480*270,     0.8,      64,       22.05,       "h263"),
+        "13":  (176*144,     0.5,      64,       22.05,       "mp4v"),
+        "17":  (176*144,     2,        64,       22.05,       "mp4v"),
+        "18":  (640*360,     0.5,      96,       44.1,        "h264"),
+        "22":  (1280*720,    2.9,      192,      44.1,        "h264"),
+        "34":  (640*360,     0.5,      128,      44.1,        "h264"),
+        "35":  (854*480,     1,        128,      44.1,        "h264"),
+        "36":  (320*240,     0.17,     38,       44.1,        "mp4v"),
+        "37":  (1920*1080,   2.9,      192,      44.1,        "h264"),
+        "38":  (4096*3072,   5,        192,      44.1,        "h264"),
+        "43":  (640*360,     0.5,      128,      44.1,        "vp8"),
+        "44":  (854*480,     1,        128,      44.1,        "vp8"),
+        "45":  (1280*720,    2,        192,      44.1,        "vp8"),
+        "46":  (1920*1080,   2,        192,      44.1,        "vp8"),
     }
 
-    sorted_itags = sorted(
-        itags[video_type],
+    return sorted(
+        itags,
         reverse=True,
-        key=lambda x: itags[video_type][x]
+        key=lambda x: itags[x]
     )
-
-    return sorted_itags
 
 
 def strip_to_video_id(url):
@@ -91,11 +71,10 @@ def strip_to_video_id(url):
     url_params = parse_qs(urlparse(url).query)
 
     if "v" in url_params:
-        video_id = url_params["v"][0][:max_video_id_length]
+        return url_params["v"][0]
     else:
-        video_id = url.split("/")[-1][:max_video_id_length]
-
-    return video_id
+        maximum_video_id_length = 11
+        return url.split("/")[-1][:maximum_video_id_length]
 
 
 def itag_order(desired_itag, known_itags):
@@ -130,81 +109,44 @@ def available_itags(video_id, test_file_handle=None):
     res_data = parse_qs(res_handle.read().decode("utf8"))
 
     if "url_encoded_fmt_stream_map" in res_data:
-        stream_maps_raw = res_data["url_encoded_fmt_stream_map"][0]
-        stream_maps = stream_maps_raw.split(",")
-
-        for stream_map in stream_maps:
-            stream_map = parse_qs(stream_map)
-
-            itag = stream_map["itag"][0]
-            base_url = stream_map["url"][0]
-            signature = stream_map["sig"][0]
-
-            yield (
-                itag,
-                base_url + "&signature=" + signature,
-            )
+        stream_maps = res_data["url_encoded_fmt_stream_map"][0].split(",")
+        for video in stream_maps:
+            video = dict((k, v[0]) for k, v in parse_qs(video).items())
+            yield video["itag"], "%(url)s&signature=%(sig)s" % video
     else:
-        failure_reason = res_data["reason"][0]
-        raise YouTubeAPIError(failure_reason)
+        raise YouTubeAPIError(res_data["reason"][0])
 
 
-def parse_quality_group(name, known_itags):
+def quality_group(group, known_itags):
     """
     Parse string based quality groups into their itag equivalents.
 
     :param name: the name of the quality group to be parsed
     :param known_itags: a list of locally known itags
-    :returns: if a group, the appropriate itag, if an itag, the same itag
+    :returns: the associated itag, or None if the group is unknown
     """
 
-    if name == "low":
-        return known_itags[-1]
-    elif name == "medium":
-        return known_itags[len(known_itags) // 2]
-    elif name == "high":
-        return known_itags[0]
-    else:
-        try:
-            int(name)
-        except ValueError:
-            raise UnknownQualityGroupError(name)
-        else:
-            return name
+    groups = {
+        "low": -1,
+        "medium": len(known_itags) // 2,
+        "high": 0,
+    }
+
+    if group in groups:
+        return known_itags[groups[group]]
+    elif group in known_itags:
+        return group
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "-q", "--quality",
-        help='"low", "medium", "high", or an itag, see http://goo.gl/uEIuR',
-        default="medium"
-    )
-    parser.add_argument(
-        "--3d",
-        dest="three_dimensions",
-        action="store_true",
-        help="Return 3D video only",
-    )
-    parser.add_argument(
-        "url",
-        metavar="video_id/url",
-        help="a YouTube url (or bare video ID)"
-    )
-    args = parser.parse_args()
+    args = docopt(__doc__)
 
-    if args.three_dimensions:
-        video_type = "3d"
-    else:
-        video_type = "normal"
+    video_id = strip_to_video_id(args["<url>"])
+    known_itags = default_itag_order()
 
-    video_id = strip_to_video_id(args.url)
-    known_itags = default_itag_order(video_type)
-
-    try:
-        desired_itag = parse_quality_group(args.quality, known_itags)
-    except UnknownQualityGroupError:
-        print("Unknown quality: " + args.quality, file=sys.stderr)
+    desired_itag = quality_group(args["--quality"] or "medium", known_itags)
+    if desired_itag is None:
+        print("Unknown quality: " + args["--quality"], file=sys.stderr)
         sys.exit(2)
 
     try:
@@ -223,6 +165,4 @@ if __name__ == "__main__":
         print(used_url)
     else:
         print("No local itags available.", file=sys.stderr)
-        if args.three_dimensions:
-            print("Maybe you requested 3D on a non-3D video?", file=sys.stderr)
         sys.exit(1)
