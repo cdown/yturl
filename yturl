@@ -16,9 +16,6 @@ except ImportError:  # Python 2 fallback
     from urlparse import parse_qs, urlparse
 
 
-max_video_id_length = 11
-
-
 class YouTubeAPIError(Exception):
     """
     Raised when the YouTube API returns unknown data.
@@ -72,7 +69,8 @@ def strip_to_video_id(url):
     if "v" in url_params:
         return url_params["v"][0]
     else:
-        return url.split("/")[-1]
+        maximum_video_id_length = 11
+        return url.split("/")[-1][:maximum_video_id_length]
 
 
 def itag_order(desired_itag, known_itags):
@@ -115,7 +113,7 @@ def available_itags(video_id, test_file_handle=None):
         raise YouTubeAPIError(res_data["reason"][0])
 
 
-def parse_quality_group(name, known_itags):
+def parse_quality_group(group, known_itags):
     """
     Parse string based quality groups into their itag equivalents.
 
@@ -124,19 +122,16 @@ def parse_quality_group(name, known_itags):
     :returns: the associated itag, or None if the group is unknown
     """
 
-    if name == "low":
-        return known_itags[-1]
-    elif name == "medium":
-        return known_itags[len(known_itags) // 2]
-    elif name == "high":
-        return known_itags[0]
-    else:
-        try:
-            int(name)
-        except ValueError:
-            return None
-        else:
-            return name
+    groups = {
+        "low": -1,
+        "medium": len(known_itags) // 2,
+        "high": 0,
+    }
+
+    if group in groups:
+        return known_itags[groups[group]]
+    elif group in known_itags:
+        return group
 
 
 if __name__ == "__main__":
