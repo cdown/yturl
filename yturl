@@ -33,51 +33,36 @@ class YouTubeAPIError(Exception):
     pass
 
 
-def default_itag_order(video_type):
+def default_itag_order():
     """
     Return itags in order of quality preference.
 
-    :param video_type: normal or 3d video
     :returns: itags sorted in default order
     """
 
     itags = {
-        "normal": {
-        #   itag    v-dimensions v-bitrate a-bitrate a-samplerate v-encoding
-            "5":   (400*240,     0.25,     64,       22.05,       "h263"),
-            "6":   (480*270,     0.8,      64,       22.05,       "h263"),
-            "13":  (176*144,     0.5,      64,       22.05,       "mp4v"),
-            "17":  (176*144,     2,        64,       22.05,       "mp4v"),
-            "18":  (640*360,     0.5,      96,       44.1,        "h264"),
-            "22":  (1280*720,    2.9,      192,      44.1,        "h264"),
-            "34":  (640*360,     0.5,      128,      44.1,        "h264"),
-            "35":  (854*480,     1,        128,      44.1,        "h264"),
-            "36":  (320*240,     0.17,     38,       44.1,        "mp4v"),
-            "37":  (1920*1080,   2.9,      192,      44.1,        "h264"),
-            "38":  (4096*3072,   5,        192,      44.1,        "h264"),
-            "43":  (640*360,     0.5,      128,      44.1,        "vp8"),
-            "44":  (854*480,     1,        128,      44.1,        "vp8"),
-            "45":  (1280*720,    2,        192,      44.1,        "vp8"),
-            "46":  (1920*1080,   2,        192,      44.1,        "vp8"),
-        },
-        "3d": {
-            "82":  (640*360,     0.5,      96,       44.1,        "h264"),
-            "83":  (320*240,     0.5,      96,       44.1,        "h264"),
-            "84":  (1280*720,    2.9,      152,      44.1,        "h264"),
-            "85":  (960*540,     2.9,      152,      44.1,        "h264"),
-            "100": (640*360,     0.5,      128,      44.1,        "vp8"),
-            "101": (640*360,     0.5,      192,      44.1,        "vp8"),
-            "102": (1280*720,    2,        192,      44.1,        "vp8"),
-        }
+        "5":   (400*240,     0.25,     64,       22.05,       "h263"),
+        "6":   (480*270,     0.8,      64,       22.05,       "h263"),
+        "13":  (176*144,     0.5,      64,       22.05,       "mp4v"),
+        "17":  (176*144,     2,        64,       22.05,       "mp4v"),
+        "18":  (640*360,     0.5,      96,       44.1,        "h264"),
+        "22":  (1280*720,    2.9,      192,      44.1,        "h264"),
+        "34":  (640*360,     0.5,      128,      44.1,        "h264"),
+        "35":  (854*480,     1,        128,      44.1,        "h264"),
+        "36":  (320*240,     0.17,     38,       44.1,        "mp4v"),
+        "37":  (1920*1080,   2.9,      192,      44.1,        "h264"),
+        "38":  (4096*3072,   5,        192,      44.1,        "h264"),
+        "43":  (640*360,     0.5,      128,      44.1,        "vp8"),
+        "44":  (854*480,     1,        128,      44.1,        "vp8"),
+        "45":  (1280*720,    2,        192,      44.1,        "vp8"),
+        "46":  (1920*1080,   2,        192,      44.1,        "vp8"),
     }
 
-    sorted_itags = sorted(
-        itags[video_type],
+    return sorted(
+        itags,
         reverse=True,
-        key=lambda x: itags[video_type][x]
+        key=lambda x: itags[x]
     )
-
-    return sorted_itags
 
 
 def strip_to_video_id(url):
@@ -181,25 +166,14 @@ if __name__ == "__main__":
         default="medium"
     )
     parser.add_argument(
-        "--3d",
-        dest="three_dimensions",
-        action="store_true",
-        help="Return 3D video only",
-    )
-    parser.add_argument(
         "url",
         metavar="video_id/url",
         help="a YouTube url (or bare video ID)"
     )
     args = parser.parse_args()
 
-    if args.three_dimensions:
-        video_type = "3d"
-    else:
-        video_type = "normal"
-
     video_id = strip_to_video_id(args.url)
-    known_itags = default_itag_order(video_type)
+    known_itags = default_itag_order()
 
     try:
         desired_itag = parse_quality_group(args.quality, known_itags)
