@@ -107,23 +107,12 @@ def available_itags(video_id, test_file_handle=None):
     res_data = parse_qs(res_handle.read().decode("utf8"))
 
     if "url_encoded_fmt_stream_map" in res_data:
-        stream_maps_raw = res_data["url_encoded_fmt_stream_map"][0]
-        stream_maps = stream_maps_raw.split(",")
-
-        for stream_map in stream_maps:
-            stream_map = parse_qs(stream_map)
-
-            itag = stream_map["itag"][0]
-            base_url = stream_map["url"][0]
-            signature = stream_map["sig"][0]
-
-            yield (
-                itag,
-                base_url + "&signature=" + signature,
-            )
+        stream_maps = res_data["url_encoded_fmt_stream_map"][0].split(",")
+        for video in stream_maps:
+            video = dict((k, v[0]) for k, v in parse_qs(video).items())
+            yield video["itag"], "%(url)s&signature=%(sig)s" % video
     else:
-        failure_reason = res_data["reason"][0]
-        raise YouTubeAPIError(failure_reason)
+        raise YouTubeAPIError(res_data["reason"][0])
 
 
 def parse_quality_group(name, known_itags):
