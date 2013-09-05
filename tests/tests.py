@@ -50,7 +50,7 @@ def testAvailableItagsReal():
     assert r.getcode() == 200
 
 def testQualityGroupParse():
-    parse = yturl.parse_quality_group
+    parse = yturl.quality_group
 
     assert parse("18", known_itags) == "18"
     assert known_itags.index(parse("high", known_itags)) == 0

@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 
 """
-Print direct URLs to YouTube videos.
+Usage: yturl [options] <url>
+
+Options:
+  -h, --help             This help text.
+  -q, --quality QUALITY  The video quality, either an itag or low/medium/high.
 """
 
 from __future__ import print_function
-import argparse
+from docopt import docopt
 import sys
 
 try:
@@ -113,7 +117,7 @@ def available_itags(video_id, test_file_handle=None):
         raise YouTubeAPIError(res_data["reason"][0])
 
 
-def parse_quality_group(group, known_itags):
+def quality_group(group, known_itags):
     """
     Parse string based quality groups into their itag equivalents.
 
@@ -135,25 +139,14 @@ def parse_quality_group(group, known_itags):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "-q", "--quality",
-        help='"low", "medium", "high", or an itag, see http://goo.gl/uEIuR',
-        default="medium"
-    )
-    parser.add_argument(
-        "url",
-        metavar="video_id/url",
-        help="a YouTube url (or bare video ID)"
-    )
-    args = parser.parse_args()
+    args = docopt(__doc__)
 
-    video_id = strip_to_video_id(args.url)
+    video_id = strip_to_video_id(args["<url>"])
     known_itags = default_itag_order()
 
-    desired_itag = parse_quality_group(args.quality, known_itags)
+    desired_itag = quality_group(args["--quality"] or "medium", known_itags)
     if desired_itag is None:
-        print("Unknown quality: " + args.quality, file=sys.stderr)
+        print("Unknown quality: " + args["--quality"], file=sys.stderr)
         sys.exit(2)
 
     try:
