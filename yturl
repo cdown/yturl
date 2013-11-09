@@ -5,7 +5,7 @@ Usage: yturl [options] <url>
 
 Options:
   -h, --help             This help text.
-  -q, --quality QUALITY  The video quality, either an itag or low/medium/high.
+  -q, --quality QUALITY  Either an itag or low/medium/high. [default: medium]
 """
 
 from __future__ import print_function
@@ -147,7 +147,7 @@ if __name__ == "__main__":
     video_id = strip_to_video_id(args["<url>"])
     known_itags = default_itag_order()
 
-    desired_itag = quality_group(args["--quality"] or "medium", known_itags)
+    desired_itag = quality_group(args["--quality"], known_itags)
     if desired_itag is None:
         print("Unknown quality: " + args["--quality"], file=sys.stderr)
         sys.exit(2)
