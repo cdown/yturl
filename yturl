@@ -120,24 +120,24 @@ def available_itags(video_id, test_file_handle=None):
         raise YouTubeAPIError(res_data["reason"][0])
 
 
-def quality_group(group, known_itags):
+def quality_group(group, itags_in_quality_order):
     """
     Parse string based quality groups into their itag equivalents.
 
     :param name: the name of the quality group to be parsed
-    :param known_itags: a list of locally known itags
+    :param itags_in_quality_order: a list of locally known itags, in order
     :returns: the associated itag, or None if the group is unknown
     """
 
     groups = {
         "low": -1,
-        "medium": len(known_itags) // 2,
+        "medium": len(itags_in_quality_order) // 2,
         "high": 0,
     }
 
     if group in groups:
-        return known_itags[groups[group]]
-    elif group in known_itags:
+        return itags_in_quality_order[groups[group]]
+    elif group in itags_in_quality_order:
         return group
 
 
