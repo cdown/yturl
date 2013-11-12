@@ -58,9 +58,9 @@ def strip_to_video_id(url):
 
     url_params = parse_qs(urlparse(url).query)
 
-    if "v" in url_params:
+    try:
         return url_params["v"][0]
-    else:
+    except KeyError:
         maximum_video_id_length = 11
         return url.split("/")[-1][:maximum_video_id_length]
 
