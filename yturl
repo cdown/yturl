@@ -20,13 +20,6 @@ except ImportError:  # Python 2 fallback
     from urlparse import parse_qs, urlparse
 
 
-class YouTubeAPIError(Exception):
-    """
-    Raised when the YouTube API returns unknown data.
-    """
-    pass
-
-
 def default_itag_order():
     """
     Return itags in order of quality preference.
@@ -117,7 +110,7 @@ def available_itags(video_id, test_file_handle=None):
             video = dict((k, v[0]) for k, v in stream.items())
             yield video["itag"], "%(url)s&signature=%(sig)s" % video
     else:
-        raise YouTubeAPIError(res_data["reason"][0])
+        raise LookupError(res_data["reason"][0])
 
 
 def quality_group(group, itags_in_quality_order):
@@ -154,7 +147,7 @@ if __name__ == "__main__":
 
     try:
         avail_itags = dict(available_itags(video_id))
-    except YouTubeAPIError as e:
+    except LookupError as e:
         print("The YouTube API returned an error: " + str(e), file=sys.stderr)
         sys.exit(3)
 

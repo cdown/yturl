@@ -49,4 +49,4 @@ def test_quality_group_parsing():
 def test_embed_restriction_raises():
     with open(os.path.join(os.path.dirname(__file__), "api_output/embed_restricted"), "rb") as f:
         avail = yturl.available_itags(None, f)
-        assert_raises(yturl.YouTubeAPIError, list, avail)
+        assert_raises(LookupError, list, avail)
