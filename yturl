@@ -45,12 +45,7 @@ def default_itag_order():
         "45":  (1280*720,    2,        192,      44.1,        "vp8"),
         "46":  (1920*1080,   2,        192,      44.1,        "vp8"),
     }
-
-    return sorted(
-        itags,
-        reverse=True,
-        key=lambda x: itags[x]
-    )
+    return sorted(itags, reverse=True, key=lambda x: itags[x])
 
 
 def strip_to_video_id(url):
