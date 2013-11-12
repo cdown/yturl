@@ -17,7 +17,7 @@ def test_itag_order():
 
 def test_desired_itag_order():
     itag_order = yturl.itag_order("18", known_itags)
-    assert itag_order == ('18', '34', '6', '43', '5', '35', '36', '44', '17', '45', '13', '22', '46', '37', '38')
+    assert list(itag_order) == ['18', '6', '34', '5', '43', '36', '35', '17', '44', '13', '45', '22', '46', '37', '38']
 
 def test_url_stripping():
     assert yturl.strip_to_video_id("http://www.youtube.com/watch?feature=player_embedded&v=gEl6TXrkZnk") == "gEl6TXrkZnk"
