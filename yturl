@@ -143,8 +143,8 @@ if __name__ == "__main__":
 
     try:
         avail_itags = dict(available_itags(video_id))
-    except LookupError as e:
-        print("The YouTube API returned an error: " + str(e), file=sys.stderr)
+    except LookupError as err:
+        print("YouTube API error: " + str(err), file=sys.stderr)
         sys.exit(3)
 
     ordered_itags = itag_order(desired_itag, known_itags)
