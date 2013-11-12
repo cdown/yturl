@@ -74,10 +74,12 @@ def itag_order(desired_itag, known_itags):
     :returns: the preferential order of itags
     """
 
-    return list(zip(*sorted(
+    desired_index = known_itags.index(desired_itag)
+    desirable_order = sorted(
         enumerate(known_itags),
-        key=lambda x: abs(known_itags.index(desired_itag) - x[0]))
-    ))[1]
+        key=lambda itags_indexed: abs(desired_index - itags_indexed[0])
+    )
+    return list(zip(*desirable_order))[1]
 
 
 def available_itags(video_id, test_file_handle=None):
