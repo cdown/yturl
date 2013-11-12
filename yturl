@@ -96,16 +96,16 @@ def available_itags(video_id, test_file_handle=None):
 
     res_data = parse_qs(res_handle.read().decode("utf8"))
 
-    if "url_encoded_fmt_stream_map" in res_data:
+    try:
         streams_raw = res_data["url_encoded_fmt_stream_map"][0]
+    except KeyError:
+        raise LookupError(res_data["reason"][0])
+    else:
         streams = streams_raw.split(",")
-
         for stream in streams:
             stream = parse_qs(stream)
             video = dict((k, v[0]) for k, v in stream.items())
             yield video["itag"], "%(url)s&signature=%(sig)s" % video
-    else:
-        raise LookupError(res_data["reason"][0])
 
 
 def quality_group(group, itags_in_quality_order):
