@@ -123,10 +123,11 @@ def quality_group(group, itags_in_quality_order):
         "high": 0,
     }
 
-    if group in groups:
+    try:
         return itags_in_quality_order[groups[group]]
-    elif group in itags_in_quality_order:
-        return group
+    except KeyError:
+        if group in itags_in_quality_order:
+            return group
 
 
 if __name__ == "__main__":
