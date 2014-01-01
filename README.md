@@ -1,37 +1,27 @@
 [![Build Status](https://travis-ci.org/cdown/yturl.png?branch=master)](https://travis-ci.org/cdown/yturl)
-[![PyPI](https://pypip.in/v/yturl/badge.png)](https://pypi.python.org/pypi/yturl)
 
 yturl gets direct media URLs to YouTube media, allowing you to play them in
 your favourite media player, download them, or do whatever you like.
 
-# Examples
+# Usage
 
-Watch a video of Bill Gates jumping over a chair (`-q medium` is implicit, you
-may also want to look at mplayer's `-cache` option):
+To get the media URL for a video, all you need to do is pass the URL to the
+video as an argument:
 
-    mplayer "$(yturl 'http://www.youtube.com/watch?v=KxaCOHT0pmI')"
+    yturl youtu.be/kTFZyl7hfBw
 
-Download the same video, using the highest quality format available:
+You can get higher quality by using `-q high`.
 
-    curl -o bill "$(yturl -q high 'http://www.youtube.com/watch?v=KxaCOHT0pmI')"
+It's up to you what you do with the URL. I usually view the video in
+[mpv][mpv]:
 
-Download the same video, at the closest available quality to itag 38:
+    mpv "$(yturl youtu.be/kTFZyl7hfBw)"
 
-    curl -o bill "$(yturl -q 38 'http://www.youtube.com/watch?v=KxaCOHT0pmI')"
+You might consider using a shell function if you do this often, which allows
+you to pass any yturl arguments and automatically have the video play in mpv:
 
-Download the same video, using the lowest quality format available:
+    yt() { mpv "$(yturl "$@")"; }
 
-    curl -o bill "$(yturl -q low 'http://www.youtube.com/watch?v=KxaCOHT0pmI')"
+You can replace mpv with your media player of choice.
 
-# Use with a media player
-
-If you find yourself frequently watching videos in mplayer using yturl, you can
-quite easily write a shell wrapper:
-
-    yt() {
-        mplayer "$(yturl "$@")"
-    }
-
-Then just use it in the same way you would use `yturl`, calling it with `yt`
-instead. Obviously you can substitute mplayer as appropriate with your media
-player of choice.
+[mpv]: http://mpv.io/
