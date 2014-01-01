@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 
 import os
-import imp
+import yturl
 from nose.tools import assert_raises, eq_
 
 try:
@@ -9,7 +9,6 @@ try:
 except ImportError:  # Python 2 fallback
     from urllib import urlopen
 
-yturl = imp.load_source("yturl", os.path.join(os.path.dirname(__file__), "../yturl"))
 known_itags = yturl.default_itag_order()
 
 def test_itag_order():
