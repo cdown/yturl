@@ -24,5 +24,4 @@ setup(
         "Topic :: Internet",
         "Topic :: Utilities",
     ],
-    requires = [ "docopt" ],
 )
