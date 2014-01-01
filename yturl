@@ -75,20 +75,15 @@ def itag_order(desired_itag, known_itags):
                 yield itag
 
 
-def available_itags(video_id, test_file_handle=None):
+def available_itags(video_id):
     """
     Return available itags and their associated URLs as a list.
 
     :param video_id: the video ID to get itags for
-    :param test_file_handle: read from file handle (for testing)
     """
 
-    if test_file_handle is None:
-        url = "http://youtube.com/get_video_info?hl=en&video_id=" + video_id
-        res_handle = urlopen(url)
-    else:
-        res_handle = test_file_handle
-
+    url = "http://youtube.com/get_video_info?hl=en&video_id=" + video_id
+    res_handle = urlopen(url)
     res_data = parse_qs(res_handle.read().decode("utf8"))
 
     try:
