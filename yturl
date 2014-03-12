@@ -95,7 +95,7 @@ def available_itags(video_id):
         for stream in streams:
             stream = parse_qs(stream)
             video = dict((k, v[0]) for k, v in stream.items())
-            yield video["itag"], "%(url)s&signature=%(sig)s" % video
+            yield video["itag"], video["url"]
 
 
 def quality_group(group, itags_in_quality_order):
