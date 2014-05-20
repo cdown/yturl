@@ -1,27 +1,50 @@
+yturl gets direct media URLs to YouTube media, freeing you having to view them
+in your browser.
+
+```
+$ yturl 'http://www.youtube.com/watch?v=8TCxE0bWQeQ'
+Using itag 43.
+http://r2---sn-uphxqvujvh-30al.googlevideo.com/videoplayback?source=[...]
+```
+
+## Examples
+
+### View video in your video player
+
+Using [mpv][]:
+
+```
+$ mpv "$(yturl 'http://www.youtube.com/watch?v=8TCxE0bWQeQ')"
+```
+
+[mpv]: http://mpv.io
+
+### Download video
+
+Using [curl][]:
+
+```
+$ curl -o bill_chair "$(yturl 'http://www.youtube.com/watch?v=8TCxE0bWQeQ')"
+```
+
+[curl]: http://curl.haxx.se
+
+## Installation
+
+    $ pip install yturl
+
+## Testing
+
 [![Build status][travis-image]][travis-builds]
 
-yturl gets direct media URLs to YouTube media, allowing you to play them in
-your favourite media player, download them, or do whatever you like.
+    $ pip install -r tests/requirements.txt
+    $ nosetests
 
-# Usage
-
-To get the media URL for a video, pass a URL containing the video ID:
-
-    yturl youtu.be/kTFZyl7hfBw
-
-You can get higher quality by using `-q high`.
-
-It's up to you what you do with the URL. I usually view the video in
-[mpv][mpv]:
-
-    mpv "$(yturl youtu.be/kTFZyl7hfBw)"
-
-You might use a shell function if you do this often:
-
-    yt() { mpv "$(yturl "$@")"; }
-
-You can replace mpv with your media player of choice.
-
-[mpv]: http://mpv.io/
 [travis-builds]: https://travis-ci.org/cdown/yturl
 [travis-image]: https://travis-ci.org/cdown/yturl.png?branch=master
+
+## License
+
+yturl is [ISC licensed][isc]. See the LICENSE file for full details.
+
+[isc]: http://en.wikipedia.org/wiki/ISC_license
