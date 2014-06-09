@@ -86,7 +86,6 @@ def available_itags(video_id):
     res_handle = urlopen(url)
     res_data = dict(parse_qsl(res_handle.read().decode("utf8")))
 
-
     try:
         streams_raw = res_data["url_encoded_fmt_stream_map"]
     except KeyError:
