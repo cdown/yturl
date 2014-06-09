@@ -67,8 +67,7 @@ def itag_order(desired_itag, known_itags):
     pivot = known_itags.index(desired_itag)
     for pair in zip_longest(known_itags[pivot::-1], known_itags[pivot+1:]):
         for itag in pair:
-            if itag is not None:
-                yield itag
+            yield itag
 
 
 def available_itags(video_id):
