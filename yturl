@@ -50,13 +50,13 @@ def strip_to_video_id(url):
     :returns: the video ID
     """
 
+    parsed_url = urlparse(url)
     url_params = dict(parse_qsl(urlparse(url).query))
 
     try:
         return url_params["v"]
     except KeyError:
-        maximum_video_id_length = 11
-        return url.split("/")[-1][:maximum_video_id_length]
+        return parsed_url.path.split("/")[-1]
 
 
 def itag_order(desired_itag, known_itags):
