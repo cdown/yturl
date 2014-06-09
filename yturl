@@ -6,11 +6,11 @@ import sys
 
 try:
     from urllib.request import urlopen
-    from urllib.parse import parse_qs, urlparse
+    from urllib.parse import parse_qsl, urlparse
     from itertools import zip_longest
 except ImportError:  # Python 2 fallback
     from urllib import urlopen
-    from urlparse import parse_qs, urlparse
+    from urlparse import parse_qsl, urlparse
     from itertools import izip_longest as zip_longest
 
 
@@ -50,10 +50,10 @@ def strip_to_video_id(url):
     :returns: the video ID
     """
 
-    url_params = parse_qs(urlparse(url).query)
+    url_params = dict(parse_qsl(urlparse(url).query))
 
     try:
-        return url_params["v"][0]
+        return url_params["v"]
     except KeyError:
         maximum_video_id_length = 11
         return url.split("/")[-1][:maximum_video_id_length]
@@ -84,17 +84,17 @@ def available_itags(video_id):
 
     url = "http://youtube.com/get_video_info?hl=en&video_id=" + video_id
     res_handle = urlopen(url)
-    res_data = parse_qs(res_handle.read().decode("utf8"))
+    res_data = dict(parse_qsl(res_handle.read().decode("utf8")))
+
 
     try:
-        streams_raw = res_data["url_encoded_fmt_stream_map"][0]
+        streams_raw = res_data["url_encoded_fmt_stream_map"]
     except KeyError:
-        raise LookupError(res_data["reason"][0])
+        raise LookupError(res_data["reason"])
     else:
         streams = streams_raw.split(",")
         for stream in streams:
-            stream = parse_qs(stream)
-            video = dict((k, v[0]) for k, v in stream.items())
+            video = dict(parse_qsl(stream))
             yield video["itag"], video["url"]
 
 
