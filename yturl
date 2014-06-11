@@ -14,11 +14,13 @@ except ImportError:  # Python 2 fallback
     from itertools import izip_longest as zip_longest
 
 
-def default_itag_order():
+def itags_by_quality():
     """
-    Return itags in order of quality preference.
+    List all known itags from best quality to worst. Quality is determined by
+    sorting each itag's video dimensions, video bitrate, audio bitrate, audio
+    sample rate, and video encoding, in that order.
 
-    :returns: itags sorted in default order
+    :returns: all known itags sorted from best quality to worst
     """
 
     itags = {
@@ -42,12 +44,12 @@ def default_itag_order():
     return sorted(itags, reverse=True, key=lambda x: itags[x])
 
 
-def strip_to_video_id(url):
+def video_id_from_url(url):
     """
-    Strip a URL to its video ID.
+    Parse a video ID from a YouTube URL.
 
-    :param url: a url containing a video ID
-    :returns: the video ID
+    :param url: a YouTube URL or string containing a video ID
+    :returns: the video ID contained in the URL or string
     """
 
     parsed_url = urlparse(url)
@@ -55,13 +57,15 @@ def strip_to_video_id(url):
     return url_params.get("v", parsed_url.path.split("/")[-1])
 
 
-def itag_order(desired_itag, known_itags):
+def itags_by_similarity(desired_itag, known_itags):
     """
-    Return the desired itag sorting.
+    Return itags ordered by the similarity to the desired one. Similarity is
+    determined by seeking outwards from the index of the desired itag in the
+    sorted list of known itags.
 
-    :param desired_itag: the itag to sort based upon
-    :param known_itags: locally known itags (sorted)
-    :returns: the preferential order of itags
+    :param desired_itag: the itag most desired
+    :param known_itags: all known itags
+    :returns: itags in order of similarity to the desired one
     """
 
     pivot = known_itags.index(desired_itag)
@@ -70,11 +74,12 @@ def itag_order(desired_itag, known_itags):
             yield itag
 
 
-def available_itags(video_id):
+def itags_for_video(video_id):
     """
-    Return available itags and their associated URLs as a list.
+    Return the available itags for a video with their associated URLs.
 
     :param video_id: the video ID to get itags for
+    :returns: tuples of itags and their media URL
     """
 
     url = "http://youtube.com/get_video_info?hl=en&video_id=" + video_id
@@ -92,25 +97,26 @@ def available_itags(video_id):
             yield video["itag"], video["url"]
 
 
-def quality_group(group, itags_in_quality_order):
+def itag_from_quality(group, itags_by_quality):
     """
-    Parse string based quality groups into their itag equivalents.
+    Return the itag representing a quality group name, or if the quality is a
+    known itag, return that itag.
 
     :param name: the name of the quality group to be parsed
-    :param itags_in_quality_order: a list of locally known itags, in order
+    :param itags_by_quality: locally known itags in quality order
     :returns: the associated itag, or None if the group is unknown
     """
 
     groups = {
         "low": -1,
-        "medium": len(itags_in_quality_order) // 2,
+        "medium": len(itags_by_quality) // 2,
         "high": 0,
     }
 
     try:
-        return itags_in_quality_order[groups[group]]
+        return itags_by_quality[groups[group]]
     except KeyError:
-        if group in itags_in_quality_order:
+        if group in itags_by_quality:
             return group
 
 
@@ -128,21 +134,21 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    video_id = strip_to_video_id(args.url)
-    known_itags = default_itag_order()
+    video_id = video_id_from_url(args.url)
+    known_itags = itags_by_quality()
 
-    desired_itag = quality_group(args.quality, known_itags)
+    desired_itag = itag_from_quality(args.quality, known_itags)
     if desired_itag is None:
         print("Unknown quality: " + args.quality, file=sys.stderr)
         sys.exit(2)
 
     try:
-        avail_itags = dict(available_itags(video_id))
+        avail_itags = dict(itags_for_video(video_id))
     except LookupError as err:
         print("YouTube API error: " + str(err), file=sys.stderr)
         sys.exit(3)
 
-    ordered_itags = itag_order(desired_itag, known_itags)
+    ordered_itags = itags_by_similarity(desired_itag, known_itags)
     suitable_itags = [x for x in ordered_itags if x in avail_itags]
 
     if suitable_itags:
