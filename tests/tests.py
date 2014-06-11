@@ -11,13 +11,11 @@ try:
 except ImportError:  # Python 2 fallback
     from urllib import urlopen
 
-known_itags = yturl.itags_by_quality()
-
 def test_itag_order():
-    eq_(known_itags, ['38', '37', '46', '22', '45', '44', '35', '43', '34', '18', '6', '5', '36', '17', '13'])
+    eq_(yturl.itags_by_quality, ['38', '37', '46', '22', '45', '44', '35', '43', '34', '18', '6', '5', '36', '17', '13'])
 
 def test_desired_itags_by_similarity():
-    itags_by_similarity = yturl.itags_by_similarity("18", known_itags)
+    itags_by_similarity = yturl.itags_by_similarity("18")
     eq_(list(itags_by_similarity), ['18', '6', '34', '5', '43', '36', '35', '17', '44', '13', '45', None, '22', None, '46', None, '37', None, '38', None])
 
 def test_url_stripping():
@@ -47,10 +45,10 @@ def test_available_itags_parsing(urlopen_mock):
     f.close()
 
 def test_quality_group_parsing():
-    eq_(yturl.itag_from_quality("18", known_itags), "18")
-    eq_(known_itags.index(yturl.itag_from_quality("high", known_itags)), 0)
-    eq_(known_itags.index(yturl.itag_from_quality("medium", known_itags)), len(known_itags) // 2)
-    eq_(known_itags.index(yturl.itag_from_quality("low", known_itags)), len(known_itags) - 1)
+    eq_(yturl.itag_from_quality("18"), "18")
+    eq_(yturl.itags_by_quality.index(yturl.itag_from_quality("high")), 0)
+    eq_(yturl.itags_by_quality.index(yturl.itag_from_quality("medium")), len(yturl.itags_by_quality) // 2)
+    eq_(yturl.itags_by_quality.index(yturl.itag_from_quality("low")), len(yturl.itags_by_quality) - 1)
 
 @patch("yturl.urlopen")
 def test_embed_restriction_raises(urlopen_mock):

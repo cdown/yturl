@@ -14,34 +14,25 @@ except ImportError:  # Python 2 fallback
     from itertools import izip_longest as zip_longest
 
 
-def itags_by_quality():
-    """
-    List all known itags from best quality to worst. Quality is determined by
-    sorting each itag's video dimensions, video bitrate, audio bitrate, audio
-    sample rate, and video encoding, in that order.
-
-    :returns: all known itags sorted from best quality to worst
-    """
-
-    itags = {
-    #   itag    v-dimensions v-bitrate a-bitrate a-samplerate v-encoding
-        "5":   (400*240,     0.25,     64,       22.05,       "h263"),
-        "6":   (480*270,     0.8,      64,       22.05,       "h263"),
-        "13":  (176*144,     0.5,      64,       22.05,       "mp4v"),
-        "17":  (176*144,     2,        64,       22.05,       "mp4v"),
-        "18":  (640*360,     0.5,      96,       44.1,        "h264"),
-        "22":  (1280*720,    2.9,      192,      44.1,        "h264"),
-        "34":  (640*360,     0.5,      128,      44.1,        "h264"),
-        "35":  (854*480,     1,        128,      44.1,        "h264"),
-        "36":  (320*240,     0.17,     38,       44.1,        "mp4v"),
-        "37":  (1920*1080,   2.9,      192,      44.1,        "h264"),
-        "38":  (4096*3072,   5,        192,      44.1,        "h264"),
-        "43":  (640*360,     0.5,      128,      44.1,        "vp8"),
-        "44":  (854*480,     1,        128,      44.1,        "vp8"),
-        "45":  (1280*720,    2,        192,      44.1,        "vp8"),
-        "46":  (1920*1080,   2,        192,      44.1,        "vp8"),
-    }
-    return sorted(itags, reverse=True, key=lambda x: itags[x])
+itags = {
+#   itag    v-dimensions v-bitrate a-bitrate a-samplerate v-encoding
+    "5":   (400*240,     0.25,     64,       22.05,       "h263"),
+    "6":   (480*270,     0.8,      64,       22.05,       "h263"),
+    "13":  (176*144,     0.5,      64,       22.05,       "mp4v"),
+    "17":  (176*144,     2,        64,       22.05,       "mp4v"),
+    "18":  (640*360,     0.5,      96,       44.1,        "h264"),
+    "22":  (1280*720,    2.9,      192,      44.1,        "h264"),
+    "34":  (640*360,     0.5,      128,      44.1,        "h264"),
+    "35":  (854*480,     1,        128,      44.1,        "h264"),
+    "36":  (320*240,     0.17,     38,       44.1,        "mp4v"),
+    "37":  (1920*1080,   2.9,      192,      44.1,        "h264"),
+    "38":  (4096*3072,   5,        192,      44.1,        "h264"),
+    "43":  (640*360,     0.5,      128,      44.1,        "vp8"),
+    "44":  (854*480,     1,        128,      44.1,        "vp8"),
+    "45":  (1280*720,    2,        192,      44.1,        "vp8"),
+    "46":  (1920*1080,   2,        192,      44.1,        "vp8"),
+}
+itags_by_quality = sorted(itags, reverse=True, key=lambda itag: itags[itag])
 
 
 def video_id_from_url(url):
@@ -57,19 +48,23 @@ def video_id_from_url(url):
     return url_params.get("v", parsed_url.path.split("/")[-1])
 
 
-def itags_by_similarity(desired_itag, known_itags):
+def itags_by_similarity(desired_itag):
     """
     Return itags ordered by the similarity to the desired one. Similarity is
     determined by seeking outwards from the index of the desired itag in the
     sorted list of known itags.
 
     :param desired_itag: the itag most desired
-    :param known_itags: all known itags
     :returns: itags in order of similarity to the desired one
     """
 
-    pivot = known_itags.index(desired_itag)
-    for pair in zip_longest(known_itags[pivot::-1], known_itags[pivot+1:]):
+    desired_index = itags_by_quality.index(desired_itag)
+    pairs_by_distance = zip_longest(
+        itags_by_quality[desired_index::-1],
+        itags_by_quality[desired_index+1:],
+    )
+
+    for pair in pairs_by_distance:
         for itag in pair:
             yield itag
 
@@ -97,13 +92,12 @@ def itags_for_video(video_id):
             yield video["itag"], video["url"]
 
 
-def itag_from_quality(group, itags_by_quality):
+def itag_from_quality(group):
     """
     Return the itag representing a quality group name, or if the quality is a
     known itag, return that itag.
 
     :param name: the name of the quality group to be parsed
-    :param itags_by_quality: locally known itags in quality order
     :returns: the associated itag, or None if the group is unknown
     """
 
@@ -135,9 +129,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     video_id = video_id_from_url(args.url)
-    known_itags = itags_by_quality()
 
-    desired_itag = itag_from_quality(args.quality, known_itags)
+    desired_itag = itag_from_quality(args.quality)
     if desired_itag is None:
         print("Unknown quality: " + args.quality, file=sys.stderr)
         sys.exit(2)
@@ -148,7 +141,7 @@ if __name__ == "__main__":
         print("YouTube API error: " + str(err), file=sys.stderr)
         sys.exit(3)
 
-    ordered_itags = itags_by_similarity(desired_itag, known_itags)
+    ordered_itags = itags_by_similarity(desired_itag)
     suitable_itags = [x for x in ordered_itags if x in avail_itags]
 
     if suitable_itags:
