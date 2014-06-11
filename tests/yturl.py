@@ -1,1 +1,1 @@
-../yturl
+../yturl.py
