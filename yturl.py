@@ -40,7 +40,7 @@ def video_id_from_url(url):
     """
 
     parsed_url = urlparse(url)
-    url_params = dict(parse_qsl(urlparse(url).query))
+    url_params = dict(parse_qsl(parsed_url.query))
     return url_params.get("v", parsed_url.path.split("/")[-1])
 
 
