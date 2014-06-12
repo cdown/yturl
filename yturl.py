@@ -3,11 +3,11 @@
 try:
     from urllib.request import urlopen
     from urllib.parse import parse_qsl, urlparse
-    from itertools import zip_longest
+    from itertools import chain, zip_longest
 except ImportError:  # Python 2 fallback
     from urllib import urlopen
     from urlparse import parse_qsl, urlparse
-    from itertools import izip_longest as zip_longest
+    from itertools import chain, izip_longest as zip_longest
 
 
 itags = {
@@ -60,9 +60,7 @@ def itags_by_similarity(desired_itag):
         itags_by_quality[desired_index+1:],
     )
 
-    for pair in pairs_by_distance:
-        for itag in pair:
-            yield itag
+    return chain(*pairs_by_distance)
 
 
 def itags_for_video(video_id):
