@@ -106,3 +106,19 @@ def itag_from_quality(group):
     except KeyError:
         if group in itags_by_quality:
             return group
+
+
+def most_similar_available_itag(itags_by_similarity, itags_for_video):
+    """
+    Return the most similar available itag to the desired itag. See
+    itags_by_similarity for information about how "similarity" is determined.
+
+    :param itags_by_similarity: a list of itags, from the most desired to least
+                                desired
+    :param itags_for_video: the itags available for this video
+    :returns: the most similar available itag
+    """
+
+    for itag in itags_by_similarity:
+        if itag in itags_for_video:
+            return itag
