@@ -18,6 +18,10 @@ def test_desired_itags_by_similarity():
     itags_by_similarity = yturl.itags_by_similarity("18")
     eq_(list(itags_by_similarity), ['18', '6', '34', '5', '43', '36', '35', '17', '44', '13', '45', None, '22', None, '46', None, '37', None, '38', None])
 
+def test_most_similar_available_itag():
+    itags_by_similarity = yturl.itags_by_similarity("18")
+    eq_(yturl.most_similar_available_itag(itags_by_similarity, ["46", "38"]), "46")
+
 def test_url_stripping():
     eq_(yturl.video_id_from_url("http://www.youtube.com/watch?feature=player_embedded&v=gEl6TXrkZnk"), "gEl6TXrkZnk")
     eq_(yturl.video_id_from_url("youtu.be/gEl6TXrkZnk#foo"), "gEl6TXrkZnk")
