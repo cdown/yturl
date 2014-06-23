@@ -24,7 +24,7 @@ $ mpv "$(yturl 'http://www.youtube.com/watch?v=8TCxE0bWQeQ')"
 Using [curl][]:
 
 ```
-$ curl -o bill_chair "$(yturl 'http://www.youtube.com/watch?v=8TCxE0bWQeQ')"
+$ curl -Lo bill_chair "$(yturl 'http://www.youtube.com/watch?v=8TCxE0bWQeQ')"
 ```
 
 [curl]: http://curl.haxx.se
