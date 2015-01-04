@@ -1,8 +1,13 @@
 language: python
 install:
-  - "pip install --use-mirrors -r tests/requirements.txt"
+  - pip install --use-mirrors nose pep8 flake8 coveralls
 python:
-  - "2.7"
-  - "3.2"
-  - "3.3"
-script: nosetests
+  - 2.7
+  - 3.3
+  - 3.4
+script:
+  - pep8 yturl.py
+  - flake8 --max-complexity 5 yturl.py
+  - nosetests --with-coverage
+after_success:
+  - coveralls

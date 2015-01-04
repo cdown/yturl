@@ -1,3 +1,14 @@
+[![Build status][travis-image]][travis-builds]
+[![Coverage][coveralls-image]][coveralls]
+[![Code quality][scrutinizer-image]][scrutinizer]
+
+[travis-builds]: https://travis-ci.org/cdown/yturl
+[travis-image]: https://img.shields.io/travis/cdown/yturl/master.svg
+[coveralls]: https://coveralls.io/r/cdown/yturl
+[coveralls-image]: https://img.shields.io/coveralls/cdown/yturl/master.svg
+[scrutinizer]: https://scrutinizer-ci.com/g/cdown/yturl/code-structure/master/hot-spots
+[scrutinizer-image]: https://img.shields.io/scrutinizer/g/cdown/yturl.svg
+
 yturl gets direct media URLs to YouTube media, freeing you having to view them
 in your browser.
 
@@ -35,13 +46,8 @@ $ curl -Lo bill_chair "$(yturl 'http://www.youtube.com/watch?v=8TCxE0bWQeQ')"
 
 ## Testing
 
-[![Build status][travis-image]][travis-builds]
-
     $ pip install -r tests/requirements.txt
     $ nosetests
-
-[travis-builds]: https://travis-ci.org/cdown/yturl
-[travis-image]: https://travis-ci.org/cdown/yturl.png?branch=master
 
 ## License
 
