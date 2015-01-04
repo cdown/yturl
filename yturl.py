@@ -79,11 +79,11 @@ def itags_for_video(video_id):
         streams_raw = res_data["url_encoded_fmt_stream_map"]
     except KeyError:
         raise LookupError(res_data["reason"])
-    else:
-        streams = streams_raw.split(",")
-        for stream in streams:
-            video = dict(parse_qsl(stream))
-            yield video["itag"], video["url"]
+
+    streams = streams_raw.split(",")
+    for stream in streams:
+        video = dict(parse_qsl(stream))
+        yield video["itag"], video["url"]
 
 
 def itag_from_quality(group):
