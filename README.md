@@ -1,6 +1,7 @@
 [![Build status][travis-image]][travis-builds]
 [![Coverage][coveralls-image]][coveralls]
 [![Code quality][scrutinizer-image]][scrutinizer]
+[![Dependencies][requires-image]][requires]
 
 [travis-builds]: https://travis-ci.org/cdown/yturl
 [travis-image]: https://img.shields.io/travis/cdown/yturl/master.svg
@@ -8,6 +9,8 @@
 [coveralls-image]: https://img.shields.io/coveralls/cdown/yturl/master.svg
 [scrutinizer]: https://scrutinizer-ci.com/g/cdown/yturl/code-structure/master/hot-spots
 [scrutinizer-image]: https://img.shields.io/scrutinizer/g/cdown/yturl.svg
+[requires]: https://requires.io/github/cdown/yturl/requirements/?branch=master
+[requires-image]: https://img.shields.io/requires/github/cdown/yturl.svg
 
 yturl gets direct media URLs to YouTube media, freeing you having to view them
 in your browser.
