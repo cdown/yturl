@@ -11,6 +11,7 @@ setup(
     author = "Chris Down",
     author_email = "chris@chrisdown.name",
 
+    py_modules = ["yturl"],
     scripts = [ "yturl" ],
 
     classifiers = [
