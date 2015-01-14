@@ -1,19 +1,26 @@
-[![Build status][travis-image]][travis-builds]
+[![Linux build status][travis-image]][travis-builds]
+[![Windows build status][appveyor-image]][appveyor-builds]
 [![Coverage][coveralls-image]][coveralls]
-[![Code quality][scrutinizer-image]][scrutinizer]
+[![Code health][landscape-image]][landscape]
 [![Dependencies][requires-image]][requires]
 
 [travis-builds]: https://travis-ci.org/cdown/yturl
-[travis-image]: https://img.shields.io/travis/cdown/yturl/master.svg
+[travis-image]: https://img.shields.io/travis/cdown/yturl/master.svg?label=linux
+[appveyor-builds]: https://ci.appveyor.com/project/cdown/yturl
+[appveyor-image]: https://img.shields.io/appveyor/ci/cdown/yturl/master.svg?label=windows
 [coveralls]: https://coveralls.io/r/cdown/yturl
 [coveralls-image]: https://img.shields.io/coveralls/cdown/yturl/master.svg
-[scrutinizer]: https://scrutinizer-ci.com/g/cdown/yturl/code-structure/master/hot-spots
-[scrutinizer-image]: https://img.shields.io/scrutinizer/g/cdown/yturl.svg
+[landscape]: https://landscape.io/github/cdown/yturl/master
+[landscape-image]: https://landscape.io/github/cdown/yturl/master/landscape.svg
 [requires]: https://requires.io/github/cdown/yturl/requirements/?branch=master
-[requires-image]: https://img.shields.io/requires/github/cdown/yturl.svg
+[requires-image]: https://img.shields.io/requires/github/cdown/yturl.svg?label=deps
 
 yturl gets direct media URLs to YouTube media, freeing you having to view them
 in your browser.
+
+## Usage
+
+### Get media URL
 
 ```
 $ yturl 'http://www.youtube.com/watch?v=8TCxE0bWQeQ'
@@ -21,11 +28,9 @@ Using itag 43.
 http://r2---sn-uphxqvujvh-30al.googlevideo.com/videoplayback?source=[...]
 ```
 
-## Examples
-
 ### View video in your video player
 
-Using [mpv][]:
+For example, with [mpv][]:
 
 ```
 $ mpv "$(yturl 'http://www.youtube.com/watch?v=8TCxE0bWQeQ')"
@@ -33,19 +38,17 @@ $ mpv "$(yturl 'http://www.youtube.com/watch?v=8TCxE0bWQeQ')"
 
 [mpv]: http://mpv.io
 
-### Download video
-
-Using [curl][]:
-
-```
-$ curl -Lo bill_chair "$(yturl 'http://www.youtube.com/watch?v=8TCxE0bWQeQ')"
-```
-
-[curl]: http://curl.haxx.se
-
 ## Installation
 
+### Stable
+
     $ pip install yturl
+
+### Master
+
+    $ git clone git://github.com/cdown/yturl.git
+    $ cd yturl
+    $ python setup.py install
 
 ## Testing
 
@@ -54,6 +57,6 @@ $ curl -Lo bill_chair "$(yturl 'http://www.youtube.com/watch?v=8TCxE0bWQeQ')"
 
 ## License
 
-yturl is [ISC licensed][isc]. See the LICENSE file for full details.
-
-[isc]: http://en.wikipedia.org/wiki/ISC_license
+yturl is licensed under an
+[ISC license](http://en.wikipedia.org/wiki/ISC_license). Full information is in
+[LICENSE.md](LICENSE.md).
