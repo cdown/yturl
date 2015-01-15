@@ -28,7 +28,7 @@ def test_url_stripping():
 
 @patch("yturl.urlopen")
 def test_available_itags_parsing(urlopen_mock):
-    f = open(os.path.join(os.path.dirname(__file__), "api_output/good"), "rb")
+    f = open(os.path.join(os.path.dirname(__file__), "files/good"), "rb")
     urlopen_mock.return_value = f
 
     avail = yturl.itags_for_video("fake")
@@ -56,7 +56,7 @@ def test_quality_group_parsing():
 
 @patch("yturl.urlopen")
 def test_embed_restriction_raises(urlopen_mock):
-    f = open(os.path.join(os.path.dirname(__file__), "api_output/embed_restricted"), "rb")
+    f = open(os.path.join(os.path.dirname(__file__), "files/embed_restricted"), "rb")
     urlopen_mock.return_value = f
 
     avail = yturl.itags_for_video("fake")
