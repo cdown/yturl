@@ -12,7 +12,7 @@ except ImportError:  # Python 2 fallback
     from urllib import urlopen
 
 def test_itag_order():
-    eq_(yturl.itags_by_quality, [38, 37, 46, 22, 45, 44, 35, 43, 34, 18, 6, 5, 36, 17, 13])
+    eq_(yturl.ITAGS_BY_QUALITY, [38, 37, 46, 22, 45, 44, 35, 43, 34, 18, 6, 5, 36, 17, 13])
 
 def test_desired_itags_by_similarity():
     itags_by_similarity = yturl.itags_by_similarity(18)
@@ -50,9 +50,9 @@ def test_available_itags_parsing(urlopen_mock):
 
 def test_quality_group_parsing():
     eq_(yturl.itag_from_quality(18), 18)
-    eq_(yturl.itags_by_quality.index(yturl.itag_from_quality("high")), 0)
-    eq_(yturl.itags_by_quality.index(yturl.itag_from_quality("medium")), len(yturl.itags_by_quality) // 2)
-    eq_(yturl.itags_by_quality.index(yturl.itag_from_quality("low")), len(yturl.itags_by_quality) - 1)
+    eq_(yturl.ITAGS_BY_QUALITY.index(yturl.itag_from_quality("high")), 0)
+    eq_(yturl.ITAGS_BY_QUALITY.index(yturl.itag_from_quality("medium")), len(yturl.ITAGS_BY_QUALITY) // 2)
+    eq_(yturl.ITAGS_BY_QUALITY.index(yturl.itag_from_quality("low")), len(yturl.ITAGS_BY_QUALITY) - 1)
 
 @patch("yturl.urlopen")
 def test_embed_restriction_raises(urlopen_mock):
