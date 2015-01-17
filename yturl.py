@@ -38,7 +38,7 @@ ITAGS = {
     45:  Itag(1280*720,    2,        192,      44.1,        "vp8"),
     46:  Itag(1920*1080,   2,        192,      44.1,        "vp8"),
 }
-ITAGS_BY_QUALITY = sorted(itags, reverse=True, key=lambda itag: itags[itag])
+ITAGS_BY_QUALITY = sorted(ITAGS, reverse=True, key=lambda itag: ITAGS[itag])
 
 
 def video_id_from_url(url):
