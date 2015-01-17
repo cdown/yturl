@@ -21,7 +21,7 @@ Itag = namedtuple('Itag', [
 ])
 
 
-itags = {
+ITAGS = {
     5:   Itag(400*240,     0.25,     64,       22.05,       "h263"),
     6:   Itag(480*270,     0.8,      64,       22.05,       "h263"),
     13:  Itag(176*144,     0.5,      64,       22.05,       "mp4v"),
@@ -38,7 +38,7 @@ itags = {
     45:  Itag(1280*720,    2,        192,      44.1,        "vp8"),
     46:  Itag(1920*1080,   2,        192,      44.1,        "vp8"),
 }
-itags_by_quality = sorted(itags, reverse=True, key=lambda itag: itags[itag])
+ITAGS_BY_QUALITY = sorted(itags, reverse=True, key=lambda itag: itags[itag])
 
 
 def video_id_from_url(url):
@@ -64,10 +64,10 @@ def itags_by_similarity(desired_itag):
     :returns: itags in order of similarity to the desired one
     """
 
-    desired_index = itags_by_quality.index(desired_itag)
+    desired_index = ITAGS_BY_QUALITY.index(desired_itag)
     pairs_by_distance = zip_longest(
-        itags_by_quality[desired_index::-1],
-        itags_by_quality[desired_index+1:],
+        ITAGS_BY_QUALITY[desired_index::-1],
+        ITAGS_BY_QUALITY[desired_index+1:],
     )
 
     return chain(*pairs_by_distance)
@@ -107,14 +107,14 @@ def itag_from_quality(group):
 
     groups = {
         "low": -1,
-        "medium": len(itags_by_quality) // 2,
+        "medium": len(ITAGS_BY_QUALITY) // 2,
         "high": 0,
     }
 
     try:
-        return itags_by_quality[groups[group]]
+        return ITAGS_BY_QUALITY[groups[group]]
     except KeyError:
-        if group in itags_by_quality:
+        if group in ITAGS_BY_QUALITY:
             return group
 
 
