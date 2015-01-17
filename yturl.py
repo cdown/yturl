@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+'''
+Get direct media URLs to YouTube media, freeing you having to view them in your
+browser.
+'''
+
 try:
     from urllib.request import urlopen                        # no lint
     from urllib.parse import parse_qsl, urlparse              # no lint
