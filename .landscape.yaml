@@ -1,4 +1,5 @@
-doc-warnings: true
+doc-warnings: false
+test-warnings: true
 strictness: veryhigh
 
 ignore-patterns:
