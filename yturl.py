@@ -118,17 +118,17 @@ def itag_from_quality(group):
             return group
 
 
-def most_similar_available_itag(itags_by_similarity, itags_for_video):
+def most_similar_available_itag(itags_by_preference, itags_for_video):
     """
     Return the most similar available itag to the desired itag. See
-    itags_by_similarity for information about how "similarity" is determined.
+    itags_by_preference for information about how "similarity" is determined.
 
-    :param itags_by_similarity: a list of itags, from the most desired to least
+    :param itags_by_preference: a list of itags, from the most desired to least
                                 desired
     :param itags_for_video: the itags available for this video
     :returns: the most similar available itag
     """
 
-    for itag in itags_by_similarity:
+    for itag in itags_by_preference:
         if itag in itags_for_video:
             return itag
