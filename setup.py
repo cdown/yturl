@@ -3,25 +3,25 @@
 from distutils.core import setup
 
 setup(
-    name = "yturl",
-    version = "1.15.5",
-    description = "Gets direct media URLs to YouTube media",
-    long_description = """
+    name="yturl",
+    version="1.15.5",
+    description="Gets direct media URLs to YouTube media",
+    long_description="""
     Gets direct media URLs to YouTube media, freeing you having to view them in
     your browser.
     """,
-    url = "https://github.com/cdown/yturl",
-    license = 'ISC',
+    url="https://github.com/cdown/yturl",
+    license='ISC',
 
-    author = "Chris Down",
-    author_email = "chris@chrisdown.name",
+    author="Chris Down",
+    author_email="chris@chrisdown.name",
 
-    py_modules = ["yturl"],
-    scripts = [ "yturl" ],
+    py_modules=["yturl"],
+    scripts=["yturl"],
 
     keywords='youtube media video',
 
-    classifiers = [
+    classifiers=[
         "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 2.7",
