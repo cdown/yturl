@@ -19,11 +19,16 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
+    try:
+        args.quality = int(args.quality)
+    except ValueError:
+        pass
+
     video_id = yturl.video_id_from_url(args.url)
     desired_itag = yturl.itag_from_quality(args.quality)
 
     if desired_itag is None:
-        print("Unknown quality: " + args.quality, file=sys.stderr)
+        print("Unknown quality: %d" % args.quality, file=sys.stderr)
         sys.exit(2)
 
     try:

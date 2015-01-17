@@ -1,14 +1,11 @@
 language: python
 install:
-  - pip install --use-mirrors -r tests/requirements.txt
-  - pip install --use-mirrors pep8 flake8 coveralls
+  - pip install -r tests/requirements.txt
 python:
   - 2.7
   - 3.3
   - 3.4
 script:
-  - pep8 yturl.py
-  - flake8 --max-complexity 5 yturl.py
   - nosetests --with-coverage
 after_success:
   - coveralls
