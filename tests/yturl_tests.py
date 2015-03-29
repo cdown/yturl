@@ -15,10 +15,7 @@ def test_dibs():
     itags_by_similarity = yturl.itags_by_similarity(18)
     eq(
         list(itags_by_similarity),
-        [
-            18, 6, 34, 5, 43, 36, 35, 17, 44, 13, 45, None, 22, None, 46, None,
-            37, None, 38, None
-        ],
+        [18, 6, 34, 5, 43, 36, 35, 17, 44, 13, 45, 22, 46, 37, 38],
     )
 
 
