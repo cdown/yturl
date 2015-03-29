@@ -70,7 +70,7 @@ def itags_by_similarity(desired_itag):
         ITAGS_BY_QUALITY[desired_index+1:],
     )
 
-    return chain(*pairs_by_distance)
+    return (x for x in chain(*pairs_by_distance) if x is not None)
 
 
 def itags_for_video(video_id):
