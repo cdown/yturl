@@ -156,7 +156,7 @@ def _parse_args(args):
         metavar="video_id/url",
         help="a YouTube url (or bare video ID)",
     )
-    args = parser.parse_args()
+    args = parser.parse_args(args)
 
     try:
         args.quality = int(args.quality)
@@ -166,12 +166,12 @@ def _parse_args(args):
     return args
 
 
-def _main():
+def _main(args=sys.argv[1:]):
     '''
     The entry point for the CLI application.
     '''
 
-    args = _parse_args()
+    args = _parse_args(args)
 
     video_id = video_id_from_url(args.url)
     desired_itag = itag_from_quality(args.quality)
@@ -186,14 +186,16 @@ def _main():
         print("YouTube API error: " + str(err), file=sys.stderr)
         sys.exit(3)
 
-    itags_by_similarity = itags_by_similarity(desired_itag)
-    most_similar_available_itag = most_similar_available_itag(
-        itags_by_similarity, video_itags,
+    similar_itags = itags_by_similarity(desired_itag)
+    most_similar_itag = most_similar_available_itag(
+        similar_itags, video_itags,
     )
 
-    if most_similar_available_itag:
-        print("Using itag %s." % most_similar_available_itag, file=sys.stderr)
-        print(video_itags[most_similar_available_itag])
+    if most_similar_itag:
+        url_to_video = video_itags[most_similar_itag]
+        print("Using itag %s." % most_similar_itag, file=sys.stderr)
+        print(url_to_video)
+        return url_to_video
     else:
         print("No local itags available.", file=sys.stderr)
         sys.exit(1)
