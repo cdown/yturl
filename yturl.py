@@ -138,9 +138,12 @@ def most_similar_available_itag(itags_by_preference, available_itags):
             return itag
 
 
-def main():
+def _parse_args(args):
     '''
-    The entry point for the CLI application.
+    Parse command line arguments.
+
+    :param args: the command line arguments to parse
+    :returns: a Namespace object representing the parsed arguments
     '''
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -159,6 +162,16 @@ def main():
         args.quality = int(args.quality)
     except ValueError:
         pass
+
+    return args
+
+
+def _main():
+    '''
+    The entry point for the CLI application.
+    '''
+
+    args = _parse_args()
 
     video_id = video_id_from_url(args.url)
     desired_itag = itag_from_quality(args.quality)

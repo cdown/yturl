@@ -19,7 +19,7 @@ setup(
     py_modules=["yturl"],
 
     entry_points = {
-        'console_scripts': ['yturl=yturl:main'],
+        'console_scripts': ['yturl=yturl:_main'],
     },
 
     keywords='youtube media video',
