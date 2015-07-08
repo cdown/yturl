@@ -5,6 +5,8 @@ Get direct media URLs to YouTube media, freeing you having to view them in your
 browser.
 '''
 
+from __future__ import print_function
+
 try:
     from urllib.request import urlopen                        # no lint
     from urllib.parse import parse_qsl, urlparse              # no lint
@@ -14,6 +16,8 @@ except ImportError:  # Python 2 fallback
     from urlparse import parse_qsl, urlparse                  # no lint
     from itertools import chain, izip_longest as zip_longest  # no lint
 
+import argparse
+import sys
 from collections import namedtuple
 
 Itag = namedtuple('Itag', [
@@ -163,3 +167,66 @@ def most_similar_available_itag(itags_by_preference, available_itags):
     for itag in itags_by_preference:
         if itag in available_itags:
             return itag
+
+
+def _parse_args(args):
+    '''
+    Parse command line arguments.
+
+    :param args: the command line arguments to parse
+    :returns: a Namespace object representing the parsed arguments
+    '''
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-q", "--quality",
+        help='"low", "medium", "high", or an itag',
+        default="medium",
+    )
+    parser.add_argument(
+        "url",
+        metavar="video_id/url",
+        help="a YouTube url (or bare video ID)",
+    )
+    args = parser.parse_args(args)
+
+    try:
+        args.quality = int(args.quality)
+    except ValueError:
+        pass
+
+    return args
+
+
+def _main(args=sys.argv[1:]):
+    '''
+    The entry point for the CLI application.
+    '''
+
+    args = _parse_args(args)
+
+    video_id = video_id_from_url(args.url)
+    desired_itag = itag_from_quality(args.quality)
+
+    if desired_itag is None:
+        print("Unknown quality: %d" % args.quality, file=sys.stderr)
+        sys.exit(2)
+
+    try:
+        video_itags = dict(itags_for_video(video_id))
+    except LookupError as err:
+        print("YouTube API error: " + str(err), file=sys.stderr)
+        sys.exit(3)
+
+    similar_itags = itags_by_similarity(desired_itag)
+    most_similar_itag = most_similar_available_itag(
+        similar_itags, video_itags,
+    )
+
+    if most_similar_itag:
+        url_to_video = video_itags[most_similar_itag]
+        print("Using itag %s." % most_similar_itag, file=sys.stderr)
+        print(url_to_video)
+        return url_to_video
+    else:
+        print("No local itags available.", file=sys.stderr)
+        sys.exit(1)

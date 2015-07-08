@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     name="yturl",
@@ -17,7 +17,10 @@ setup(
     author_email="chris@chrisdown.name",
 
     py_modules=["yturl"],
-    scripts=["yturl"],
+
+    entry_points = {
+        'console_scripts': ['yturl=yturl:_main'],
+    },
 
     keywords='youtube media video',
 
