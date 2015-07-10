@@ -6,6 +6,7 @@ python:
   - 2.7
   - 3.3
   - 3.4
+  - nightly
 script:
   - nosetests --with-coverage
 
@@ -17,3 +18,5 @@ after_success:
 
 matrix:
   fast_finish: true
+  allow_failures:
+    - python: nightly
