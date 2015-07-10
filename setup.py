@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name="yturl",
-    version="1.15.5",
+    version="1.18.0",
     description="Gets direct media URLs to YouTube media",
     long_description="""
     Gets direct media URLs to YouTube media, freeing you having to view them in
