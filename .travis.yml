@@ -14,3 +14,6 @@ script:
   - '[[ $(python --version 2>&1) == "Python 2"* ]] || (cd docs && make doctest)'
 after_success:
   - coveralls
+
+matrix:
+  fast_finish: true
