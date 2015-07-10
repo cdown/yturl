@@ -18,7 +18,7 @@ setup(
 
     py_modules=["yturl"],
 
-    entry_points = {
+    entry_points={
         'console_scripts': ['yturl=yturl:_main'],
     },
 
