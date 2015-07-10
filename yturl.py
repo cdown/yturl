@@ -197,9 +197,13 @@ def _parse_args(args):
     return args
 
 
-def _main(args=sys.argv[1:]):
+def _main(args=sys.argv[1:], force_return=False):
     '''
     The entry point for the CLI application.
+
+    :param args: the arguments to pass to argparse
+    :param force_return: whether to return the URL for testing (not default as
+                         console_scripts prints this to stderr)
     '''
 
     args = _parse_args(args)
@@ -226,7 +230,8 @@ def _main(args=sys.argv[1:]):
         url_to_video = video_itags[most_similar_itag]
         print("Using itag %s." % most_similar_itag, file=sys.stderr)
         print(url_to_video)
-        return url_to_video
+        if force_return:
+            return url_to_video
     else:
         print("No local itags available.", file=sys.stderr)
         sys.exit(1)

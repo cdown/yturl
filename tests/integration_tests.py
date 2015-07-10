@@ -10,7 +10,7 @@ def test_quality_as_word_ok(urlopen_mock):
     good_f = open(os.path.join(os.path.dirname(__file__), "files/good"), "rb")
     urlopen_mock.return_value = good_f
 
-    chosen_uri = yturl._main(['-q', 'high', 'http://foo.com'])
+    chosen_uri = yturl._main(['-q', 'high', 'http://foo.com'], True)
     eq(
         chosen_uri,
         'http://r1---sn-uh-30as.googlevideo.com/videoplayback?itag=43&'
