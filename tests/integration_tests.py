@@ -24,3 +24,8 @@ def test_quality_as_word_ok(urlopen_mock):
     )
 
     good_f.close()
+
+def test_unknown_quality():
+    with assert_raises(SystemExit) as raise_cm:
+        yturl._main(['-q', '123456', 'http://foo.com'])
+    eq(raise_cm.exception.code, 2)
