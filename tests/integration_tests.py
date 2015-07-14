@@ -44,3 +44,16 @@ def test_youtube_api_error_exit(urlopen_mock):
         yturl._main(['http://foo.com'])
 
     eq(raise_cm.exception.code, 3)
+
+@patch('yturl.most_similar_available_itag')
+@patch('yturl.urlopen')
+def test_no_local_itags_available_exit(urlopen_mock, msai_mock):
+    good_f = open(os.path.join(os.path.dirname(__file__), "files/good"), "rb")
+
+    urlopen_mock.return_value = good_f
+    msai_mock.return_value = None
+
+    with assert_raises(SystemExit) as raise_cm:
+        yturl._main(['http://foo.com'])
+
+    eq(raise_cm.exception.code, 1)
