@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     name="yturl",
-    version="1.15.5",
+    version="1.18.0",
     description="Gets direct media URLs to YouTube media",
     long_description="""
     Gets direct media URLs to YouTube media, freeing you having to view them in
@@ -17,7 +17,10 @@ setup(
     author_email="chris@chrisdown.name",
 
     py_modules=["yturl"],
-    scripts=["yturl"],
+
+    entry_points={
+        'console_scripts': ['yturl=yturl:_main'],
+    },
 
     keywords='youtube media video',
 
