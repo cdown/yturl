@@ -29,3 +29,18 @@ def test_unknown_quality():
     with assert_raises(SystemExit) as raise_cm:
         yturl._main(['-q', '123456', 'http://foo.com'])
     eq(raise_cm.exception.code, 2)
+
+
+@patch('yturl.urlopen')
+def test_youtube_api_error_exit(urlopen_mock):
+    mock_filename = os.path.join(
+        os.path.dirname(__file__), 'files/embed_restricted'
+    )
+
+    mock_f = open(mock_filename, 'rb')
+    urlopen_mock.return_value = mock_f
+
+    with assert_raises(SystemExit) as raise_cm:
+        yturl._main(['http://foo.com'])
+
+    eq(raise_cm.exception.code, 3)
