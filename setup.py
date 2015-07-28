@@ -2,14 +2,15 @@
 
 from setuptools import setup
 
+
+with open('README.rst') as readme_f:
+    README = readme_f.read()
+
 setup(
     name="yturl",
     version="1.18.0",
     description="Gets direct media URLs to YouTube media",
-    long_description="""
-    Gets direct media URLs to YouTube media, freeing you having to view them in
-    your browser.
-    """,
+    long_description=README,
     url="https://github.com/cdown/yturl",
     license='ISC',
 
