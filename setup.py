@@ -6,6 +6,10 @@ from setuptools import setup
 with open('README.rst') as readme_f:
     README = readme_f.read()
 
+with open('tests/requirements.txt') as test_requirements_f:
+    TEST_REQUIREMENTS = test_requirements_f.readlines()
+
+
 setup(
     name="yturl",
     version="1.18.0",
@@ -35,4 +39,7 @@ setup(
         "Topic :: Internet",
         "Topic :: Utilities",
     ],
+
+    test_suite='nose.collector',
+    tests_require=TEST_REQUIREMENTS
 )
