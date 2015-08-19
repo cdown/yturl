@@ -59,7 +59,7 @@ Stable
 
     $ pip install yturl
 
-Master
+develop
 ------
 
 ::
@@ -87,13 +87,13 @@ yturl is licensed under an `ISC license`_. Full information is in
 .. _ISC license: http://en.wikipedia.org/wiki/ISC_license
 .. _LICENSE.md: LICENSE.md
 
-.. |Linux build status| image:: https://img.shields.io/travis/cdown/yturl/master.svg?label=linux
+.. |Linux build status| image:: https://img.shields.io/travis/cdown/yturl/develop.svg?label=linux
    :target: https://travis-ci.org/cdown/yturl
-.. |Windows build status| image:: https://img.shields.io/appveyor/ci/cdown/yturl/master.svg?label=windows
+.. |Windows build status| image:: https://img.shields.io/appveyor/ci/cdown/yturl/develop.svg?label=windows
    :target: https://ci.appveyor.com/project/cdown/yturl
-.. |Coverage| image:: https://img.shields.io/coveralls/cdown/yturl/master.svg
+.. |Coverage| image:: https://img.shields.io/coveralls/cdown/yturl/develop.svg
    :target: https://coveralls.io/r/cdown/yturl
-.. |Code health| image:: https://landscape.io/github/cdown/yturl/master/landscape.svg
-   :target: https://landscape.io/github/cdown/yturl/master
+.. |Code health| image:: https://landscape.io/github/cdown/yturl/develop/landscape.svg
+   :target: https://landscape.io/github/cdown/yturl/develop
 .. |Dependencies| image:: https://img.shields.io/requires/github/cdown/yturl.svg?label=deps
-   :target: https://requires.io/github/cdown/yturl/requirements/?branch=master
+   :target: https://requires.io/github/cdown/yturl/requirements/?branch=develop
