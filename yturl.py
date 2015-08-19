@@ -7,18 +7,22 @@ browser.
 
 from __future__ import print_function
 
-try:
-    from urllib.request import urlopen                        # no lint
-    from urllib.parse import parse_qsl, urlparse              # no lint
-    from itertools import chain, zip_longest                  # no lint
-except ImportError:  # Python 2 fallback
-    from urllib import urlopen                                # no lint
-    from urlparse import parse_qsl, urlparse                  # no lint
-    from itertools import chain, izip_longest as zip_longest  # no lint
-
 import argparse
 import sys
 from collections import namedtuple
+
+
+using_python_3 = sys.version_info[0] == 3
+
+if using_python_3:
+    from urllib.request import urlopen
+    from urllib.parse import parse_qsl, urlparse
+    from itertools import chain, zip_longest
+else:
+    from urllib import urlopen
+    from urlparse import parse_qsl, urlparse
+    from itertools import chain, izip_longest as zip_longest
+
 
 Itag = namedtuple('Itag', [
     'v_dimensions', 'v_bitrate', 'a_bitrate', 'a_samplerate', 'v_encoding'
