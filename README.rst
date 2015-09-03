@@ -1,5 +1,7 @@
-|Linux build status| |Windows build status| |Coverage| |Code health|
-|Dependencies|
+|Build status|
+
+.. |Build status| image:: https://travis-ci.org/cdown/yturl.svg?branch=develop
+   :target: https://travis-ci.org/cdown/yturl
 
 yturl gets direct media URLs to YouTube media, freeing you having to
 view them in your browser.
@@ -34,6 +36,9 @@ Or something like the following to download it (using `curl`_):
 There is also a ``-q`` option for controlling the quality, see the
 program help for more information.
 
+.. _mpv: http://mpv.io
+.. _curl: http://curl.haxx.se
+
 Library
 -------
 
@@ -52,6 +57,10 @@ Library
     Itag 36: http://r20---sn-aigllnl6.googlevideo.com/videoplayback?key=yt5&up[...]
     Itag 17: http://r20---sn-aigllnl6.googlevideo.com/videoplayback?key=yt5&up[...]
 
+
+Installation
+============
+
 Stable
 ------
 
@@ -60,7 +69,7 @@ Stable
     $ pip install yturl
 
 develop
-------
+-------
 
 ::
 
@@ -82,18 +91,5 @@ License
 yturl is licensed under an `ISC license`_. Full information is in
 `LICENSE.md`_.
 
-.. _mpv: http://mpv.io
-.. _curl: http://curl.haxx.se
 .. _ISC license: http://en.wikipedia.org/wiki/ISC_license
 .. _LICENSE.md: LICENSE.md
-
-.. |Linux build status| image:: https://img.shields.io/travis/cdown/yturl/develop.svg?label=linux
-   :target: https://travis-ci.org/cdown/yturl
-.. |Windows build status| image:: https://img.shields.io/appveyor/ci/cdown/yturl/develop.svg?label=windows
-   :target: https://ci.appveyor.com/project/cdown/yturl
-.. |Coverage| image:: https://img.shields.io/coveralls/cdown/yturl/develop.svg
-   :target: https://coveralls.io/r/cdown/yturl
-.. |Code health| image:: https://landscape.io/github/cdown/yturl/develop/landscape.svg
-   :target: https://landscape.io/github/cdown/yturl/develop
-.. |Dependencies| image:: https://img.shields.io/requires/github/cdown/yturl.svg?label=deps
-   :target: https://requires.io/github/cdown/yturl/requirements/?branch=develop
