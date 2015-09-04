@@ -4,6 +4,8 @@ import os
 import yturl
 from nose.tools import assert_raises, eq_ as eq
 from mock import patch
+from nose_parameterized import parameterized
+
 
 def test_itag_order():
     eq(
@@ -11,31 +13,41 @@ def test_itag_order():
         [38, 37, 46, 22, 45, 44, 35, 43, 34, 18, 6, 5, 36, 17, 13],
     )
 
-def test_dibs():
-    itags_by_similarity = yturl.itags_by_similarity(18)
+@parameterized([
+    (18, [18, 6, 34, 5, 43, 36, 35, 17, 44, 13, 45, 22, 46, 37, 38]),
+    (38, [38, 37, 46, 22, 45, 44, 35, 43, 34, 18, 6, 5, 36, 17, 13]),
+    (13, [13, 17, 36, 5, 6, 18, 34, 43, 35, 44, 45, 22, 46, 37, 38]),
+    (46, [46, 22, 37, 45, 38, 44, 35, 43, 34, 18, 6, 5, 36, 17, 13]),
+])
+def test_itags_by_similarity(input_itag, expected):
+    itags_by_similarity = yturl.itags_by_similarity(input_itag)
+    eq(list(itags_by_similarity), expected)
+
+
+@parameterized([
+    (18, [46, 38], 46),
+    (38, [17, 13], 17),
+    (13, [38, 35, 17, 13], 13),
+    (46, [], None),
+])
+def test_most_similar_available_itag(input_itag, available_itags, expected):
+    itags_by_similarity = yturl.itags_by_similarity(input_itag)
     eq(
-        list(itags_by_similarity),
-        [18, 6, 34, 5, 43, 36, 35, 17, 44, 13, 45, 22, 46, 37, 38],
-    )
-
-
-def test_msai():
-    itags_by_similarity = yturl.itags_by_similarity(18)
-    eq(yturl.most_similar_available_itag(itags_by_similarity, [46, 38]), 46)
-
-def test_url_stripping_main():
-    eq(
-        yturl.video_id_from_url(
-            "http://www.youtube.com/watch?feature=player_embed&v=gEl6TXrkZnk"
+        yturl.most_similar_available_itag(
+            itags_by_similarity, available_itags
         ),
-        "gEl6TXrkZnk",
+        expected,
     )
 
-def test_url_stripping_short():
-    eq(
-        yturl.video_id_from_url("youtu.be/gEl6TXrkZnk#foo"),
-        "gEl6TXrkZnk",
-    )
+
+@parameterized([
+    ('http://www.youtube.com/watch?v=gEl6TXrkZnk&feature=pem', 'gEl6TXrkZnk'),
+    ('youtu.be/gEl6TXrkZnk?feature=pem&g=q#video', 'gEl6TXrkZnk'),
+    ('gEl6TXrkZnk', 'gEl6TXrkZnk'),
+])
+def test_video_id_from_url(url, expected):
+    eq(yturl.video_id_from_url(url), expected)
+
 
 @patch("yturl.urlopen")
 def test_available_itags_parsing(urlopen_mock):
