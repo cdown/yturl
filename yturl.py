@@ -46,19 +46,8 @@ ITAGS_BY_QUALITY = sorted(ITAGS, reverse=True, key=lambda itag: ITAGS[itag])
 
 
 def video_id_from_url(url):
-    r'''
+    '''
     Parse a video ID from a YouTube URL.
-
-    >>> import yturl
-    >>> yturl.video_id_from_url('https://www.youtube.com/watch?v=8TCxE0bWQeQ')
-    '8TCxE0bWQeQ'
-    >>> yturl.video_id_from_url('https://youtu.be/8TCxE0bWQeQ')
-    '8TCxE0bWQeQ'
-
-    :param url: A YouTube URL or video ID
-    :type url: str
-    :returns: The video ID contained in the URL or string
-    :rtype: str
     '''
 
     parsed_url = urlparse(url)
@@ -67,19 +56,10 @@ def video_id_from_url(url):
 
 
 def itags_by_similarity(desired_itag):
-    r'''
+    '''
     Return itags ordered by the similarity to the desired one. Similarity is
     determined by seeking outwards from the index of the desired itag in the
     sorted list of known itags.
-
-    >>> import yturl
-    >>> list(yturl.itags_by_similarity(18))
-    [18, 6, 34, 5, 43, 36, 35, 17, 44, 13, 45, 22, 46, 37, 38]
-
-    :param desired_itag: The itag most desired
-    :type desired_itag: int
-    :returns: itags in the order of similarity to the desired one
-    :rtype: :term:`generator` of ints
     '''
 
     desired_index = ITAGS_BY_QUALITY.index(desired_itag)
@@ -92,13 +72,8 @@ def itags_by_similarity(desired_itag):
 
 
 def itags_for_video(video_id):
-    r'''
+    '''
     Return the available itags for a video with their associated URLs.
-
-    :param video_id: The video ID to get itags for
-    :type video_id: str
-    :returns: Itags and their media URLs for this video
-    :rtype: :term:`generator` of int, str pairs
     '''
 
     url = "http://youtube.com/get_video_info?hl=en&video_id=" + video_id
@@ -117,20 +92,9 @@ def itags_for_video(video_id):
 
 
 def itag_from_quality(group):
-    r'''
+    '''
     Return the itag representing a quality group name, or if the quality is a
     known itag, return that itag.
-
-    >>> import yturl
-    >>> yturl.itag_from_quality('medium')
-    43
-    >>> yturl.itag_from_quality(35)
-    35
-
-    :param group: The name of the quality group to be parsed, or an itag
-    :type group: str (group) or int (itag)
-    :returns: The associated itag, or None if the group or itag is unknown
-    :rtype: int or None
     '''
 
     groups = {
@@ -147,21 +111,9 @@ def itag_from_quality(group):
 
 
 def most_similar_available_itag(itags_by_preference, available_itags):
-    r'''
+    '''
     Return the most similar available itag to the desired itag. See
     itags_by_similarity for information about how "similarity" is determined.
-
-    >>> import yturl
-    >>> yturl.most_similar_available_itag((5, 4, 3, 2, 1), (1, 4, 2))
-    4
-
-    :param itags_by_preference: A list of itags, from the most desired to least
-                                desired
-    :type itags_by_preference: :term:`iterator` of ints
-    :param available_itags: The itags available for this video
-    :type available_itags: :term:`iterator` of ints
-    :returns: the most similar available itag
-    :rtype: int
     '''
 
     for itag in itags_by_preference:
@@ -170,12 +122,6 @@ def most_similar_available_itag(itags_by_preference, available_itags):
 
 
 def parse_args(args):
-    '''
-    Parse command line arguments.
-
-    :param args: the command line arguments to parse
-    :returns: a Namespace object representing the parsed arguments
-    '''
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-q", "--quality",
@@ -198,14 +144,6 @@ def parse_args(args):
 
 
 def main(args=sys.argv[1:], force_return=False):
-    '''
-    The entry point for the CLI application.
-
-    :param args: the arguments to pass to argparse
-    :param force_return: whether to return the URL for testing (not default as
-                         console_scripts prints this to stderr)
-    '''
-
     args = parse_args(args)
 
     video_id = video_id_from_url(args.url)
