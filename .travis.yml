@@ -6,14 +6,11 @@ python:
   - 2.7
   - 3.3
   - 3.4
-  - nightly
 script:
-  - nosetests --with-coverage
+  - python setup.py test
 
   # Our doctests are authoritative only on 3.4
   - '[[ $TRAVIS_PYTHON_VERSION != 3.4 ]] || (cd docs && make doctest)'
-after_success:
-  - coveralls
 
 matrix:
   fast_finish: true
