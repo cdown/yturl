@@ -61,15 +61,19 @@ Library
 Installation
 ============
 
-Stable
-------
+Installation requires `setuptools`_.
+
+.. _setuptools: https://pypi.python.org/pypi/setuptools
+
+Stable version
+--------------
 
 ::
 
     $ pip install yturl
 
-develop
--------
+Development version
+-------------------
 
 ::
 
@@ -88,8 +92,8 @@ Testing
 License
 =======
 
-yturl is licensed under an `ISC license`_. Full information is in
-`LICENSE.md`_.
+yturl is licensed under an `ISC license`_. Full information is in the
+`LICENSE`_ file.
 
-.. _ISC license: http://en.wikipedia.org/wiki/ISC_license
-.. _LICENSE.md: LICENSE.md
+.. _ISC license: https://en.wikipedia.org/wiki/ISC_license
+.. _LICENSE: LICENSE
