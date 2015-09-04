@@ -169,7 +169,7 @@ def most_similar_available_itag(itags_by_preference, available_itags):
             return itag
 
 
-def _parse_args(args):
+def parse_args(args):
     '''
     Parse command line arguments.
 
@@ -197,7 +197,7 @@ def _parse_args(args):
     return args
 
 
-def _main(args=sys.argv[1:], force_return=False):
+def main(args=sys.argv[1:], force_return=False):
     '''
     The entry point for the CLI application.
 
@@ -206,7 +206,7 @@ def _main(args=sys.argv[1:], force_return=False):
                          console_scripts prints this to stderr)
     '''
 
-    args = _parse_args(args)
+    args = parse_args(args)
 
     video_id = video_id_from_url(args.url)
     desired_itag = itag_from_quality(args.quality)

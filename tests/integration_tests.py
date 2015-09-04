@@ -10,7 +10,7 @@ def test_quality_as_word_ok(urlopen_mock):
     good_f = open(os.path.join(os.path.dirname(__file__), "files/good"), "rb")
     urlopen_mock.return_value = good_f
 
-    chosen_uri = yturl._main(['-q', 'high', 'http://foo.com'], True)
+    chosen_uri = yturl.main(['-q', 'high', 'http://foo.com'], True)
     eq(
         chosen_uri,
         'http://r1---sn-uh-30as.googlevideo.com/videoplayback?itag=43&'
@@ -27,7 +27,7 @@ def test_quality_as_word_ok(urlopen_mock):
 
 def test_unknown_quality():
     with assert_raises(SystemExit) as raise_cm:
-        yturl._main(['-q', '123456', 'http://foo.com'])
+        yturl.main(['-q', '123456', 'http://foo.com'])
     eq(raise_cm.exception.code, 2)
 
 
@@ -41,7 +41,7 @@ def test_youtube_api_error_exit(urlopen_mock):
     urlopen_mock.return_value = mock_f
 
     with assert_raises(SystemExit) as raise_cm:
-        yturl._main(['http://foo.com'])
+        yturl.main(['http://foo.com'])
 
     eq(raise_cm.exception.code, 3)
 
@@ -54,6 +54,6 @@ def test_no_local_itags_available_exit(urlopen_mock, msai_mock):
     msai_mock.return_value = None
 
     with assert_raises(SystemExit) as raise_cm:
-        yturl._main(['http://foo.com'])
+        yturl.main(['http://foo.com'])
 
     eq(raise_cm.exception.code, 1)
