@@ -44,6 +44,12 @@ ITAGS = {
 }
 ITAGS_BY_QUALITY = sorted(ITAGS, reverse=True, key=lambda itag: ITAGS[itag])
 
+NAMED_QUALITY_GROUPS = {
+    "low": -1,
+    "medium": len(ITAGS_BY_QUALITY) // 2,
+    "high": 0,
+}
+
 
 def video_id_from_url(url):
     '''
@@ -97,14 +103,8 @@ def itag_from_quality(group):
     known itag, return that itag.
     '''
 
-    groups = {
-        "low": -1,
-        "medium": len(ITAGS_BY_QUALITY) // 2,
-        "high": 0,
-    }
-
     try:
-        return ITAGS_BY_QUALITY[groups[group]]
+        return ITAGS_BY_QUALITY[NAMED_QUALITY_GROUPS[group]]
     except KeyError:
         if group in ITAGS_BY_QUALITY:
             return group
