@@ -1,22 +1,25 @@
 language: python
-install:
-  - pip install -r docs/requirements.txt
-  - pip install -r tests/requirements.txt
 python:
   - 2.7
   - 3.3
   - 3.4
-script:
-  - python setup.py test
 
-  # Our doctests are authoritative only on 3.4
+install:
+  # != and || are used to avoid this pipeline exiting with 1 when the run
+  # condition is false.
+  - '[[ $TRAVIS_PYTHON_VERSION != 3.4 ]] || pip install -r docs/requirements.txt'
+  - 'pip install -r tests/requirements.txt'
+
+script:
+  # The latest stable version of Python is the one we use to authoritatively
+  # determine if a doctest passes, since the outcome might be different in
+  # different versions.
   - '[[ $TRAVIS_PYTHON_VERSION != 3.4 ]] || (cd docs && make doctest)'
+  - 'python setup.py test'
 
 matrix:
   fast_finish: true
-  allow_failures:
-    - python: nightly
 
-# Enable container based Travis CI infrastructure
-# http://docs.travis-ci.com/user/migrating-from-legacy/
+# This is required to enable container based Travis CI infrastructure.
+# See http://docs.travis-ci.com/user/migrating-from-legacy/
 sudo: false
