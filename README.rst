@@ -9,9 +9,6 @@ view them in your browser.
 Usage
 =====
 
-Command line
-------------
-
 By default, yturl prints the media URL to standard output.
 
 ::
@@ -33,30 +30,11 @@ Or something like the following to download it (using `curl`_):
 
     $ curl -Lo bill "$(yturl 'http://www.youtube.com/watch?v=8TCxE0bWQeQ')"
 
-There is also a ``-q`` option for controlling the quality, see the
-program help for more information.
+There is also a ``-q`` option for controlling the quality (for example ``-q
+high``), see the program help for more information.
 
 .. _mpv: http://mpv.io
 .. _curl: http://curl.haxx.se
-
-Library
--------
-
-.. code:: python
-
-    >>> video_id = yturl.video_id_from_url('http://www.youtube.com/watch?v=8TCxE0bWQeQ&hl=en-US#x')
-    >>> video_id
-    '8TCxE0bWQeQ'
-    >>>
-    >>> for itag, url in yturl.itags_for_video(video_id):
-    ...     print('Itag %d: %s[...]' % (itag, url[:65]))
-    ...
-    Itag 43: http://r20---sn-aigllnl6.googlevideo.com/videoplayback?key=yt5&up[...]
-    Itag 18: http://r20---sn-aigllnl6.googlevideo.com/videoplayback?key=yt5&up[...]
-    Itag 5: http://r20---sn-aigllnl6.googlevideo.com/videoplayback?key=yt5&up[...]
-    Itag 36: http://r20---sn-aigllnl6.googlevideo.com/videoplayback?key=yt5&up[...]
-    Itag 17: http://r20---sn-aigllnl6.googlevideo.com/videoplayback?key=yt5&up[...]
-
 
 Installation
 ============
@@ -86,8 +64,7 @@ Testing
 
 ::
 
-    $ pip install -r tests/requirements.txt
-    $ nosetests
+    $ python setup.py test
 
 License
 =======
