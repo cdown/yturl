@@ -86,14 +86,9 @@ def test_itag_from_quality():
 
 @patch("yturl.urlopen")
 def test_embed_restriction_raises(urlopen_mock):
-    mock_filename = os.path.join(
-        os.path.dirname(__file__), "files/embed_restricted"
-    )
+    mock_filename = os.path.join(SCRIPT_DIR, 'files/embed_restricted')
 
-    mock_f = open(mock_filename, "rb")
-    urlopen_mock.return_value = mock_f
-
-    avail = yturl.itags_for_video("fake")
-    assert_raises(LookupError, list, avail)
-
-    mock_f.close()
+    with open(mock_filename, 'rb') as mock_f:
+        urlopen_mock.return_value = mock_f
+        avail = yturl.itags_for_video('fake')
+        assert_raises(LookupError, list, avail)
