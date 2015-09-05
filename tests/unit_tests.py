@@ -61,11 +61,14 @@ def test_video_id_from_url(url, expected):
 @patch("yturl.urlopen")
 def test_available_itags_parsing(urlopen_mock):
     with open(os.path.join(SCRIPT_DIR, 'files/success_output')) as output_f:
-        expected = json.load(output_f)
+        expected_raw = json.load(output_f)
+        # json has no tuple tupe, and we return tuples from itags_for_video, so
+        # we need to coerce them.
+        expected = map(tuple, expected_raw)
 
     with open(os.path.join(SCRIPT_DIR, 'files/success_input'), 'rb') as mock_f:
         urlopen_mock.return_value = mock_f
-        eq(list(yturl.itags_for_video('fake')), expected)
+        eq(list(yturl.itags_for_video('fake')), list(expected))
 
 
 def itag_quality_pos(itag_quality):

@@ -101,7 +101,7 @@ def itags_for_video(video_id):
     streams = streams_raw.split(",")
     for stream in streams:
         video = dict(parse_qsl(stream))
-        yield [int(video["itag"]), video["url"]]
+        yield int(video["itag"]), video["url"]
 
 
 def itag_from_quality(group):
