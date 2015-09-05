@@ -32,7 +32,6 @@ def test_itags_by_similarity(input_itag, expected):
     (18, [46, 38], 46),
     (38, [17, 13], 17),
     (13, [38, 35, 17, 13], 13),
-    (46, [], None),
 ])
 def test_most_similar_available_itag(input_itag, available_itags, expected):
     itags_by_similarity = yturl.itags_by_similarity(input_itag)
@@ -42,6 +41,16 @@ def test_most_similar_available_itag(input_itag, available_itags, expected):
         ),
         expected,
     )
+
+
+@parameterized([
+    (46, []),
+    (38, [1, 2, 3]),
+])
+def test_most_similar_available_itag_none(input_itag, available_itags):
+    itags_by_similarity = yturl.itags_by_similarity(input_itag)
+    with assert_raises(yturl.NoLocallyKnownItagsAvailableError):
+        yturl.most_similar_available_itag(itags_by_similarity, available_itags)
 
 
 @parameterized([
@@ -71,12 +80,20 @@ def itag_quality_pos(itag_quality):
     return yturl.ITAGS_BY_QUALITY.index(yturl.itag_from_quality(itag_quality))
 
 
-def test_itag_from_quality():
+def test_itag_from_quality_num():
     eq(yturl.itag_from_quality(18), 18)
 
-    # Unidentifiable values should return None
-    eq(yturl.itag_from_quality(-1), None)
 
+def test_itag_from_quality_string():
+    eq(yturl.itag_from_quality('high'), 38)
+
+
+def test_itag_from_quality_unknown():
+    with assert_raises(yturl.UnknownQualityError):
+        eq(yturl.itag_from_quality(-1), None)
+
+
+def test_itag_from_quality_ordering():
     assert_true(
         itag_quality_pos('high') < \
         itag_quality_pos('medium') < \
@@ -91,4 +108,4 @@ def test_embed_restriction_raises(urlopen_mock):
     with open(mock_filename, 'rb') as mock_f:
         urlopen_mock.return_value = mock_f
         avail = yturl.itags_for_video('fake')
-        assert_raises(LookupError, list, avail)
+        assert_raises(yturl.YouTubeAPIError, list, avail)

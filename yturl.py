@@ -20,6 +20,13 @@ import argparse
 import sys
 from collections import namedtuple
 
+
+class YturlError(Exception): pass
+class UnknownQualityError(YturlError): pass
+class YouTubeAPIError(YturlError): pass
+class NoLocallyKnownItagsAvailableError(YturlError): pass
+
+
 Itag = namedtuple('Itag', [
     'v_dimensions', 'v_bitrate', 'a_bitrate', 'a_samplerate', 'v_encoding'
 ])
@@ -73,7 +80,6 @@ def itags_by_similarity(desired_itag):
         ITAGS_BY_QUALITY[desired_index::-1],
         ITAGS_BY_QUALITY[desired_index+1:],
     )
-
     return (x for x in chain(*pairs_by_distance) if x is not None)
 
 
@@ -89,7 +95,7 @@ def itags_for_video(video_id):
     try:
         streams_raw = res_data["url_encoded_fmt_stream_map"]
     except KeyError:
-        raise LookupError(res_data["reason"])
+        raise YouTubeAPIError(res_data.get('reason', 'No reason given'))
 
     streams = streams_raw.split(",")
     for stream in streams:
@@ -108,6 +114,8 @@ def itag_from_quality(group):
     except KeyError:
         if group in ITAGS_BY_QUALITY:
             return group
+        else:
+            raise UnknownQualityError('%r is not a known quality' % group)
 
 
 def most_similar_available_itag(itags_by_preference, available_itags):
@@ -119,6 +127,12 @@ def most_similar_available_itag(itags_by_preference, available_itags):
     for itag in itags_by_preference:
         if itag in available_itags:
             return itag
+    else:
+        raise NoLocallyKnownItagsAvailableError(
+            'No local itags available. (known: %r, available: %r)' % (
+                sorted(itags_by_preference), sorted(available_itags),
+            )
+        )
 
 
 def parse_args(args):
@@ -148,28 +162,14 @@ def main(args=sys.argv[1:], force_return=False):
 
     video_id = video_id_from_url(args.url)
     desired_itag = itag_from_quality(args.quality)
-
-    if desired_itag is None:
-        print("Unknown quality: %d" % args.quality, file=sys.stderr)
-        sys.exit(2)
-
-    try:
-        video_itags = dict(itags_for_video(video_id))
-    except LookupError as err:
-        print("YouTube API error: " + str(err), file=sys.stderr)
-        sys.exit(3)
+    video_itags = dict(itags_for_video(video_id))
 
     similar_itags = itags_by_similarity(desired_itag)
-    most_similar_itag = most_similar_available_itag(
-        similar_itags, video_itags,
-    )
+    most_similar_itag = most_similar_available_itag(similar_itags, video_itags)
+    url_to_video = video_itags[most_similar_itag]
 
-    if most_similar_itag:
-        url_to_video = video_itags[most_similar_itag]
+    if force_return:
+        return url_to_video
+    else:
         print("Using itag %s." % most_similar_itag, file=sys.stderr)
         print(url_to_video)
-        if force_return:
-            return url_to_video
-    else:
-        print("No local itags available.", file=sys.stderr)
-        sys.exit(1)
