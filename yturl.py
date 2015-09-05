@@ -86,9 +86,10 @@ def video_id_from_url(url):
     # clearer here.
     if len(video_id) != VIDEO_ID_LEN:
         raise VideoIDParserError(
-            'Could not parse video ID from %r (expected len: %d, got: %d)' % (
-                url, VIDEO_ID_LEN, len(video_id),
-            ),
+            'Could not parse video ID from {url!r} '
+            '(expected len: {expected}, got: {got})'.format(
+                url=url, expected=VIDEO_ID_LEN, got=len(video_id),
+            )
         )
 
     return video_id
@@ -140,7 +141,11 @@ def itag_from_quality(group):
         if group in ITAGS_BY_QUALITY:
             return group
         else:
-            raise UnknownQualityError('%r is not a known quality' % group)
+            raise UnknownQualityError(
+                '{group!r} is not a known quality (known: {known!r})'.format(
+                    group=group, known=ITAGS_BY_QUALITY,
+                )
+            )
 
 
 def most_similar_available_itag(desired_itag, available_itags):
@@ -156,8 +161,10 @@ def most_similar_available_itag(desired_itag, available_itags):
             return itag
     else:
         raise NoLocallyKnownItagsAvailableError(
-            'No local itags available. (known: %r, available: %r)' % (
-                sorted(itags_by_preference), sorted(available_itags),
+            'No local itags available. '
+            '(known: {known_itags!r}, available: {available_itags!r})'.format(
+                known_itags=sorted(itags_by_preference),
+                available_itags=sorted(available_itags),
             )
         )
 
@@ -193,7 +200,7 @@ def run(args=sys.argv[1:], force_return=False):
     if force_return:
         return url_to_video
     else:
-        print("Using itag %s." % most_similar_itag, file=sys.stderr)
+        print('Using itag {0!d}.'.format(most_similar_itag), file=sys.stderr)
         print(url_to_video)
 
 
@@ -201,7 +208,7 @@ def main():
     try:
         run()
     except YturlError as thrown_exc:
-        print('fatal: %s' % thrown_exc, file=sys.stderr)
+        print('fatal: {0!s}'.format(thrown_exc), file=sys.stderr)
         sys.exit(thrown_exc.error_code)
 
 
