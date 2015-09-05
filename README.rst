@@ -1,8 +1,3 @@
-|Build status|
-
-.. |Build status| image:: https://travis-ci.org/cdown/yturl.svg?branch=develop
-   :target: https://travis-ci.org/cdown/yturl
-
 yturl gets direct media URLs to YouTube media, freeing you having to
 view them in your browser.
 
@@ -61,6 +56,10 @@ Development version
 
 Testing
 =======
+
+.. image:: https://travis-ci.org/cdown/yturl.svg?branch=develop
+  :target: https://travis-ci.org/cdown/yturl
+  :alt: Test status
 
 ::
 
