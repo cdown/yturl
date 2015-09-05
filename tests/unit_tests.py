@@ -7,6 +7,9 @@ from mock import patch
 from nose_parameterized import parameterized
 
 
+SCRIPT_DIR = os.path.dirname(__file__)
+
+
 def test_itag_order():
     eq(
         yturl.ITAGS_BY_QUALITY,
@@ -51,8 +54,8 @@ def test_video_id_from_url(url, expected):
 
 @patch("yturl.urlopen")
 def test_available_itags_parsing(urlopen_mock):
-    good_f = open(os.path.join(os.path.dirname(__file__), "files/good"), "rb")
-    urlopen_mock.return_value = good_f
+    with open(os.path.join(SCRIPT_DIR, 'files/success_input')) as success_f:
+        urlopen_mock.read.return_value = success_f.read()
 
     avail = yturl.itags_for_video("fake")
     eq(list(avail),
@@ -106,8 +109,6 @@ def test_available_itags_parsing(urlopen_mock):
           't=40')]
     )
 
-
-    good_f.close()
 
 def test_quality_group_parsing():
     eq(yturl.itag_from_quality(18), 18)

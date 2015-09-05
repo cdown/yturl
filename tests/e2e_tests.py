@@ -5,9 +5,13 @@ import yturl
 from nose.tools import assert_raises, eq_ as eq
 from mock import patch
 
+
+SCRIPT_DIR = os.path.dirname(__file__)
+
+
 @patch("yturl.urlopen")
 def test_quality_as_word_ok(urlopen_mock):
-    good_f = open(os.path.join(os.path.dirname(__file__), "files/good"), "rb")
+    good_f = open(os.path.join(SCRIPT_DIR, 'files/success_input'), "rb")
     urlopen_mock.return_value = good_f
 
     chosen_uri = yturl.main(['-q', 'high', 'http://foo.com'], True)
@@ -33,9 +37,7 @@ def test_unknown_quality():
 
 @patch('yturl.urlopen')
 def test_youtube_api_error_exit(urlopen_mock):
-    mock_filename = os.path.join(
-        os.path.dirname(__file__), 'files/embed_restricted'
-    )
+    mock_filename = os.path.join(SCRIPT_DIR, 'files/embed_restricted')
 
     mock_f = open(mock_filename, 'rb')
     urlopen_mock.return_value = mock_f
@@ -48,7 +50,7 @@ def test_youtube_api_error_exit(urlopen_mock):
 @patch('yturl.most_similar_available_itag')
 @patch('yturl.urlopen')
 def test_no_local_itags_available_exit(urlopen_mock, msai_mock):
-    good_f = open(os.path.join(os.path.dirname(__file__), "files/good"), "rb")
+    good_f = open(os.path.join(SCRIPT_DIR, "files/success_input"), "rb")
 
     urlopen_mock.return_value = good_f
     msai_mock.return_value = None
