@@ -9,7 +9,7 @@ from mock import patch
 
 
 SCRIPT_DIR = os.path.dirname(__file__)
-VIDEO_ID = 'x' * 11
+VIDEO_ID = 'x' * yturl.VIDEO_ID_LEN
 FAKE_URL = 'http://foo.com/' + VIDEO_ID
 
 
