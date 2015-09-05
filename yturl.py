@@ -202,7 +202,7 @@ def main():
     try:
         run()
     except YturlError as thrown_exc:
-        print('fatal: %s' % thrown_exc)
+        print('fatal: %s' % thrown_exc, file=sys.stderr)
         sys.exit(thrown_exc.error_code)
 
 
