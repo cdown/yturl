@@ -60,6 +60,7 @@ NAMED_QUALITY_GROUPS = {
 
 VIDEO_ID_LEN = 11
 GVI_BASE_URL = 'https://youtube.com/get_video_info?hl=en&video_id='
+GENERIC_API_FAIL_MSG = 'The YouTube API returned malformed data.'
 
 
 def video_id_from_url(url):
@@ -122,7 +123,7 @@ def itags_for_video(video_id):
     try:
         streams = api_response['url_encoded_fmt_stream_map'].split(',')
     except KeyError:
-        raise YouTubeAPIError(api_response.get('reason', 'No reason given'))
+        raise YouTubeAPIError(api_response.get('reason', GENERIC_API_FAIL_MSG))
 
     for stream in streams:
         video = dict(parse_qsl(stream))
