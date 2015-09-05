@@ -198,3 +198,7 @@ def main(args=sys.argv[1:], force_return=False):
     else:
         print("Using itag %s." % most_similar_itag, file=sys.stderr)
         print(url_to_video)
+
+
+if __name__ == '__main__':
+    main()
