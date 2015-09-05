@@ -24,10 +24,10 @@ from collections import namedtuple
 
 
 class YturlError(Exception): pass
-class UnknownQualityError(YturlError): pass
-class YouTubeAPIError(YturlError): pass
-class NoLocallyKnownItagsAvailableError(YturlError): pass
-class VideoIDParserError(YturlError): pass
+class UnknownQualityError(YturlError): error_code = 1
+class YouTubeAPIError(YturlError): error_code = 2
+class NoLocallyKnownItagsAvailableError(YturlError): error_code = 3
+class VideoIDParserError(YturlError): error_code = 4
 
 
 Itag = namedtuple('Itag', [
@@ -181,7 +181,7 @@ def parse_args(args):
     return parser.parse_args(args)
 
 
-def main(args=sys.argv[1:], force_return=False):
+def run(args=sys.argv[1:], force_return=False):
     args = parse_args(args)
 
     video_id = video_id_from_url(args.url)
@@ -196,6 +196,14 @@ def main(args=sys.argv[1:], force_return=False):
     else:
         print("Using itag %s." % most_similar_itag, file=sys.stderr)
         print(url_to_video)
+
+
+def main():
+    try:
+        run()
+    except YturlError as thrown_exc:
+        print('fatal: %s' % thrown_exc)
+        sys.exit(thrown_exc.error_code)
 
 
 if __name__ == '__main__':

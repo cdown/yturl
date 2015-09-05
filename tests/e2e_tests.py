@@ -27,13 +27,13 @@ def test_quality_as_word_ok(urlopen_mock):
         body=fake_api_output, content_type='application/x-www-form-urlencoded',
     )
 
-    chosen_uri = yturl.main(['-q', 'high', FAKE_URL], force_return=True)
+    chosen_uri = yturl.run(['-q', 'high', FAKE_URL], force_return=True)
     eq(chosen_uri, expected)
 
 
 def test_unknown_quality():
     with assert_raises(yturl.UnknownQualityError):
-        yturl.main(['-q', '123456', FAKE_URL], force_return=True)
+        yturl.run(['-q', '123456', FAKE_URL], force_return=True)
 
 
 @httpretty.activate
@@ -49,4 +49,4 @@ def test_youtube_api_error_exit(urlopen_mock):
     )
 
     with assert_raises(yturl.YouTubeAPIError):
-        yturl.main([FAKE_URL], force_return=True)
+        yturl.run([FAKE_URL], force_return=True)
