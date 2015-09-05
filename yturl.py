@@ -143,6 +143,9 @@ def parse_args(args):
     parser.add_argument(
         "-q", "--quality",
         help='"low", "medium", "high", or an itag',
+        # We accept either an int or string here because this could be either
+        # an itag or a quality group.
+        type=lambda arg: int(arg) if arg.isdigit() else arg,
         default="medium",
     )
     parser.add_argument(
@@ -150,14 +153,7 @@ def parse_args(args):
         metavar="video_id/url",
         help="a YouTube url (or bare video ID)",
     )
-    args = parser.parse_args(args)
-
-    try:
-        args.quality = int(args.quality)
-    except ValueError:
-        pass
-
-    return args
+    return parser.parse_args(args)
 
 
 def main(args=sys.argv[1:], force_return=False):
