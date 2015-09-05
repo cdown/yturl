@@ -1,14 +1,13 @@
-|Linux build status| |Windows build status| |Coverage| |Code health|
-|Dependencies|
+|Build status|
+
+.. |Build status| image:: https://travis-ci.org/cdown/yturl.svg?branch=develop
+   :target: https://travis-ci.org/cdown/yturl
 
 yturl gets direct media URLs to YouTube media, freeing you having to
 view them in your browser.
 
 Usage
 =====
-
-Command line
-------------
 
 By default, yturl prints the media URL to standard output.
 
@@ -31,36 +30,28 @@ Or something like the following to download it (using `curl`_):
 
     $ curl -Lo bill "$(yturl 'http://www.youtube.com/watch?v=8TCxE0bWQeQ')"
 
-There is also a ``-q`` option for controlling the quality, see the
-program help for more information.
+There is also a ``-q`` option for controlling the quality (for example ``-q
+high``), see the program help for more information.
 
-Library
--------
+.. _mpv: http://mpv.io
+.. _curl: http://curl.haxx.se
 
-.. code:: python
+Installation
+============
 
-    >>> video_id = yturl.video_id_from_url('http://www.youtube.com/watch?v=8TCxE0bWQeQ&hl=en-US#x')
-    >>> video_id
-    '8TCxE0bWQeQ'
-    >>>
-    >>> for itag, url in yturl.itags_for_video(video_id):
-    ...     print('Itag %d: %s[...]' % (itag, url[:65]))
-    ...
-    Itag 43: http://r20---sn-aigllnl6.googlevideo.com/videoplayback?key=yt5&up[...]
-    Itag 18: http://r20---sn-aigllnl6.googlevideo.com/videoplayback?key=yt5&up[...]
-    Itag 5: http://r20---sn-aigllnl6.googlevideo.com/videoplayback?key=yt5&up[...]
-    Itag 36: http://r20---sn-aigllnl6.googlevideo.com/videoplayback?key=yt5&up[...]
-    Itag 17: http://r20---sn-aigllnl6.googlevideo.com/videoplayback?key=yt5&up[...]
+Installation requires `setuptools`_.
 
-Stable
-------
+.. _setuptools: https://pypi.python.org/pypi/setuptools
+
+Stable version
+--------------
 
 ::
 
     $ pip install yturl
 
-develop
-------
+Development version
+-------------------
 
 ::
 
@@ -73,27 +64,13 @@ Testing
 
 ::
 
-    $ pip install -r tests/requirements.txt
-    $ nosetests
+    $ python setup.py test
 
 License
 =======
 
-yturl is licensed under an `ISC license`_. Full information is in
-`LICENSE.md`_.
+yturl is licensed under an `ISC license`_. Full information is in the
+`LICENSE`_ file.
 
-.. _mpv: http://mpv.io
-.. _curl: http://curl.haxx.se
-.. _ISC license: http://en.wikipedia.org/wiki/ISC_license
-.. _LICENSE.md: LICENSE.md
-
-.. |Linux build status| image:: https://img.shields.io/travis/cdown/yturl/develop.svg?label=linux
-   :target: https://travis-ci.org/cdown/yturl
-.. |Windows build status| image:: https://img.shields.io/appveyor/ci/cdown/yturl/develop.svg?label=windows
-   :target: https://ci.appveyor.com/project/cdown/yturl
-.. |Coverage| image:: https://img.shields.io/coveralls/cdown/yturl/develop.svg
-   :target: https://coveralls.io/r/cdown/yturl
-.. |Code health| image:: https://landscape.io/github/cdown/yturl/develop/landscape.svg
-   :target: https://landscape.io/github/cdown/yturl/develop
-.. |Dependencies| image:: https://img.shields.io/requires/github/cdown/yturl.svg?label=deps
-   :target: https://requires.io/github/cdown/yturl/requirements/?branch=develop
+.. _ISC license: https://en.wikipedia.org/wiki/ISC_license
+.. _LICENSE: LICENSE
