@@ -142,8 +142,8 @@ def itag_from_quality(group):
             return group
         else:
             raise UnknownQualityError(
-                '{group!r} is not a known quality (known: {known!r})'.format(
-                    group=group, known=NAMED_QUALITY_GROUPS,
+                '{group!r} is not a known quality (known: {known!s})'.format(
+                    group=group, known=', '.join(NAMED_QUALITY_GROUPS),
                 )
             )
 
