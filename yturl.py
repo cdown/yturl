@@ -19,6 +19,7 @@ except ImportError:  # Python 2 fallback
 
 import argparse
 import sys
+import requests
 from collections import namedtuple
 
 
@@ -58,6 +59,7 @@ NAMED_QUALITY_GROUPS = {
 }
 
 VIDEO_ID_LEN = 11
+GVI_BASE_URL = 'https://youtube.com/get_video_info?hl=en&video_id='
 
 
 def video_id_from_url(url):
@@ -113,19 +115,15 @@ def itags_for_video(video_id):
     Return the available itags for a video with their associated URLs.
     '''
 
-    url = "http://youtube.com/get_video_info?hl=en&video_id=" + video_id
-
-    # No Content-Encoding header is sent by the server, so we can't use that to
-    # dynamically determine the encoding to use. Thankfully, everything is
-    # percent encoded, so it should be legal ASCII.
-    res_data = dict(parse_qsl(urlopen(url).read().decode('ascii')))
+    gvi_url = GVI_BASE_URL + video_id
+    api_response_raw = requests.get(gvi_url).text
+    api_response = dict(parse_qsl(api_response_raw))
 
     try:
-        streams_raw = res_data["url_encoded_fmt_stream_map"]
+        streams = api_response['url_encoded_fmt_stream_map'].split(',')
     except KeyError:
-        raise YouTubeAPIError(res_data.get('reason', 'No reason given'))
+        raise YouTubeAPIError(api_response.get('reason', 'No reason given'))
 
-    streams = streams_raw.split(",")
     for stream in streams:
         video = dict(parse_qsl(stream))
         yield int(video["itag"]), video["url"]

@@ -3,6 +3,7 @@
 import os
 import yturl
 import json
+import httpretty
 from nose.tools import assert_raises, eq_ as eq, assert_true
 from mock import patch
 from nose_parameterized import parameterized
@@ -69,6 +70,7 @@ def test_video_id_from_url_unparseable(url):
         yturl.video_id_from_url(url)
 
 
+@httpretty.activate
 @patch("yturl.urlopen")
 def test_available_itags_parsing(urlopen_mock):
     with open(os.path.join(SCRIPT_DIR, 'files/success_output')) as output_f:
@@ -78,8 +80,14 @@ def test_available_itags_parsing(urlopen_mock):
         expected = map(tuple, expected_raw)
 
     with open(os.path.join(SCRIPT_DIR, 'files/success_input'), 'rb') as mock_f:
-        urlopen_mock.return_value = mock_f
-        eq(list(yturl.itags_for_video('fake')), list(expected))
+        fake_api_output = mock_f.read()
+
+    httpretty.register_uri(
+        httpretty.GET, yturl.GVI_BASE_URL + 'fake',
+        body=fake_api_output, content_type='application/x-www-form-urlencoded',
+    )
+
+    eq(list(yturl.itags_for_video('fake')), list(expected))
 
 
 def itag_quality_pos(itag_quality):
@@ -111,11 +119,18 @@ def test_itag_from_quality_ordering():
     )
 
 
+@httpretty.activate
 @patch("yturl.urlopen")
 def test_embed_restriction_raises(urlopen_mock):
     mock_filename = os.path.join(SCRIPT_DIR, 'files/embed_restricted')
 
     with open(mock_filename, 'rb') as mock_f:
-        urlopen_mock.return_value = mock_f
-        avail = yturl.itags_for_video('fake')
-        assert_raises(yturl.YouTubeAPIError, list, avail)
+        fake_api_output = mock_f.read()
+
+    httpretty.register_uri(
+        httpretty.GET, yturl.GVI_BASE_URL + 'fake',
+        body=fake_api_output, content_type='application/x-www-form-urlencoded',
+    )
+
+    avail = yturl.itags_for_video('fake')
+    assert_raises(yturl.YouTubeAPIError, list, avail)
