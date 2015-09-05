@@ -119,11 +119,13 @@ def itag_from_quality(group):
             raise UnknownQualityError('%r is not a known quality' % group)
 
 
-def most_similar_available_itag(itags_by_preference, available_itags):
+def most_similar_available_itag(desired_itag, available_itags):
     '''
     Return the most similar available itag to the desired itag. See
     itags_by_similarity for information about how "similarity" is determined.
     '''
+
+    itags_by_preference = itags_by_similarity(desired_itag)
 
     for itag in itags_by_preference:
         if itag in available_itags:
@@ -165,8 +167,7 @@ def main(args=sys.argv[1:], force_return=False):
     desired_itag = itag_from_quality(args.quality)
     video_itags = dict(itags_for_video(video_id))
 
-    similar_itags = itags_by_similarity(desired_itag)
-    most_similar_itag = most_similar_available_itag(similar_itags, video_itags)
+    most_similar_itag = most_similar_available_itag(desired_itag, video_itags)
     url_to_video = video_itags[most_similar_itag]
 
     if force_return:

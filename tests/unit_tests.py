@@ -34,11 +34,8 @@ def test_itags_by_similarity(input_itag, expected):
     (13, [38, 35, 17, 13], 13),
 ])
 def test_most_similar_available_itag(input_itag, available_itags, expected):
-    itags_by_similarity = yturl.itags_by_similarity(input_itag)
     eq(
-        yturl.most_similar_available_itag(
-            itags_by_similarity, available_itags
-        ),
+        yturl.most_similar_available_itag(input_itag, available_itags),
         expected,
     )
 
@@ -48,9 +45,8 @@ def test_most_similar_available_itag(input_itag, available_itags, expected):
     (38, [1, 2, 3]),
 ])
 def test_most_similar_available_itag_none(input_itag, available_itags):
-    itags_by_similarity = yturl.itags_by_similarity(input_itag)
     with assert_raises(yturl.NoLocallyKnownItagsAvailableError):
-        yturl.most_similar_available_itag(itags_by_similarity, available_itags)
+        yturl.most_similar_available_itag(input_itag, available_itags)
 
 
 @parameterized([
