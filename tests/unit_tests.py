@@ -7,9 +7,12 @@ import httpretty
 from nose.tools import assert_raises, eq_ as eq, assert_true
 from mock import patch
 from nose_parameterized import parameterized
+from hypothesis import given, assume
+from hypothesis.strategies import integers, lists, sampled_from
 
 
 SCRIPT_DIR = os.path.dirname(__file__)
+MAX_NUM_ITAG = max(yturl.ITAGS_BY_QUALITY)
 
 
 def test_itag_order():
@@ -41,11 +44,12 @@ def test_most_similar_available_itag(input_itag, available_itags, expected):
     )
 
 
-@parameterized([
-    (46, []),
-    (38, [1, 2, 3]),
-])
+@given(
+    sampled_from(yturl.ITAGS_BY_QUALITY),
+    lists(integers(min_value=MAX_NUM_ITAG), max_size=10),
+)
 def test_most_similar_available_itag_none(input_itag, available_itags):
+    assume(not any(x in yturl.ITAGS_BY_QUALITY for x in available_itags))
     with assert_raises(yturl.NoLocallyKnownItagsAvailableError):
         yturl.most_similar_available_itag(input_itag, available_itags)
 
@@ -98,17 +102,20 @@ def itag_quality_pos(itag_quality):
     return yturl.ITAGS_BY_QUALITY.index(yturl.itag_from_quality(itag_quality))
 
 
-def test_itag_from_quality_num():
-    eq(yturl.itag_from_quality(18), 18)
+@given(sampled_from(yturl.ITAGS_BY_QUALITY))
+def test_itag_from_quality_itag(itag):
+    eq(yturl.itag_from_quality(itag), itag)
+
+
+@given(integers())
+def test_itag_from_quality_num_but_not_itag(itag):
+    assume(itag not in yturl.ITAGS_BY_QUALITY)
+    with assert_raises(yturl.UnknownQualityError):
+        yturl.itag_from_quality(itag)
 
 
 def test_itag_from_quality_string():
     eq(yturl.itag_from_quality('high'), 38)
-
-
-def test_itag_from_quality_unknown():
-    with assert_raises(yturl.UnknownQualityError):
-        eq(yturl.itag_from_quality(-1), None)
 
 
 def test_itag_from_quality_ordering():
