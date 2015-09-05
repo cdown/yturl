@@ -86,7 +86,7 @@ def test_video_id_from_url_unparseable(url):
 def test_available_itags_parsing():
     with open(os.path.join(SCRIPT_DIR, 'files/success_output')) as output_f:
         expected_raw = json.load(output_f)
-        # json has no tuple tupe, and we return tuples from itags_for_video, so
+        # JSON has no tuple type, and we return tuples from itags_for_video, so
         # we need to coerce them.
         expected = map(tuple, expected_raw)
 
