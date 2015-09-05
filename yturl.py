@@ -9,11 +9,9 @@ from __future__ import absolute_import, division, print_function, \
                        unicode_literals
 
 try:
-    from urllib.request import urlopen
     from urllib.parse import parse_qsl, urlparse
     from itertools import chain, zip_longest
 except ImportError:  # Python 2 fallback
-    from urllib import urlopen
     from urlparse import parse_qsl, urlparse
     from itertools import chain, izip_longest as zip_longest
 

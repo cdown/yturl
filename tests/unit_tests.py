@@ -83,8 +83,7 @@ def test_video_id_from_url_unparseable(url):
 
 
 @httpretty.activate
-@patch("yturl.urlopen")
-def test_available_itags_parsing(urlopen_mock):
+def test_available_itags_parsing():
     with open(os.path.join(SCRIPT_DIR, 'files/success_output')) as output_f:
         expected_raw = json.load(output_f)
         # json has no tuple tupe, and we return tuples from itags_for_video, so
@@ -135,8 +134,7 @@ def test_itag_from_quality_ordering():
 
 
 @httpretty.activate
-@patch("yturl.urlopen")
-def test_embed_restriction_raises(urlopen_mock):
+def test_embed_restriction_raises():
     mock_filename = os.path.join(SCRIPT_DIR, 'files/embed_restricted')
 
     with open(mock_filename, 'rb') as mock_f:

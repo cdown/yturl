@@ -14,8 +14,7 @@ FAKE_URL = 'http://foo.com/' + VIDEO_ID
 
 
 @httpretty.activate
-@patch("yturl.urlopen")
-def test_quality_as_word_ok(urlopen_mock):
+def test_quality_as_word_ok():
     with open(os.path.join(SCRIPT_DIR, 'files/success_output')) as output_f:
         expected = dict(json.load(output_f))[43]
 
@@ -37,8 +36,7 @@ def test_unknown_quality():
 
 
 @httpretty.activate
-@patch('yturl.urlopen')
-def test_youtube_api_error_exit(urlopen_mock):
+def test_youtube_api_error_exit():
     mock_filename = os.path.join(SCRIPT_DIR, 'files/embed_restricted')
     with open(mock_filename, 'rb') as mock_f:
         fake_api_output = mock_f.read()
