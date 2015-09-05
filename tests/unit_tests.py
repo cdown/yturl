@@ -63,8 +63,8 @@ def test_available_itags_parsing(urlopen_mock):
     with open(os.path.join(SCRIPT_DIR, 'files/success_output')) as output_f:
         expected = json.load(output_f)
 
-    with open(os.path.join(SCRIPT_DIR, 'files/success_input'), 'rb') as temp_f:
-        urlopen_mock.return_value = temp_f
+    with open(os.path.join(SCRIPT_DIR, 'files/success_input'), 'rb') as mock_f:
+        urlopen_mock.return_value = mock_f
         eq(list(yturl.itags_for_video('fake')), expected)
 
 
