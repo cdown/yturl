@@ -26,13 +26,12 @@ class YturlError(Exception): pass
 class UnknownQualityError(YturlError): pass
 class YouTubeAPIError(YturlError): pass
 class NoLocallyKnownItagsAvailableError(YturlError): pass
+class VideoIDParserError(YturlError): pass
 
 
 Itag = namedtuple('Itag', [
     'v_dimensions', 'v_bitrate', 'a_bitrate', 'a_samplerate', 'v_encoding'
 ])
-
-
 ITAGS = {
     5:   Itag(400*240,   0.25, 64,  22.05, 'h263'),
     6:   Itag(480*270,   0.8,  64,  22.05, 'h263'),
@@ -58,15 +57,40 @@ NAMED_QUALITY_GROUPS = {
     "high": 0,
 }
 
+VIDEO_ID_LEN = 11
+
 
 def video_id_from_url(url):
     '''
     Parse a video ID from a YouTube URL.
+
+    There are basically two different types of input we're trying to parse:
+
+    - A youtube.com URL: youtube.com/watch?v=12345&foo=bar. In this case, we
+      want to grab the value of the "v" key, and return that.
+    - A youtu.be URL: youtu.be/12345. In this case, we grab the path component
+      from urlparse and get the last path element (I don't know of any cases
+      where there would be more than one element, this is mostly just an
+      artifact of how the algorithm works).
     '''
 
     parsed_url = urlparse(url)
     url_params = dict(parse_qsl(parsed_url.query))
-    return url_params.get("v", parsed_url.path.split("/")[-1])
+    video_id = url_params.get('v', parsed_url.path.split('/')[-1])
+
+    # Google has made no commitment about this length, although it's likely to
+    # stay like this. I'd usually prefer to just let the API complain about the
+    # video ID down the line so that we don't duplicate its logic to determine
+    # "correctness", but we have the opportunity to make the error message much
+    # clearer here.
+    if len(video_id) != VIDEO_ID_LEN:
+        raise VideoIDParserError(
+            'Could not parse video ID from %r (expected len: %d, got: %d)' % (
+                url, VIDEO_ID_LEN, len(video_id),
+            ),
+        )
+
+    return video_id
 
 
 def itags_by_similarity(desired_itag):

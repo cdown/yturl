@@ -58,6 +58,17 @@ def test_video_id_from_url(url, expected):
     eq(yturl.video_id_from_url(url), expected)
 
 
+@parameterized([
+    'http://www.youtube.com/watch?v=gEl6TXrkZn&feature=pem',
+    'some.other.site/gEl6TXrkZn',
+    'youtu.be/gEl6TXrkZn?feature=pem&g=q#video',
+    'gEl6TXrkZn',
+])
+def test_video_id_from_url_unparseable(url):
+    with assert_raises(yturl.VideoIDParserError):
+        yturl.video_id_from_url(url)
+
+
 @patch("yturl.urlopen")
 def test_available_itags_parsing(urlopen_mock):
     with open(os.path.join(SCRIPT_DIR, 'files/success_output')) as output_f:
