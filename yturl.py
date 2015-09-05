@@ -142,7 +142,7 @@ def itag_from_quality(group):
             return group
         else:
             raise UnknownQualityError(
-                '{group!r} is not a known quality (known: {known!s})'.format(
+                '{group!r} is not a known quality (known: {known})'.format(
                     group=group, known=', '.join(NAMED_QUALITY_GROUPS),
                 )
             )
@@ -200,7 +200,7 @@ def run(args=sys.argv[1:], force_return=False):
     if force_return:
         return url_to_video
     else:
-        print('Using itag {0!d}.'.format(most_similar_itag), file=sys.stderr)
+        print('Using itag {0}.'.format(most_similar_itag), file=sys.stderr)
         print(url_to_video)
 
 
