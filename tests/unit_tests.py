@@ -3,7 +3,7 @@
 import os
 import yturl
 import json
-from nose.tools import assert_raises, eq_ as eq
+from nose.tools import assert_raises, eq_ as eq, assert_true
 from mock import patch
 from nose_parameterized import parameterized
 
@@ -63,17 +63,26 @@ def test_available_itags_parsing(urlopen_mock):
         eq(list(yturl.itags_for_video('fake')), expected)
 
 
-def test_quality_group_parsing():
+def itag_quality_pos(itag_quality):
+    '''
+    Return the position of an itag quality in ITAGS_BY_QUALITY, in order to
+    check that index constraints hold. See test_itag_from_quality.
+    '''
+    return yturl.ITAGS_BY_QUALITY.index(yturl.itag_from_quality(itag_quality))
+
+
+def test_itag_from_quality():
     eq(yturl.itag_from_quality(18), 18)
-    eq(yturl.ITAGS_BY_QUALITY.index(yturl.itag_from_quality("high")), 0)
-    eq(
-        yturl.ITAGS_BY_QUALITY.index(yturl.itag_from_quality("medium")),
-        len(yturl.ITAGS_BY_QUALITY) // 2,
+
+    # Unidentifiable values should return None
+    eq(yturl.itag_from_quality(-1), None)
+
+    assert_true(
+        itag_quality_pos('high') < \
+        itag_quality_pos('medium') < \
+        itag_quality_pos('low')
     )
-    eq(
-        yturl.ITAGS_BY_QUALITY.index(yturl.itag_from_quality("low")),
-        len(yturl.ITAGS_BY_QUALITY) - 1,
-    )
+
 
 @patch("yturl.urlopen")
 def test_embed_restriction_raises(urlopen_mock):
