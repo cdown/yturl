@@ -114,8 +114,11 @@ def itags_for_video(video_id):
     '''
 
     url = "http://youtube.com/get_video_info?hl=en&video_id=" + video_id
-    res_handle = urlopen(url)
-    res_data = dict(parse_qsl(res_handle.read().decode("utf8")))
+
+    # No Content-Encoding header is sent by the server, so we can't use that to
+    # dynamically determine the encoding to use. Thankfully, everything is
+    # percent encoded, so it should be legal ASCII.
+    res_data = dict(parse_qsl(urlopen(url).read().decode('ascii')))
 
     try:
         streams_raw = res_data["url_encoded_fmt_stream_map"]
