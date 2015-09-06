@@ -12,8 +12,7 @@ from hypothesis.strategies import integers, lists, sampled_from
 
 
 SCRIPT_DIR = os.path.dirname(__file__)
-ITAGS_BY_QUALITY = yturl.ITAGS_BY_QUALITY
-MAX_NUM_ITAG = max(ITAGS_BY_QUALITY)
+MAX_NUM_ITAG = max(yturl.ITAGS_BY_QUALITY)
 
 
 def test_itag_order():
@@ -34,20 +33,20 @@ def test_itags_by_similarity(input_itag, expected):
 
 
 @given(
-    sampled_from(ITAGS_BY_QUALITY),
-    lists(sampled_from(ITAGS_BY_QUALITY), min_size=1),
+    sampled_from(yturl.ITAGS_BY_QUALITY),
+    lists(sampled_from(yturl.ITAGS_BY_QUALITY), min_size=1),
 )
 def test_most_similar_available_itag(input_itag, available_itags):
     chosen = yturl.most_similar_available_itag(input_itag, available_itags)
 
-    input_itag_idx = ITAGS_BY_QUALITY.index(input_itag)
-    chosen_itag_idx = ITAGS_BY_QUALITY.index(chosen)
+    input_itag_idx = itag_quality_pos(input_itag)
+    chosen_itag_idx = itag_quality_pos(chosen)
     ideal_distance = abs(input_itag_idx - chosen_itag_idx)
 
     # No other element should be closer than the one we chose, although one
     # could be *as* close.
     assert_true(not any(
-        abs(input_itag_idx - ITAGS_BY_QUALITY.index(itag)) < ideal_distance
+        abs(input_itag_idx - itag_quality_pos(itag)) < ideal_distance
         for itag in available_itags
     ))
 
