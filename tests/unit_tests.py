@@ -5,7 +5,6 @@ import yturl
 import json
 import httpretty
 from nose.tools import assert_raises, eq_ as eq, assert_true
-from mock import patch
 from nose_parameterized import parameterized
 from hypothesis import given, assume
 from hypothesis.strategies import integers, lists, sampled_from
@@ -87,7 +86,7 @@ def test_available_itags_parsing():
         expected_raw = json.load(output_f)
         # JSON has no tuple type, and we return tuples from itags_for_video, so
         # we need to coerce them.
-        expected = map(tuple, expected_raw)
+        expected = [tuple(itag_info) for itag_info in expected_raw]
 
     with open(os.path.join(SCRIPT_DIR, 'files/success_input'), 'rb') as mock_f:
         fake_api_output = mock_f.read()

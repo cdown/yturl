@@ -5,7 +5,6 @@ import httpretty
 import os
 import yturl
 from nose.tools import assert_raises, eq_ as eq
-from mock import patch
 
 
 SCRIPT_DIR = os.path.dirname(__file__)

@@ -21,7 +21,7 @@ import requests
 from collections import namedtuple
 
 
-class YturlError(Exception): pass
+class YturlError(Exception): error_code = None
 class UnknownQualityError(YturlError): error_code = 1
 class YouTubeAPIError(YturlError): error_code = 2
 class NoLocallyKnownItagsAvailableError(YturlError): error_code = 3
@@ -159,14 +159,14 @@ def most_similar_available_itag(desired_itag, available_itags):
     for itag in itags_by_preference:
         if itag in available_itags:
             return itag
-    else:
-        raise NoLocallyKnownItagsAvailableError(
-            'No local itags available. '
-            '(known: {known_itags!r}, available: {available_itags!r})'.format(
-                known_itags=sorted(itags_by_preference),
-                available_itags=sorted(available_itags),
-            )
+
+    raise NoLocallyKnownItagsAvailableError(
+        'No local itags available. '
+        '(known: {known_itags!r}, available: {available_itags!r})'.format(
+            known_itags=sorted(itags_by_preference),
+            available_itags=sorted(available_itags),
         )
+    )
 
 
 def parse_args(args):
