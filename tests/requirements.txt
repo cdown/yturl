@@ -1,3 +1,5 @@
 mock
 nose
 nose-parameterized
+httpretty
+hypothesis

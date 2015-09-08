@@ -1,8 +1,3 @@
-|Build status|
-
-.. |Build status| image:: https://travis-ci.org/cdown/yturl.svg?branch=develop
-   :target: https://travis-ci.org/cdown/yturl
-
 yturl gets direct media URLs to YouTube media, freeing you having to
 view them in your browser.
 
@@ -57,13 +52,19 @@ Development version
 
     $ git clone git://github.com/cdown/yturl.git
     $ cd yturl
+    $ pip install -r requirements.txt
     $ python setup.py install
 
 Testing
 =======
 
+.. image:: https://travis-ci.org/cdown/yturl.svg?branch=develop
+  :target: https://travis-ci.org/cdown/yturl
+  :alt: Test status
+
 ::
 
+    $ pip install -r tests/requirements.txt
     $ python setup.py test
 
 License

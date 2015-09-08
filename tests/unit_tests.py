@@ -3,12 +3,15 @@
 import os
 import yturl
 import json
+import httpretty
 from nose.tools import assert_raises, eq_ as eq, assert_true
-from mock import patch
 from nose_parameterized import parameterized
+from hypothesis import given, assume
+from hypothesis.strategies import integers, lists, sampled_from
 
 
 SCRIPT_DIR = os.path.dirname(__file__)
+MAX_NUM_ITAG = max(yturl.ITAGS_BY_QUALITY)
 
 
 def test_itag_order():
@@ -28,23 +31,31 @@ def test_itags_by_similarity(input_itag, expected):
     eq(list(itags_by_similarity), expected)
 
 
-@parameterized([
-    (18, [46, 38], 46),
-    (38, [17, 13], 17),
-    (13, [38, 35, 17, 13], 13),
-])
-def test_most_similar_available_itag(input_itag, available_itags, expected):
-    eq(
-        yturl.most_similar_available_itag(input_itag, available_itags),
-        expected,
-    )
+@given(
+    sampled_from(yturl.ITAGS_BY_QUALITY),
+    lists(sampled_from(yturl.ITAGS_BY_QUALITY), min_size=1),
+)
+def test_most_similar_available_itag(input_itag, available_itags):
+    chosen = yturl.most_similar_available_itag(input_itag, available_itags)
+
+    input_itag_idx = itag_quality_pos(input_itag)
+    chosen_itag_idx = itag_quality_pos(chosen)
+    ideal_distance = abs(input_itag_idx - chosen_itag_idx)
+
+    # No other element should be closer than the one we chose, although one
+    # could be *as* close.
+    assert_true(not any(
+        abs(input_itag_idx - itag_quality_pos(itag)) < ideal_distance
+        for itag in available_itags
+    ))
 
 
-@parameterized([
-    (46, []),
-    (38, [1, 2, 3]),
-])
+@given(
+    sampled_from(yturl.ITAGS_BY_QUALITY),
+    lists(integers(min_value=MAX_NUM_ITAG), max_size=10),
+)
 def test_most_similar_available_itag_none(input_itag, available_itags):
+    assume(not any(x in yturl.ITAGS_BY_QUALITY for x in available_itags))
     with assert_raises(yturl.NoLocallyKnownItagsAvailableError):
         yturl.most_similar_available_itag(input_itag, available_itags)
 
@@ -58,17 +69,34 @@ def test_video_id_from_url(url, expected):
     eq(yturl.video_id_from_url(url), expected)
 
 
-@patch("yturl.urlopen")
-def test_available_itags_parsing(urlopen_mock):
+@parameterized([
+    'http://www.youtube.com/watch?v=gEl6TXrkZn&feature=pem',
+    'some.other.site/gEl6TXrkZn',
+    'youtu.be/gEl6TXrkZn?feature=pem&g=q#video',
+    'gEl6TXrkZn',
+])
+def test_video_id_from_url_unparseable(url):
+    with assert_raises(yturl.VideoIDParserError):
+        yturl.video_id_from_url(url)
+
+
+@httpretty.activate
+def test_available_itags_parsing():
     with open(os.path.join(SCRIPT_DIR, 'files/success_output')) as output_f:
         expected_raw = json.load(output_f)
-        # json has no tuple tupe, and we return tuples from itags_for_video, so
+        # JSON has no tuple type, and we return tuples from itags_for_video, so
         # we need to coerce them.
         expected = map(tuple, expected_raw)
 
     with open(os.path.join(SCRIPT_DIR, 'files/success_input'), 'rb') as mock_f:
-        urlopen_mock.return_value = mock_f
-        eq(list(yturl.itags_for_video('fake')), list(expected))
+        fake_api_output = mock_f.read()
+
+    httpretty.register_uri(
+        httpretty.GET, yturl.GVI_BASE_URL + 'fake',
+        body=fake_api_output, content_type='application/x-www-form-urlencoded',
+    )
+
+    eq(list(yturl.itags_for_video('fake')), list(expected))
 
 
 def itag_quality_pos(itag_quality):
@@ -79,17 +107,20 @@ def itag_quality_pos(itag_quality):
     return yturl.ITAGS_BY_QUALITY.index(yturl.itag_from_quality(itag_quality))
 
 
-def test_itag_from_quality_num():
-    eq(yturl.itag_from_quality(18), 18)
+@given(sampled_from(yturl.ITAGS_BY_QUALITY))
+def test_itag_from_quality_itag(itag):
+    eq(yturl.itag_from_quality(itag), itag)
+
+
+@given(integers())
+def test_itag_from_quality_num_but_not_itag(itag):
+    assume(itag not in yturl.ITAGS_BY_QUALITY)
+    with assert_raises(yturl.UnknownQualityError):
+        yturl.itag_from_quality(itag)
 
 
 def test_itag_from_quality_string():
     eq(yturl.itag_from_quality('high'), 38)
-
-
-def test_itag_from_quality_unknown():
-    with assert_raises(yturl.UnknownQualityError):
-        eq(yturl.itag_from_quality(-1), None)
 
 
 def test_itag_from_quality_ordering():
@@ -100,11 +131,17 @@ def test_itag_from_quality_ordering():
     )
 
 
-@patch("yturl.urlopen")
-def test_embed_restriction_raises(urlopen_mock):
+@httpretty.activate
+def test_embed_restriction_raises():
     mock_filename = os.path.join(SCRIPT_DIR, 'files/embed_restricted')
 
     with open(mock_filename, 'rb') as mock_f:
-        urlopen_mock.return_value = mock_f
-        avail = yturl.itags_for_video('fake')
-        assert_raises(yturl.YouTubeAPIError, list, avail)
+        fake_api_output = mock_f.read()
+
+    httpretty.register_uri(
+        httpretty.GET, yturl.GVI_BASE_URL + 'fake',
+        body=fake_api_output, content_type='application/x-www-form-urlencoded',
+    )
+
+    avail = yturl.itags_for_video('fake')
+    assert_raises(yturl.YouTubeAPIError, list, avail)
