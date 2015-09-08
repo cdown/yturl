@@ -52,6 +52,7 @@ Development version
 
     $ git clone git://github.com/cdown/yturl.git
     $ cd yturl
+    $ pip install -r requirements.txt
     $ python setup.py install
 
 Testing
@@ -63,6 +64,7 @@ Testing
 
 ::
 
+    $ pip install -r tests/requirements.txt
     $ python setup.py test
 
 License
