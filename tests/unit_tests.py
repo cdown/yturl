@@ -86,7 +86,7 @@ def test_available_itags_parsing():
         expected_raw = json.load(output_f)
         # JSON has no tuple type, and we return tuples from itags_for_video, so
         # we need to coerce them.
-        expected = [tuple(itag_info) for itag_info in expected_raw]
+        expected = map(tuple, expected_raw)
 
     with open(os.path.join(SCRIPT_DIR, 'files/success_input'), 'rb') as mock_f:
         fake_api_output = mock_f.read()
