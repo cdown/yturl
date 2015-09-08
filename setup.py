@@ -15,7 +15,7 @@ with open('tests/requirements.txt') as test_requirements_f:
 
 setup(
     name='yturl',
-    version='1.19.0',
+    version='1.20.0',
     description='Gets direct media URLs to YouTube media',
     long_description=README,
     url='https://github.com/cdown/yturl',
