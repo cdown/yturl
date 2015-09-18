@@ -119,10 +119,6 @@ def test_itag_from_quality_num_but_not_itag(itag):
         yturl.itag_from_quality(itag)
 
 
-def test_itag_from_quality_string():
-    eq(yturl.itag_from_quality('high'), 38)
-
-
 def test_itag_from_quality_ordering():
     assert_true(
         itag_quality_pos('high') < \
