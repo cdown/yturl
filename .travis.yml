@@ -17,3 +17,10 @@ matrix:
 sudo: false
 
 cache: pip
+
+notifications:
+  irc:
+    channels:
+      - 'irc.freenode.net#cdown-notify'
+    template:
+      - 'cdown: %{repository_name} %{result}: "%{commit_subject}"'
