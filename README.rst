@@ -62,10 +62,23 @@ Testing
   :target: https://travis-ci.org/cdown/yturl
   :alt: Test status
 
-::
+First, install the test requirements:
+
+.. code::
 
     $ pip install -r tests/requirements.txt
-    $ python setup.py test
+
+Then, to test using your current Python interpreter:
+
+.. code::
+
+    $ nosetests
+
+Otherwise, to test on all supported Python versions:
+
+.. code::
+
+    $ tox
 
 License
 =======
