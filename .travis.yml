@@ -1,15 +1,13 @@
 language: python
-python:
-  - 2.7
-  - 3.3
-  - 3.4
-  - 3.5
+python: 3.5  # 3.5 requires manual download, so it needs to be selected
+install: pip install tox
+script: tox
 
-install:
-  - 'pip install -r tests/requirements.txt'
-
-script:
-  - 'python setup.py test'
+env:
+  - TOXENV=py27
+  - TOXENV=py33
+  - TOXENV=py34
+  - TOXENV=py35
 
 matrix:
   fast_finish: true
@@ -17,3 +15,5 @@ matrix:
 # This is required to enable container based Travis CI infrastructure.
 # See http://docs.travis-ci.com/user/migrating-from-legacy/
 sudo: false
+
+cache: pip
