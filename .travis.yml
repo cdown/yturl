@@ -4,10 +4,8 @@ install: pip install tox
 script: tox
 
 env:
-  - TOXENV=py27
-  - TOXENV=py33
-  - TOXENV=py34
-  - TOXENV=py35
+  # Github deployment key
+  - secure: "C3+AAPp8xMXMNxOz8TU4mpObcFlE9XwaYcHfYUtc2I6vrZuRjFwD9oWdwXS+03ONZIOsmy7Vjpdjm2QviX6zZw0fAnp/GM7qq+Xw1M+uAWfEg3U0ziYiYOjSkKb1WORoWXrUl4URCvC/C5gB7+EspxrkKDbVyZTjH2ULlW3DqJY="
 
 matrix:
   fast_finish: true
@@ -18,9 +16,7 @@ sudo: false
 
 cache: pip
 
-notifications:
-  irc:
-    channels:
-      - 'irc.freenode.net#cdown-notify'
-    template:
-      - 'cdown: %{repository_name} %{result}: "%{commit_subject}"'
+after_success:
+  - "curl -o /tmp/travis-automerge https://raw.githubusercontent.com/cdown/travis-automerge/master/travis-automerge"
+  - "chmod a+x /tmp/travis-automerge"
+  - "BRANCHES_TO_MERGE_REGEX='^f/' BRANCH_TO_MERGE_INTO=develop GITHUB_REPO=cdown/yturl /tmp/travis-automerge"
