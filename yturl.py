@@ -57,7 +57,7 @@ NAMED_QUALITY_GROUPS = {
 }
 
 VIDEO_ID_LEN = 11
-GVI_BASE_URL = 'https://youtube.com/get_video_info?hl=en&video_id='
+GVI_BASE_URL = 'https://www.youtube.com/get_video_info?hl=en&video_id='
 GENERIC_API_FAIL_MSG = 'The YouTube API returned malformed data.'
 
 
