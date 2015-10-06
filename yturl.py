@@ -187,8 +187,11 @@ def parse_args(args):
     return parser.parse_args(args)
 
 
-def run(args=sys.argv[1:], force_return=False):
-    args = parse_args(args)
+def run(argv=None, force_return=False):
+    if argv is None:
+        argv = sys.argv[1:]
+
+    args = parse_args(argv)
 
     video_id = video_id_from_url(args.url)
     desired_itag = itag_from_quality(args.quality)
