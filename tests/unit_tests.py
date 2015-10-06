@@ -139,5 +139,5 @@ def test_embed_restriction_raises():
         body=fake_api_output, content_type='application/x-www-form-urlencoded',
     )
 
-    avail = yturl.itags_for_video('fake')
-    assert_raises(yturl.YouTubeAPIError, list, avail)
+    with assert_raises(yturl.YouTubeAPIError):
+        yturl.itags_for_video('fake')

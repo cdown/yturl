@@ -18,6 +18,7 @@ except ImportError:  # Python 2 fallback
 import argparse
 import sys
 import requests
+import logging
 from collections import namedtuple
 
 
@@ -27,6 +28,7 @@ class YouTubeAPIError(YturlError): error_code = 2
 class NoLocallyKnownItagsAvailableError(YturlError): error_code = 3
 class VideoIDParserError(YturlError): error_code = 4
 
+log = logging.getLogger(__name__)
 
 Itag = namedtuple('Itag', [
     'v_dimensions', 'v_bitrate', 'a_bitrate', 'a_samplerate', 'v_encoding'
@@ -77,7 +79,9 @@ def video_id_from_url(url):
 
     parsed_url = urlparse(url)
     url_params = dict(parse_qsl(parsed_url.query))
+    log.debug('Got URL params from "%s": %r', url, url_params)
     video_id = url_params.get('v', parsed_url.path.split('/')[-1])
+    log.debug('Parsed video ID: "%s"', video_id)
 
     # Google has made no commitment about this length, although it's likely to
     # stay like this. I'd usually prefer to just let the API complain about the
@@ -103,11 +107,15 @@ def itags_by_similarity(desired_itag):
     '''
 
     desired_index = ITAGS_BY_QUALITY.index(desired_itag)
-    pairs_by_distance = zip_longest(
+    log.debug('Parsed index "%s" from input "%s"', desired_index, desired_itag)
+    pairs_by_distance = list(zip_longest(
         ITAGS_BY_QUALITY[desired_index::-1],
         ITAGS_BY_QUALITY[desired_index+1:],
-    )
-    return (x for x in chain(*pairs_by_distance) if x is not None)
+    ))
+    log.debug('Got itags pairs by distance: %r', pairs_by_distance)
+    similar_itags = [x for x in chain(*pairs_by_distance) if x is not None]
+    log.debug('Got itags by similarity: %r', similar_itags)
+    return similar_itags
 
 
 def itags_for_video(video_id):
@@ -115,18 +123,26 @@ def itags_for_video(video_id):
     Return the available itags for a video with their associated URLs.
     '''
 
+    log.debug('Getting available itags for video ID "%s"', video_id)
     gvi_url = GVI_BASE_URL + video_id
     api_response_raw = requests.get(gvi_url).text
+    log.debug('Raw API response: %s', api_response_raw)
     api_response = dict(parse_qsl(api_response_raw))
+    log.debug('Parsed API response: %r', api_response)
 
     try:
         streams = api_response['url_encoded_fmt_stream_map'].split(',')
     except KeyError:
         raise YouTubeAPIError(api_response.get('reason', GENERIC_API_FAIL_MSG))
 
-    for stream in streams:
-        video = dict(parse_qsl(stream))
-        yield int(video["itag"]), video["url"]
+    log.debug('Streams: %r', streams)
+    videos = [dict(parse_qsl(stream)) for stream in streams]
+
+    itag_and_url_pairs = [
+        (int(video["itag"]), video["url"]) for video in videos
+    ]
+    log.debug('Itag/URL pairs: %r', itag_and_url_pairs)
+    return itag_and_url_pairs
 
 
 def itag_from_quality(group):
@@ -136,16 +152,20 @@ def itag_from_quality(group):
     '''
 
     try:
-        return ITAGS_BY_QUALITY[NAMED_QUALITY_GROUPS[group]]
+        itag = ITAGS_BY_QUALITY[NAMED_QUALITY_GROUPS[group]]
     except KeyError:
         if group in ITAGS_BY_QUALITY:
-            return group
+            # This is actually an itag, not a group.
+            itag = group
         else:
             raise UnknownQualityError(
                 '{group!r} is not a known quality (known: {known})'.format(
                     group=group, known=', '.join(NAMED_QUALITY_GROUPS),
                 )
             )
+
+    log.debug('Parsed itag "%s" from group "%s"', itag, group)
+    return itag
 
 
 def most_similar_available_itag(desired_itag, available_itags):
@@ -158,6 +178,7 @@ def most_similar_available_itag(desired_itag, available_itags):
 
     for itag in itags_by_preference:
         if itag in available_itags:
+            log.debug('First preferred itag available is "%s"', itag)
             return itag
 
     raise NoLocallyKnownItagsAvailableError(
@@ -184,6 +205,12 @@ def parse_args(args):
         metavar="video_id/url",
         help="a YouTube url (or bare video ID)",
     )
+    parser.add_argument(
+        '--debug',
+        action='store_const', dest='log_level',
+        const=logging.DEBUG, default=logging.WARNING,
+        help='enable debug logging',
+    )
     return parser.parse_args(args)
 
 
@@ -192,6 +219,7 @@ def run(argv=None, force_return=False):
         argv = sys.argv[1:]
 
     args = parse_args(argv)
+    logging.basicConfig(level=args.log_level)
 
     video_id = video_id_from_url(args.url)
     desired_itag = itag_from_quality(args.quality)
