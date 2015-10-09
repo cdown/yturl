@@ -27,13 +27,6 @@ def video_ids(length=11):
     )
 
 
-def test_itag_order():
-    eq(
-        yturl.ITAGS_BY_QUALITY,
-        [38, 37, 46, 22, 45, 44, 35, 43, 34, 18, 6, 5, 36, 17, 13],
-    )
-
-
 @given(sampled_from(yturl.ITAGS_BY_QUALITY))
 def test_itags_by_similarity(input_itag):
     itags_by_similarity = yturl.itags_by_similarity(input_itag)
