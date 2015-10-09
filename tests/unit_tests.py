@@ -20,15 +20,19 @@ def test_itag_order():
         [38, 37, 46, 22, 45, 44, 35, 43, 34, 18, 6, 5, 36, 17, 13],
     )
 
-@parameterized([
-    (18, [18, 6, 34, 5, 43, 36, 35, 17, 44, 13, 45, 22, 46, 37, 38]),
-    (38, [38, 37, 46, 22, 45, 44, 35, 43, 34, 18, 6, 5, 36, 17, 13]),
-    (13, [13, 17, 36, 5, 6, 18, 34, 43, 35, 44, 45, 22, 46, 37, 38]),
-    (46, [46, 22, 37, 45, 38, 44, 35, 43, 34, 18, 6, 5, 36, 17, 13]),
-])
-def test_itags_by_similarity(input_itag, expected):
+
+@given(sampled_from(yturl.ITAGS_BY_QUALITY))
+def test_itags_by_similarity(input_itag):
     itags_by_similarity = yturl.itags_by_similarity(input_itag)
-    eq(list(itags_by_similarity), expected)
+
+    itags_by_similarity_index_dist = [
+        abs(itag_quality_pos(input_itag) - itag_quality_pos(similar_itag))
+        for similar_itag in itags_by_similarity
+    ]
+
+    # Check that itags are ordered from closest to the desired itag to the
+    # furthest.
+    eq(itags_by_similarity_index_dist, sorted(itags_by_similarity_index_dist))
 
 
 @given(
