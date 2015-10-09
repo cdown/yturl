@@ -5,7 +5,6 @@ import yturl
 import json
 import httpretty
 from nose.tools import assert_raises, eq_ as eq, assert_true
-from nose_parameterized import parameterized
 from hypothesis import given, assume
 from hypothesis.strategies import integers, lists, sampled_from, text
 import string
@@ -18,6 +17,14 @@ YOUTUBE_URL_EXAMPLES = (
     'youtu.be/%s?feature=pem&g=q#video',
     '%s'  # We also allow the user to just input the video ID raw
 )
+
+
+def video_ids(length=11):
+    '''A Hypothesis strategy to generate YouTube video IDs.'''
+    return text(
+        min_size=length, max_size=length,
+        alphabet=string.ascii_letters + string.digits,
+    )
 
 
 def test_itag_order():
@@ -70,25 +77,15 @@ def test_most_similar_available_itag_none(input_itag, available_itags):
         yturl.most_similar_available_itag(input_itag, available_itags)
 
 
-@given(
-    text(
-        min_size=11, max_size=11,
-        alphabet=string.ascii_letters + string.digits,
-    ),
-    sampled_from(YOUTUBE_URL_EXAMPLES),
-)
+@given(video_ids(), sampled_from(YOUTUBE_URL_EXAMPLES))
 def test_video_id_parsed_from_url(video_id, url_format):
     url = url_format % video_id
     eq(yturl.video_id_from_url(url), video_id)
 
 
-@parameterized([
-    'http://www.youtube.com/watch?v=gEl6TXrkZn&feature=pem',
-    'some.other.site/gEl6TXrkZn',
-    'youtu.be/gEl6TXrkZn?feature=pem&g=q#video',
-    'gEl6TXrkZn',
-])
-def test_video_id_from_url_unparseable(url):
+@given(video_ids(length=10), sampled_from(YOUTUBE_URL_EXAMPLES))
+def test_video_id_from_url_unparseable(video_id, url_format):
+    url = url_format % video_id
     with assert_raises(yturl.VideoIDParserError):
         yturl.video_id_from_url(url)
 
