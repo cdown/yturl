@@ -7,11 +7,17 @@ import httpretty
 from nose.tools import assert_raises, eq_ as eq, assert_true
 from nose_parameterized import parameterized
 from hypothesis import given, assume
-from hypothesis.strategies import integers, lists, sampled_from
+from hypothesis.strategies import integers, lists, sampled_from, text
+import string
 
 
 SCRIPT_DIR = os.path.dirname(__file__)
 MAX_NUM_ITAG = max(yturl.ITAGS_BY_QUALITY)
+YOUTUBE_URL_EXAMPLES = (
+    'https://www.youtube.com/watch?v=%s&feature=pem',
+    'youtu.be/%s?feature=pem&g=q#video',
+    '%s'  # We also allow the user to just input the video ID raw
+)
 
 
 def test_itag_order():
@@ -64,13 +70,16 @@ def test_most_similar_available_itag_none(input_itag, available_itags):
         yturl.most_similar_available_itag(input_itag, available_itags)
 
 
-@parameterized([
-    ('http://www.youtube.com/watch?v=gEl6TXrkZnk&feature=pem', 'gEl6TXrkZnk'),
-    ('youtu.be/gEl6TXrkZnk?feature=pem&g=q#video', 'gEl6TXrkZnk'),
-    ('gEl6TXrkZnk', 'gEl6TXrkZnk'),
-])
-def test_video_id_from_url(url, expected):
-    eq(yturl.video_id_from_url(url), expected)
+@given(
+    text(
+        min_size=11, max_size=11,
+        alphabet=string.ascii_letters + string.digits,
+    ),
+    sampled_from(YOUTUBE_URL_EXAMPLES),
+)
+def test_video_id_parsed_from_url(video_id, url_format):
+    url = url_format % video_id
+    eq(yturl.video_id_from_url(url), video_id)
 
 
 @parameterized([
