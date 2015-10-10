@@ -1,6 +1,5 @@
 #!/usr/bin/env python2
 
-import os
 import yturl
 import httpretty
 from nose.tools import assert_raises, eq_ as eq, assert_true
@@ -16,7 +15,6 @@ except ImportError:  # Python 2 fallback
     from nose.tools import assert_items_equal as assert_count_equal
 
 
-SCRIPT_DIR = os.path.dirname(__file__)
 MAX_NUM_ITAG = max(yturl.ITAGS_BY_QUALITY)
 YOUTUBE_URL_EXAMPLES = (
     'https://www.youtube.com/watch?v=%s&feature=pem',
