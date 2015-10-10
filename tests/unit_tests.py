@@ -124,8 +124,8 @@ def test_itag_from_quality_num_but_not_itag(itag):
 
 def test_itag_from_quality_ordering():
     assert_true(
-        itag_quality_pos('high') < \
-        itag_quality_pos('medium') < \
+        itag_quality_pos('high') <
+        itag_quality_pos('medium') <
         itag_quality_pos('low')
     )
 
