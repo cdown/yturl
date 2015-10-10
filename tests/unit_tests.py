@@ -9,6 +9,11 @@ from hypothesis import given, assume
 from hypothesis.strategies import integers, lists, sampled_from, text
 import string
 
+try:
+    from urllib.parse import urlencode
+except ImportError:  # Python 2 fallback
+    from urllib import urlencode
+
 
 SCRIPT_DIR = os.path.dirname(__file__)
 MAX_NUM_ITAG = max(yturl.ITAGS_BY_QUALITY)
@@ -131,11 +136,18 @@ def test_itag_from_quality_ordering():
 
 
 @httpretty.activate
-def test_embed_restriction_raises():
-    mock_filename = os.path.join(SCRIPT_DIR, 'files/embed_restricted')
+@given(text(), integers())
+def test_api_error_raises(reason, code):
+    # In Python 2, urlencode bombs on some strings since it provides no way to
+    # specify an encoding, so we do it manually.
+    reason = reason.encode('utf-8')
 
-    with open(mock_filename, 'rb') as mock_f:
-        fake_api_output = mock_f.read()
+    api_output_dict = {
+        'status': 'fail',
+        'reason': reason,
+        'code': code,
+    }
+    fake_api_output = urlencode(api_output_dict)
 
     httpretty.register_uri(
         httpretty.GET, yturl.GVI_BASE_URL + 'fake',
