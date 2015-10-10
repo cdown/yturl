@@ -33,6 +33,14 @@ def video_ids(length=11):
     )
 
 
+def itag_quality_pos(itag_quality):
+    '''
+    Return the position of an itag quality in ITAGS_BY_QUALITY, in order to
+    check that index constraints hold. See test_itag_from_quality.
+    '''
+    return yturl.ITAGS_BY_QUALITY.index(yturl.itag_from_quality(itag_quality))
+
+
 @given(sampled_from(yturl.ITAGS_BY_QUALITY))
 def test_itags_by_similarity(input_itag):
     itags_by_similarity = yturl.itags_by_similarity(input_itag)
@@ -118,14 +126,6 @@ def test_available_itags_parsing(input_itags):
     )
 
     assert_count_equal(yturl.itags_for_video('fake'), itag_to_url_map.items())
-
-
-def itag_quality_pos(itag_quality):
-    '''
-    Return the position of an itag quality in ITAGS_BY_QUALITY, in order to
-    check that index constraints hold. See test_itag_from_quality.
-    '''
-    return yturl.ITAGS_BY_QUALITY.index(yturl.itag_from_quality(itag_quality))
 
 
 @given(sampled_from(yturl.ITAGS_BY_QUALITY))
