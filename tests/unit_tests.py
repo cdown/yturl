@@ -2,7 +2,6 @@
 
 import os
 import yturl
-import json
 import httpretty
 from nose.tools import assert_raises, eq_ as eq, assert_true
 from hypothesis import given, assume
@@ -89,22 +88,28 @@ def test_video_id_from_url_unparseable(video_id, url_format):
 
 
 @httpretty.activate
-def test_available_itags_parsing():
-    with open(os.path.join(SCRIPT_DIR, 'files/success_output')) as output_f:
-        expected_raw = json.load(output_f)
-        # JSON has no tuple type, and we return tuples from itags_for_video, so
-        # we need to coerce them.
-        expected = map(tuple, expected_raw)
+@given(lists(sampled_from(yturl.ITAGS_BY_QUALITY), min_size=1))
+def test_available_itags_parsing(input_itags):
+    # In real life, the URL will obvious not just be the itag as a string, but
+    # the actual URL we retrieve is inconsequential to this test, we just want
+    # to check that they are parsed and linked together properly.
+    itag_to_url_map = {itag: str(itag) for itag in input_itags}
 
-    with open(os.path.join(SCRIPT_DIR, 'files/success_input'), 'rb') as mock_f:
-        fake_api_output = mock_f.read()
+    # This is missing a lot of "real" keys, but we don't check them at present,
+    # so we don't need them.
+    fake_api_output = urlencode({
+        'url_encoded_fmt_stream_map': [
+            (('itag', str(itag)), ('url', itag_to_url_map[itag]))
+            for itag in input_itags
+        ]
+    })
 
     httpretty.register_uri(
         httpretty.GET, yturl.GVI_BASE_URL + 'fake',
         body=fake_api_output, content_type='application/x-www-form-urlencoded',
     )
 
-    eq(list(yturl.itags_for_video('fake')), list(expected))
+    eq(list(yturl.itags_for_video('fake')), itag_to_url_map)
 
 
 def itag_quality_pos(itag_quality):
