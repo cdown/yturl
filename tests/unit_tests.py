@@ -10,8 +10,10 @@ import string
 
 try:
     from urllib.parse import urlencode
+    from nose.tools import assert_count_equal
 except ImportError:  # Python 2 fallback
     from urllib import urlencode
+    from nose.tools import assert_items_equal as assert_count_equal
 
 
 SCRIPT_DIR = os.path.dirname(__file__)
@@ -88,7 +90,9 @@ def test_video_id_from_url_unparseable(video_id, url_format):
 
 
 @httpretty.activate
-@given(lists(sampled_from(yturl.ITAGS_BY_QUALITY), min_size=1))
+@given(lists(
+    sampled_from(yturl.ITAGS_BY_QUALITY), min_size=1, unique_by=lambda x: x,
+))
 def test_available_itags_parsing(input_itags):
     # In real life, the URL will obvious not just be the itag as a string, but
     # the actual URL we retrieve is inconsequential to this test, we just want
@@ -97,11 +101,15 @@ def test_available_itags_parsing(input_itags):
 
     # This is missing a lot of "real" keys, but we don't check them at present,
     # so we don't need them.
+    api_itag_map = ','.join([
+        urlencode({
+            'itag': str(itag),
+            'url': itag_to_url_map[itag],
+        }) for itag in input_itags
+    ])
+
     fake_api_output = urlencode({
-        'url_encoded_fmt_stream_map': [
-            (('itag', str(itag)), ('url', itag_to_url_map[itag]))
-            for itag in input_itags
-        ]
+        'url_encoded_fmt_stream_map': api_itag_map,
     })
 
     httpretty.register_uri(
@@ -109,7 +117,7 @@ def test_available_itags_parsing(input_itags):
         body=fake_api_output, content_type='application/x-www-form-urlencoded',
     )
 
-    eq(list(yturl.itags_for_video('fake')), itag_to_url_map)
+    assert_count_equal(yturl.itags_for_video('fake'), itag_to_url_map.items())
 
 
 def itag_quality_pos(itag_quality):
