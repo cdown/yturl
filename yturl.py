@@ -228,11 +228,11 @@ def run(argv=None, force_return=False):
     most_similar_itag = most_similar_available_itag(desired_itag, video_itags)
     url_to_video = video_itags[most_similar_itag]
 
+    print('Using itag {0}.'.format(most_similar_itag), file=sys.stderr)
+    print(url_to_video)
+
     if force_return:
         return url_to_video
-    else:
-        print('Using itag {0}.'.format(most_similar_itag), file=sys.stderr)
-        print(url_to_video)
 
 
 def main():
