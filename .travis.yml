@@ -1,11 +1,14 @@
 language: python
 python: 3.5  # 3.5 requires manual download, so it needs to be selected
-install: pip install tox
-script: tox
 
 env:
-  # Github deployment key
-  - secure: "C3+AAPp8xMXMNxOz8TU4mpObcFlE9XwaYcHfYUtc2I6vrZuRjFwD9oWdwXS+03ONZIOsmy7Vjpdjm2QviX6zZw0fAnp/GM7qq+Xw1M+uAWfEg3U0ziYiYOjSkKb1WORoWXrUl4URCvC/C5gB7+EspxrkKDbVyZTjH2ULlW3DqJY="
+  - TOXENV=py27
+  - TOXENV=py33
+  - TOXENV=py34
+  - TOXENV=py35
+
+install: pip install tox
+script: tox
 
 matrix:
   fast_finish: true
@@ -13,13 +16,6 @@ matrix:
 # This is required to enable container based Travis CI infrastructure.
 # See http://docs.travis-ci.com/user/migrating-from-legacy/
 sudo: false
-
-cache: pip
-
-after_success:
-  - "curl -o /tmp/travis-automerge https://raw.githubusercontent.com/cdown/travis-automerge/master/travis-automerge"
-  - "chmod a+x /tmp/travis-automerge"
-  - "BRANCHES_TO_MERGE_REGEX='^f/' BRANCH_TO_MERGE_INTO=develop GITHUB_REPO=cdown/yturl /tmp/travis-automerge"
 
 notifications:
   email:
