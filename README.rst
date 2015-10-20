@@ -2,7 +2,7 @@ yturl gets direct media URLs to YouTube media, freeing you having to
 view them in your browser.
 
 Usage
-=====
+-----
 
 By default, yturl prints the media URL to standard output.
 
@@ -32,59 +32,39 @@ high``), see the program help for more information.
 .. _curl: http://curl.haxx.se
 
 Installation
-============
+------------
 
-Installation requires `setuptools`_.
+To install the latest stable version from PyPi:
 
-.. _setuptools: https://pypi.python.org/pypi/setuptools
+.. code::
 
-Stable version
---------------
+    pip install -U yturl
 
-::
+To install the latest development version directly from GitHub:
 
-    $ pip install yturl
+.. code::
 
-Development version
--------------------
-
-::
-
-    $ git clone git://github.com/cdown/yturl.git
-    $ cd yturl
-    $ pip install -r requirements.txt
-    $ python setup.py install
+    pip install -U git+https://github.com/cdown/yturl.git@develop
 
 Testing
-=======
+-------
 
-.. image:: https://travis-ci.org/cdown/yturl.svg?branch=develop
+|travis| |coveralls| |scrutinizer|
+
+.. |travis| image:: https://travis-ci.org/cdown/yturl.svg?branch=develop
   :target: https://travis-ci.org/cdown/yturl
   :alt: Test status
 
-First, install the test requirements:
+.. |coveralls| image:: https://coveralls.io/repos/cdown/yturl/badge.svg?branch=develop&service=github
+  :target: https://coveralls.io/github/cdown/yturl?branch=develop
+  :alt: Coverage
+
+.. |scrutinizer| image:: https://img.shields.io/scrutinizer/g/cdown/yturl/develop.svg
+  :target: https://scrutinizer-ci.com/g/cdown/yturl/?branch=develop
+  :alt: Code quality
 
 .. code::
 
-    $ pip install -r tests/requirements.txt
+   tox -e quick
 
-Then, to test using your current Python interpreter:
-
-.. code::
-
-    $ nosetests
-
-Otherwise, to test on all supported Python versions:
-
-.. code::
-
-    $ tox
-
-License
-=======
-
-yturl is licensed under an `ISC license`_. Full information is in the
-`LICENSE`_ file.
-
-.. _ISC license: https://en.wikipedia.org/wiki/ISC_license
-.. _LICENSE: LICENSE
+.. _Tox: https://tox.readthedocs.org
