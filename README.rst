@@ -26,7 +26,7 @@ Or something like the following to download it (using `curl`_):
     $ curl -Lo bill "$(yturl 'http://www.youtube.com/watch?v=8TCxE0bWQeQ')"
 
 There is also a ``-q`` option for controlling the quality (for example ``-q
-high``), see the program help for more information.
+high``), see :code:`yturl --help` for more information.
 
 .. _mpv: http://mpv.io
 .. _curl: http://curl.haxx.se
