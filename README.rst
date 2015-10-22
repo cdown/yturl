@@ -12,24 +12,17 @@ By default, yturl prints the media URL to standard output.
     Using itag 43.
     http://r2---sn-uphxqvujvh-30al.googlevideo.com/videoplayback?source=[...]
 
-This means that you can do something like the following to watch it in
-`mpv`_:
+
+You can use this URL in the media player of your choice. For media players that
+can be launched from the command line, this typically means that you can do
+something like the following to watch it in your preferred player:
 
 ::
 
-    $ mpv "$(yturl 'http://www.youtube.com/watch?v=8TCxE0bWQeQ')"
-
-Or something like the following to download it (using `curl`_):
-
-::
-
-    $ curl -Lo bill "$(yturl 'http://www.youtube.com/watch?v=8TCxE0bWQeQ')"
+    $ <your-preferred-player> "$(yturl 'http://www.youtube.com/watch?v=8TCxE0bWQeQ')"
 
 There is also a ``-q`` option for controlling the quality (for example ``-q
 high``), see :code:`yturl --help` for more information.
-
-.. _mpv: http://mpv.io
-.. _curl: http://curl.haxx.se
 
 Installation
 ------------
