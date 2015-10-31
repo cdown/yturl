@@ -8,7 +8,7 @@ from nose.tools import assert_raises, eq_ as eq
 
 
 SCRIPT_DIR = os.path.dirname(__file__)
-VIDEO_ID = 'x' * yturl.VIDEO_ID_LEN
+VIDEO_ID = 'x'
 FAKE_URL = 'http://foo.com/' + VIDEO_ID
 
 
@@ -25,13 +25,24 @@ def test_quality_as_word_ok():
         body=fake_api_output, content_type='application/x-www-form-urlencoded',
     )
 
-    chosen_uri = yturl.run(['-q', 'high', FAKE_URL], force_return=True)
+    chosen_uri = yturl.main(['-q', 'high', FAKE_URL])
     eq(chosen_uri, expected)
 
 
+@httpretty.activate
 def test_unknown_quality():
-    with assert_raises(yturl.UnknownQualityError):
-        yturl.run(['-q', '123456', FAKE_URL], force_return=True)
+    with open(os.path.join(SCRIPT_DIR, 'files/success_input'), 'rb') as mock_f:
+        fake_api_output = mock_f.read()
+
+    httpretty.register_uri(
+        httpretty.GET, yturl.GVI_BASE_URL + VIDEO_ID,
+        body=fake_api_output, content_type='application/x-www-form-urlencoded',
+    )
+
+    unknown_itag = '99999999'
+
+    with assert_raises(ValueError):
+        yturl.main(['-q', unknown_itag, FAKE_URL])
 
 
 @httpretty.activate
@@ -46,4 +57,4 @@ def test_youtube_api_error_exit():
     )
 
     with assert_raises(yturl.YouTubeAPIError):
-        yturl.run([FAKE_URL], force_return=True)
+        yturl.main([FAKE_URL])

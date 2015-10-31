@@ -1,7 +1,4 @@
 [report]
 exclude_lines =
     except ImportError
-    if argv is None
-    def main
     if __name__ == .__main__.:
-    if force_return:
