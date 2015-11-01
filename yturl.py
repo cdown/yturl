@@ -64,7 +64,7 @@ def itag_from_quality(group, video_itags):
     raise ValueError('Itag %s unavailable (avail: %r)' % (group, video_itags))
 
 
-def main(argv=None):
+def main(argv=None, force_return=False):
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-q', '--quality', default='medium', help='low/medium/high or an itag',
@@ -78,8 +78,11 @@ def main(argv=None):
     desired_itag = itag_from_quality(args.quality, list(itag_to_url_map))
 
     print('Using itag %s.' % desired_itag, file=sys.stderr)
-    return itag_to_url_map[desired_itag]
+    print(itag_to_url_map[desired_itag])
+
+    if force_return:
+        return itag_to_url_map[desired_itag]
 
 
 if __name__ == '__main__':
-    print(main())
+    main()

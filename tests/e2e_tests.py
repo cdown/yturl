@@ -25,7 +25,7 @@ def test_quality_as_word_ok():
         body=fake_api_output, content_type='application/x-www-form-urlencoded',
     )
 
-    chosen_uri = yturl.main(['-q', 'high', FAKE_URL])
+    chosen_uri = yturl.main(['-q', 'high', FAKE_URL], force_return=True)
     eq(chosen_uri, expected)
 
 
@@ -42,7 +42,7 @@ def test_unknown_quality():
     unknown_itag = '99999999'
 
     with assert_raises(ValueError):
-        yturl.main(['-q', unknown_itag, FAKE_URL])
+        yturl.main(['-q', unknown_itag, FAKE_URL], force_return=True)
 
 
 @httpretty.activate
@@ -57,4 +57,4 @@ def test_youtube_api_error_exit():
     )
 
     with assert_raises(yturl.YouTubeAPIError):
-        yturl.main([FAKE_URL])
+        yturl.main([FAKE_URL], force_return=True)
