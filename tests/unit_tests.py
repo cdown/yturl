@@ -56,6 +56,7 @@ def test_available_itags_parsing(input_itags):
 
     fake_api_output = urlencode({
         'url_encoded_fmt_stream_map': api_itag_map,
+        'status': 'ok',
     })
 
     httpretty.register_uri(
