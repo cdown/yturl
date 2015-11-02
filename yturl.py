@@ -80,6 +80,7 @@ def main(argv=None, force_return=False):
     print('Using itag %s.' % desired_itag, file=sys.stderr)
     print(itag_to_url_map[desired_itag])
 
+    # Goes to stderr when using console_scripts, so we can't generally return
     if force_return:
         return itag_to_url_map[desired_itag]
 
