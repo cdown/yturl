@@ -52,16 +52,21 @@ def itags_for_video(video_id):
     return OrderedDict((video['itag'], video['url']) for video in videos)
 
 
-def itag_from_quality(group, video_itags):
+def itag_from_quality(group, itags):
     '''
-    If "group" is a quality group, return an appropriate itag from video_itags
+    If "group" is a quality group, return an appropriate itag from itags
     for that group. Otherwise, group is an itag -- just return it.
     '''
     if group in NAMED_QUALITY_GROUPS:
-        return NAMED_QUALITY_GROUPS[group](video_itags)
-    elif group in video_itags:  # group is actually an itag, not a group
+        return NAMED_QUALITY_GROUPS[group](itags)
+    elif group in itags:  # group is actually an itag, not a group
         return group
-    raise ValueError('Itag %s unavailable (avail: %r)' % (group, video_itags))
+    else:
+        raise ValueError(
+            'Quality %s unavailable (video itags: %r, known groups: %r)' % (
+                group, itags, list(NAMED_QUALITY_GROUPS),
+            )
+        )
 
 
 def main(argv=None, force_return=False):
