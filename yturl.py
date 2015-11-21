@@ -38,7 +38,7 @@ def video_id_from_url(url):
     Parse a video ID, either from the "v" parameter or the last URL path slice.
     '''
     parsed_url = urlparse(url)
-    url_params = dict(parse_qsl(parsed_url.query))
+    url_params = parse_qs_single(parsed_url.query)
     video_id = url_params.get('v', parsed_url.path.split('/')[-1])
     return video_id
 
@@ -49,13 +49,13 @@ def itags_for_video(video_id):
     '''
     api_url = construct_youtube_get_video_info_url(video_id)
     api_response_raw = requests.get(api_url)
-    api_response = dict(parse_qsl(api_response_raw.text))
+    api_response = parse_qs_single(api_response_raw.text)
 
     if api_response.get('status') != 'ok':
         raise YouTubeAPIError(api_response.get('reason', 'Unspecified error.'))
     streams = api_response['url_encoded_fmt_stream_map'].split(',')
 
-    videos = [dict(parse_qsl(stream)) for stream in streams]
+    videos = [parse_qs_single(stream) for stream in streams]
     # The YouTube API returns this in quality order, which we rely on
     return collections.OrderedDict((vid['itag'], vid['url']) for vid in videos)
 
@@ -96,6 +96,24 @@ def main(argv=None, force_return=False):
     # Goes to stderr when using console_scripts, so we can't generally return
     if force_return:
         return itag_to_url_map[desired_itag]
+
+
+def parse_qs_single(query_string):
+    '''
+    Parse a query string per parse_qs, but with the values as single elements.
+
+    parse_qs, as mandated by the standard, dutifully returns each value as a
+    list in case the key appears twice in the input, which can be quite
+    inconvienient and results in hard to read code.
+
+    Instead, verify that no key appears twice, and then return each value as a
+    single element in the dictionary.
+    '''
+    parsed_tuples = parse_qsl(query_string)
+    parsed_keys = [pair[0] for pair in parsed_tuples]
+    if len(parsed_keys) != len(set(parsed_keys)):
+        raise ValueError('There are duplicate parsed keys: %r' % parsed_keys)
+    return dict(parsed_tuples)
 
 
 class YouTubeAPIError(Exception):

@@ -131,3 +131,22 @@ def test_api_error_raises(reason):
 
     with assert_raises(yturl.YouTubeAPIError):
         yturl.itags_for_video(_test_utils.VIDEO_ID)
+
+
+@given(lists(text(min_size=1), min_size=1))
+def test_parse_qs_single_duplicate_keys_raise(keys):
+    '''
+    Test that parse_qs_single raises ValueError on encountering duplicate keys.
+    '''
+    # In Python 2, urlencode bombs on some strings since it provides no way
+    # to specify an encoding, so we do it manually.
+    keys = [key.encode('utf8') for key in keys]
+
+    duplicated_keys = keys + keys
+    query_string = urlencode(
+        [(key, key) for key in duplicated_keys],
+        doseq=True,
+    )
+
+    with assert_raises(ValueError):
+        yturl.parse_qs_single(query_string)
