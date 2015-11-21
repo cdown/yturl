@@ -73,23 +73,19 @@ def itag_from_quality(group_or_itag, itags):
     it.
     '''
     if group_or_itag in NAMED_QUALITY_GROUPS:
-        # "group_or_itag" is really a named quality group. NAMED_QUALITY_GROUPS
-        # contains a mapping of names to functions that should be run with the
-        # available itags as input.
-        group = group_or_itag
-        func_to_get_desired_itag = NAMED_QUALITY_GROUPS[group]
-        itag = func_to_get_desired_itag(itags)
+        # "group_or_itag" is really a named quality group. Use
+        # NAMED_QUALITY_GROUPS to get a function to determine the itag to use.
+        func_to_get_desired_itag = NAMED_QUALITY_GROUPS[group_or_itag]
+        return func_to_get_desired_itag(itags)
     elif group_or_itag in itags:
         # "group_or_itag" is really an itag. Just pass it through unaltered.
-        itag = group_or_itag
+        return group_or_itag
     else:
         raise ValueError(
             'Group/itag %s unavailable (video itags: %r, known groups: %r)' % (
                 group_or_itag, itags, list(NAMED_QUALITY_GROUPS),
             )
         )
-
-    return itag
 
 
 def main(argv=None, force_return=False):
