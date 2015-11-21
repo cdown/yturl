@@ -5,7 +5,7 @@ import httpretty
 from nose.tools import assert_raises, eq_ as eq, assert_true
 from hypothesis import given, assume
 from hypothesis.strategies import integers, lists, sampled_from, text
-import string
+from tests import _test_utils
 
 try:
     from urllib.parse import urlencode
@@ -13,23 +13,7 @@ except ImportError:  # Python 2 fallback
     from urllib import urlencode
 
 
-YOUTUBE_URL_EXAMPLES = (
-    'https://www.youtube.com/watch?v=%s&feature=pem',
-    'youtu.be/%s?feature=pem&g=q#video',
-    '%s'  # We also allow the user to just input the video ID raw
-)
-FAKE_VIDEO_ID = 'fake'
-
-
-def video_ids(length=11):
-    '''A Hypothesis strategy to generate YouTube video IDs.'''
-    return text(
-        min_size=length, max_size=length,
-        alphabet=string.ascii_letters + string.digits,
-    )
-
-
-@given(video_ids(), sampled_from(YOUTUBE_URL_EXAMPLES))
+@given(_test_utils.video_ids(), sampled_from(_test_utils.YOUTUBE_URL_EXAMPLES))
 def test_video_id_parsed_from_url(video_id, url_format):
     url = url_format % video_id
     eq(yturl.video_id_from_url(url), video_id)
@@ -60,12 +44,9 @@ def test_available_itags_parsing(input_itags):
         'status': 'ok',
     })
 
-    httpretty.register_uri(
-        httpretty.GET, yturl.construct_youtube_get_video_info_url(FAKE_VIDEO_ID),
-        body=fake_api_output, content_type='application/x-www-form-urlencoded',
-    )
+    _test_utils.mock_get_video_info_api_response(fake_api_output)
 
-    eq(yturl.itags_for_video(FAKE_VIDEO_ID), itag_to_url_map)
+    eq(yturl.itags_for_video(_test_utils.VIDEO_ID), itag_to_url_map)
 
 
 @given(integers())
@@ -103,10 +84,7 @@ def test_api_error_raises(reason, code):
     }
     fake_api_output = urlencode(api_output_dict)
 
-    httpretty.register_uri(
-        httpretty.GET, yturl.construct_youtube_get_video_info_url(FAKE_VIDEO_ID),
-        body=fake_api_output, content_type='application/x-www-form-urlencoded',
-    )
+    _test_utils.mock_get_video_info_api_response(fake_api_output)
 
     with assert_raises(yturl.YouTubeAPIError):
-        yturl.itags_for_video(FAKE_VIDEO_ID)
+        yturl.itags_for_video(_test_utils.VIDEO_ID)
