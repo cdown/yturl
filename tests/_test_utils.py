@@ -20,6 +20,15 @@ YOUTUBE_URL_EXAMPLES = (
 )
 
 
+def read_fixture(rel_path, mode='r'):
+    '''
+    Return all data in a file relative to the current script.
+    '''
+    path = os.path.join(TEST_BASE_DIR, rel_path)
+    with open(path, mode) as fixture_f:
+        return fixture_f.read()
+
+
 def video_ids(length=11):
     '''
     A Hypothesis strategy to generate YouTube video IDs.
