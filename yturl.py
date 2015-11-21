@@ -8,19 +8,29 @@ import requests
 import sys
 
 try:
-    from urllib.parse import parse_qsl, urlencode, urlparse
+    from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 except ImportError:  # Python 2 fallback
     from urllib import urlencode
-    from urlparse import parse_qsl, urlparse
+    from urlparse import parse_qsl, urlparse, urlunparse
 
 
-
-GVI_BASE_URL = 'https://www.youtube.com/get_video_info?'
 NAMED_QUALITY_GROUPS = {
     'low': lambda itags: itags[-1],
     'medium': lambda itags: itags[len(itags) // 2],
     'high': lambda itags: itags[0],
 }
+
+
+def construct_youtube_get_video_info_url(video_id):
+    base_parsed_api_url = urlparse('https://www.youtube.com/get_video_info')
+    new_query = urlencode({'video_id': video_id})
+
+    # As documented in the core Python docs, ._replace() is not internal, the
+    # leading underscore is just to prevent name collisions with field names.
+    new_parsed_api_url = base_parsed_api_url._replace(query=new_query)
+    new_api_url = urlunparse(new_parsed_api_url)
+
+    return new_api_url
 
 
 def video_id_from_url(url):
@@ -37,9 +47,9 @@ def itags_for_video(video_id):
     '''
     Return itags for a video with their media URLs, sorted by quality.
     '''
-    api_url = GVI_BASE_URL + urlencode({'video_id': video_id})
-    api_response_raw = requests.get(api_url).text
-    api_response = dict(parse_qsl(api_response_raw))
+    api_url = construct_youtube_get_video_info_url(video_id)
+    api_response_raw = requests.get(api_url)
+    api_response = dict(parse_qsl(api_response_raw.text))
 
     if api_response.get('status') != 'ok':
         raise YouTubeAPIError(api_response.get('reason', 'Unspecified error.'))

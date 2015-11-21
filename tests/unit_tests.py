@@ -18,6 +18,7 @@ YOUTUBE_URL_EXAMPLES = (
     'youtu.be/%s?feature=pem&g=q#video',
     '%s'  # We also allow the user to just input the video ID raw
 )
+FAKE_VIDEO_ID = 'fake'
 
 
 def video_ids(length=11):
@@ -60,11 +61,11 @@ def test_available_itags_parsing(input_itags):
     })
 
     httpretty.register_uri(
-        httpretty.GET, yturl.GVI_BASE_URL + 'video_id=fake',
+        httpretty.GET, yturl.construct_youtube_get_video_info_url(FAKE_VIDEO_ID),
         body=fake_api_output, content_type='application/x-www-form-urlencoded',
     )
 
-    eq(yturl.itags_for_video('fake'), itag_to_url_map)
+    eq(yturl.itags_for_video(FAKE_VIDEO_ID), itag_to_url_map)
 
 
 @given(integers())
@@ -103,9 +104,9 @@ def test_api_error_raises(reason, code):
     fake_api_output = urlencode(api_output_dict)
 
     httpretty.register_uri(
-        httpretty.GET, yturl.GVI_BASE_URL + 'video_id=fake',
+        httpretty.GET, yturl.construct_youtube_get_video_info_url(FAKE_VIDEO_ID),
         body=fake_api_output, content_type='application/x-www-form-urlencoded',
     )
 
     with assert_raises(yturl.YouTubeAPIError):
-        yturl.itags_for_video('fake')
+        yturl.itags_for_video(FAKE_VIDEO_ID)

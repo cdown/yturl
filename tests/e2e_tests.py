@@ -21,7 +21,7 @@ def test_quality_as_word_ok():
         fake_api_output = mock_f.read()
 
     httpretty.register_uri(
-        httpretty.GET, yturl.GVI_BASE_URL + VIDEO_ID,
+        httpretty.GET, yturl.construct_youtube_get_video_info_url(VIDEO_ID),
         body=fake_api_output, content_type='application/x-www-form-urlencoded',
     )
 
@@ -35,7 +35,7 @@ def test_unknown_quality():
         fake_api_output = mock_f.read()
 
     httpretty.register_uri(
-        httpretty.GET, yturl.GVI_BASE_URL + VIDEO_ID,
+        httpretty.GET, yturl.construct_youtube_get_video_info_url(VIDEO_ID),
         body=fake_api_output, content_type='application/x-www-form-urlencoded',
     )
 
@@ -52,7 +52,7 @@ def test_youtube_api_error_exit():
         fake_api_output = mock_f.read()
 
     httpretty.register_uri(
-        httpretty.GET, yturl.GVI_BASE_URL + VIDEO_ID,
+        httpretty.GET, yturl.construct_youtube_get_video_info_url(VIDEO_ID),
         body=fake_api_output, content_type='application/x-www-form-urlencoded',
     )
 
