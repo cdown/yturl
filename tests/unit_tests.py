@@ -97,6 +97,9 @@ def test_itag_from_quality_ordering(itags):
 
 @given(integers(), lists(integers()))
 def test_itag_from_quality_num_but_not_available(itag, video_itags):
+    '''
+    Test that we raise ValueError if explicitly requesting an unavailable itag.
+    '''
     assume(itag not in video_itags)
     with assert_raises(ValueError):
         yturl.itag_from_quality(itag, video_itags)
