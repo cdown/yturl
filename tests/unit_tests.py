@@ -1,10 +1,9 @@
-#!/usr/bin/env python2
-
-import yturl
 import httpretty
-from nose.tools import assert_raises, eq_ as eq, assert_true
+import yturl
+
 from hypothesis import given, assume
 from hypothesis.strategies import integers, lists, sampled_from, text
+from nose.tools import assert_raises, eq_ as eq, assert_true
 from tests import _test_utils
 
 try:
@@ -15,6 +14,9 @@ except ImportError:  # Python 2 fallback
 
 @given(_test_utils.video_ids(), sampled_from(_test_utils.YOUTUBE_URL_EXAMPLES))
 def test_video_id_parsed_from_url(video_id, url_format):
+    '''
+    That that video IDs are successfully parsed from URLs.
+    '''
     url = url_format % video_id
     eq(yturl.video_id_from_url(url), video_id)
 
@@ -24,14 +26,28 @@ def test_video_id_parsed_from_url(video_id, url_format):
     integers(), min_size=1, unique_by=lambda x: x,
 ))
 def test_available_itags_parsing(input_itags):
+    '''
+    Test that the itag -> url map is successfully parsed from an API response.
+    '''
+    # The YouTube get_video_info API provides its output as a urlencoded
+    # string. Individual keys and values inside a urlencoded string are always
+    # strings.
+    #
+    # As such, if we didn't convert these to strings, we'd still get strings
+    # back from parse_qsl (which is called inside yturl.itags_for_video). This
+    # means that the return value of itags_for_video is always a string to
+    # string OrderedDict, so we must convert to strings to be able to do the
+    # final equality test.
     input_itags = list(map(str, input_itags))
-    # In real life, the URL will obvious not just be the itag as a string, but
-    # the actual URL we retrieve is inconsequential to this test, we just want
-    # to check that they are parsed and linked together properly.
+
+    # In real life, the URL will obviously not be the itag as a string, but the
+    # actual URL we retrieve is inconsequential to this test. We just want to
+    # check that they are parsed and linked together properly as tuples.
     itag_to_url_map = {itag: itag for itag in input_itags}
 
-    # This is missing a lot of "real" keys, but we don't check them at present,
-    # so we don't need them.
+    # This is missing a lot of "real" keys that are returned by the YouTube API
+    # inside url_encoded_fmt_stream_map, but we don't check those keys inside
+    # itags_for_video, so we don't need them here.
     api_itag_map = ','.join([
         urlencode({
             'itag': itag,
@@ -39,6 +55,9 @@ def test_available_itags_parsing(input_itags):
         }) for itag in input_itags
     ])
 
+    # This is also missing a lot of keys which are, in reality, returned by the
+    # YouTube API. If key references are added inside itags_for_video, the
+    # relevant keys will need to be added here.
     fake_api_output = urlencode({
         'url_encoded_fmt_stream_map': api_itag_map,
         'status': 'ok',
@@ -51,6 +70,9 @@ def test_available_itags_parsing(input_itags):
 
 @given(integers())
 def test_itag_from_quality_itag_pass_through(itag):
+    '''
+    Test that, when passed to itag_from_quality, itags are returned unaffected.
+    '''
     eq(yturl.itag_from_quality(itag, [itag]), itag)
 
 
