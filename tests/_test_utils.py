@@ -3,12 +3,13 @@ Utilities shared between yturl test modules.
 '''
 
 
-import httpretty
 import os
 import string
-import yturl
-import hypothesis.strategies as st
 
+import yturl
+
+import httpretty
+import hypothesis.strategies as st
 
 VIDEO_ID = 'fakefakefak'
 FAKE_URL = 'http://foo.com/' + VIDEO_ID

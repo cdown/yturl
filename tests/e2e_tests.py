@@ -1,7 +1,8 @@
-import httpretty
 import json
+
 import yturl
 
+import httpretty
 from nose.tools import eq_ as eq
 from nose_parameterized import parameterized
 from tests import _test_utils

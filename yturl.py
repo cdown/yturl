@@ -4,8 +4,9 @@ from __future__ import print_function, unicode_literals
 
 import argparse
 import collections
-import requests
 import sys
+
+import requests
 
 try:
     from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse

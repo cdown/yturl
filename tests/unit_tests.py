@@ -1,11 +1,12 @@
 import collections
-import httpretty
+
 import yturl
 
-from hypothesis import given, assume
-from hypothesis.strategies import integers, lists, sampled_from, text, none, \
-                                  one_of
-from nose.tools import assert_raises, eq_ as eq, assert_true
+import httpretty
+from hypothesis import assume, given
+from hypothesis.strategies import (integers, lists, none, one_of, sampled_from,
+                                   text)
+from nose.tools import assert_raises, assert_true, eq_ as eq
 from tests import _test_utils
 
 try:
