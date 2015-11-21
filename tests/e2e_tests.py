@@ -1,9 +1,8 @@
-#!/usr/bin/env python2
-
-import json
 import httpretty
+import json
 import yturl
-from nose.tools import assert_raises, eq_ as eq
+
+from nose.tools import eq_ as eq
 from nose_parameterized import parameterized
 from tests import _test_utils
 
@@ -37,25 +36,3 @@ def test_quality_as_word_ok(quality_word, expected_itag):
     )
 
     eq(chosen_url, expected_url)
-
-
-@httpretty.activate
-def test_unknown_quality():
-    fake_api_output = _test_utils.read_fixture('files/success_input', 'rb')
-    _test_utils.mock_get_video_info_api_response(fake_api_output)
-
-    unknown_itag = '99999999'
-
-    with assert_raises(ValueError):
-        yturl.main(
-            ['-q', unknown_itag, _test_utils.FAKE_URL],
-            force_return=True,
-        )
-
-
-@httpretty.activate
-def test_youtube_api_error_exit():
-    fake_api_output = _test_utils.read_fixture('files/embed_restricted')
-    _test_utils.mock_get_video_info_api_response(fake_api_output)
-    with assert_raises(yturl.YouTubeAPIError):
-        yturl.main([_test_utils.FAKE_URL], force_return=True)
