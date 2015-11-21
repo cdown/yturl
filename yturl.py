@@ -14,7 +14,6 @@ import requests
 from collections import OrderedDict
 
 
-class YouTubeAPIError(Exception): pass
 
 GVI_BASE_URL = 'https://www.youtube.com/get_video_info?'
 NAMED_QUALITY_GROUPS = {
@@ -87,6 +86,15 @@ def main(argv=None, force_return=False):
     # Goes to stderr when using console_scripts, so we can't generally return
     if force_return:
         return itag_to_url_map[desired_itag]
+
+
+class YouTubeAPIError(Exception):
+    '''
+    Raised when the YouTube API returns failure. This is not used when issues
+    arise during processing of the received API data -- in those cases, we use
+    more specific exception types.
+    '''
+    pass
 
 
 if __name__ == '__main__':
