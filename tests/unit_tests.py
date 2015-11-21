@@ -85,13 +85,14 @@ def test_itag_from_quality_itag_pass_through(itag):
     eq(yturl.itag_from_quality(itag, [itag]), itag)
 
 
-def test_itag_from_quality_ordering():
-    itags = list(range(len(yturl.NAMED_QUALITY_GROUPS)))
-    assert_true(
-        yturl.itag_from_quality('high', itags) <
-        yturl.itag_from_quality('medium', itags) <
-        yturl.itag_from_quality('low', itags)
-    )
+@given(lists(integers(), min_size=1, unique=True))
+def test_itag_from_quality_ordering(itags):
+    '''
+    Test that quality ordering is correct from a relative index perspective.
+    '''
+    def get_index(quality_group):
+        return itags.index(yturl.itag_from_quality(quality_group, itags))
+    assert_true(get_index('high') <= get_index('medium') <= get_index('low'))
 
 
 @given(integers(), lists(integers()))
