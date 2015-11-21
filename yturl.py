@@ -2,16 +2,16 @@
 
 from __future__ import print_function, unicode_literals
 
-try:
-    from urllib.parse import parse_qsl, urlparse, urlencode
-except ImportError:  # Python 2 fallback
-    from urlparse import parse_qsl, urlparse
-    from urllib import urlencode
-
 import argparse
-import sys
+import collections
 import requests
-from collections import OrderedDict
+import sys
+
+try:
+    from urllib.parse import parse_qsl, urlencode, urlparse
+except ImportError:  # Python 2 fallback
+    from urllib import urlencode
+    from urlparse import parse_qsl, urlparse
 
 
 
@@ -47,7 +47,7 @@ def itags_for_video(video_id):
 
     videos = [dict(parse_qsl(stream)) for stream in streams]
     # The YouTube API returns this in quality order, which we rely on
-    return OrderedDict((video['itag'], video['url']) for video in videos)
+    return collections.OrderedDict((vid['itag'], vid['url']) for vid in videos)
 
 
 def itag_from_quality(group, itags):
