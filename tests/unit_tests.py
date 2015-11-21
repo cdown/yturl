@@ -1,3 +1,4 @@
+import collections
 import httpretty
 import yturl
 
@@ -43,7 +44,9 @@ def test_available_itags_parsing(input_itags):
     # In real life, the URL will obviously not be the itag as a string, but the
     # actual URL we retrieve is inconsequential to this test. We just want to
     # check that they are parsed and linked together properly as tuples.
-    itag_to_url_map = {itag: itag for itag in input_itags}
+    itag_to_url_map = collections.OrderedDict(
+        (itag, itag) for itag in input_itags
+    )
 
     # This is missing a lot of "real" keys that are returned by the YouTube API
     # inside url_encoded_fmt_stream_map, but we don't check those keys inside
@@ -64,8 +67,14 @@ def test_available_itags_parsing(input_itags):
     })
 
     _test_utils.mock_get_video_info_api_response(fake_api_output)
+    got_itags_for_video = yturl.itags_for_video(_test_utils.VIDEO_ID)
 
-    eq(yturl.itags_for_video(_test_utils.VIDEO_ID), itag_to_url_map)
+    # dict to OrderedDict comparisons don't care about order, so if we
+    # accidentally started returning a dict from itags_for_video, it's going to
+    # return True even though the order actually isn't respected. As such, we
+    # need to make sure the return type of itags_for_video is OrderedDict.
+    assert_true(isinstance(got_itags_for_video, collections.OrderedDict))
+    eq(got_itags_for_video, itag_to_url_map)
 
 
 @given(integers())
