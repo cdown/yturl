@@ -1,5 +1,6 @@
-mock
-nose
+abduct
 httpretty
 hypothesis
+mock
+nose
 nose-parameterized
