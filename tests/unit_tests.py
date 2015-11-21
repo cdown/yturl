@@ -3,7 +3,8 @@ import httpretty
 import yturl
 
 from hypothesis import given, assume
-from hypothesis.strategies import integers, lists, sampled_from, text
+from hypothesis.strategies import integers, lists, sampled_from, text, none, \
+                                  one_of
 from nose.tools import assert_raises, eq_ as eq, assert_true
 from tests import _test_utils
 
@@ -106,17 +107,24 @@ def test_itag_from_quality_num_but_not_available(itag, video_itags):
 
 
 @httpretty.activate
-@given(text(), integers())
-def test_api_error_raises(reason, code):
-    # In Python 2, urlencode bombs on some strings since it provides no way to
-    # specify an encoding, so we do it manually.
-    reason = reason.encode('utf-8')
+@given(one_of(text(), none()))
+def test_api_error_raises(reason):
+    '''
+    Test that we raise YouTubeAPIError when the API status is "fail".
 
+    "reason" can be None, in which case we don't pass it in the API output. In
+    this case, we should fall back to our default API error message.
+    '''
     api_output_dict = {
         'status': 'fail',
-        'reason': reason,
-        'code': code,
     }
+
+    if reason is not None:
+        # In Python 2, urlencode bombs on some strings since it provides no way
+        # to specify an encoding, so we do it manually.
+        reason = reason.encode('utf-8')
+        api_output_dict['reason'] = reason
+
     fake_api_output = urlencode(api_output_dict)
 
     _test_utils.mock_get_video_info_api_response(fake_api_output)
