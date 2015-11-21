@@ -14,6 +14,9 @@ except ImportError:  # Python 2 fallback
     from urlparse import parse_qsl, urlparse, urlunparse
 
 
+# A mapping of quality names to functions that determine the desired itag from
+# a list of itags. This is used when `-q quality` is passed on the command line
+# to determine which available itag best suits that quality specification.
 NAMED_QUALITY_GROUPS = {
     'low': lambda itags: itags[-1],
     'medium': lambda itags: itags[len(itags) // 2],
