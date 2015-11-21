@@ -2,3 +2,4 @@ mock
 nose
 httpretty
 hypothesis
+nose-parameterized
