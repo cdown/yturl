@@ -22,6 +22,9 @@ NAMED_QUALITY_GROUPS = {
 
 
 def construct_youtube_get_video_info_url(video_id):
+    '''
+    Construct a YouTube API url for the get_video_id endpoint from a video ID.
+    '''
     base_parsed_api_url = urlparse('https://www.youtube.com/get_video_info')
     new_query = urlencode({'video_id': video_id})
 
@@ -60,21 +63,30 @@ def itags_for_video(video_id):
     return collections.OrderedDict((vid['itag'], vid['url']) for vid in videos)
 
 
-def itag_from_quality(group, itags):
+def itag_from_quality(group_or_itag, itags):
     '''
-    If "group" is a quality group, return an appropriate itag from itags
-    for that group. Otherwise, group is an itag -- just return it.
+    If "group_or_itag" is a quality group, return an appropriate itag from
+    itags for that group. Otherwise, group_or_itag is an itag -- just return
+    it.
     '''
-    if group in NAMED_QUALITY_GROUPS:
-        return NAMED_QUALITY_GROUPS[group](itags)
-    elif group in itags:  # group is actually an itag, not a group
-        return group
+    if group_or_itag in NAMED_QUALITY_GROUPS:
+        # "group_or_itag" is really a named quality group. NAMED_QUALITY_GROUPS
+        # contains a mapping of names to functions that should be run with the
+        # available itags as input.
+        group = group_or_itag
+        func_to_get_desired_itag = NAMED_QUALITY_GROUPS[group]
+        itag = func_to_get_desired_itag(itags)
+    elif group_or_itag in itags:
+        # "group_or_itag" is really an itag. Just pass it through unaltered.
+        itag = group_or_itag
     else:
         raise ValueError(
-            'Quality %s unavailable (video itags: %r, known groups: %r)' % (
-                group, itags, list(NAMED_QUALITY_GROUPS),
+            'Group/itag %s unavailable (video itags: %r, known groups: %r)' % (
+                group_or_itag, itags, list(NAMED_QUALITY_GROUPS),
             )
         )
+
+    return itag
 
 
 def main(argv=None, force_return=False):
