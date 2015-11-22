@@ -60,10 +60,11 @@ def itags_for_video(video_id):
 
     if api_response.get('status') != 'ok':
         raise YouTubeAPIError(api_response.get('reason', 'Unspecified error.'))
-    streams = api_response['url_encoded_fmt_stream_map'].split(',')
 
+    # The YouTube API returns these from highest to lowest quality, which we
+    # rely on. From this point forward, we need to make sure we maintain order.
+    streams = api_response['url_encoded_fmt_stream_map'].split(',')
     videos = [parse_qs_single(stream) for stream in streams]
-    # The YouTube API returns this in quality order, which we rely on
     return collections.OrderedDict((vid['itag'], vid['url']) for vid in videos)
 
 
