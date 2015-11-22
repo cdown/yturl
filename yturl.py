@@ -9,10 +9,10 @@ import sys
 import requests
 
 try:
-    from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
+    from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 except ImportError:  # Python 2 fallback
     from urllib import urlencode
-    from urlparse import parse_qsl, urlparse, urlunparse
+    from urlparse import parse_qs, urlparse, urlunparse
 
 
 # A mapping of quality names to functions that determine the desired itag from
@@ -98,14 +98,16 @@ def parse_qs_single(query_string):
     list in case the key appears twice in the input, which can be quite
     inconvienient and results in hard to read code.
 
-    Instead, verify that no key appears twice, and then return each value as a
-    single element in the dictionary.
+    We *could* just do dict(parse_qsl(x)), but this would indiscriminately
+    discard any duplicates, and we'd rather raise an exception on that.
+    Instead, we verify that no key appears twice (throwing an exception if any
+    do), and then return each value as a single element in the dictionary.
     '''
-    parsed_tuples = parse_qsl(query_string)
-    parsed_keys = [pair[0] for pair in parsed_tuples]
-    if len(parsed_keys) != len(set(parsed_keys)):
-        raise ValueError('There are duplicate parsed keys: %r' % parsed_keys)
-    return dict(parsed_tuples)
+    parsed_raw = parse_qs(query_string)
+    dupe_keys = [key for (key, value) in parsed_raw.items() if len(value) != 1]
+    if dupe_keys:
+        raise ValueError('Duplicate keys (%r): %r' % (dupe_keys, parsed_raw))
+    return {key: value[0] for (key, value) in parsed_raw.items()}
 
 
 def main(argv=None):
