@@ -90,23 +90,6 @@ def itag_from_quality(group_or_itag, itags):
         )
 
 
-def main(argv=None):
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '-q', '--quality', default='medium', help='low/medium/high or an itag',
-    )
-    parser.add_argument(
-        'video_id', metavar='video_id/url', type=video_id_from_url,
-    )
-    args = parser.parse_args(argv)
-
-    itag_to_url_map = itags_for_video(args.video_id)
-    desired_itag = itag_from_quality(args.quality, list(itag_to_url_map))
-
-    print('Using itag %s.' % desired_itag, file=sys.stderr)
-    print(itag_to_url_map[desired_itag])
-
-
 def parse_qs_single(query_string):
     '''
     Parse a query string per parse_qs, but with the values as single elements.
@@ -123,6 +106,23 @@ def parse_qs_single(query_string):
     if len(parsed_keys) != len(set(parsed_keys)):
         raise ValueError('There are duplicate parsed keys: %r' % parsed_keys)
     return dict(parsed_tuples)
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-q', '--quality', default='medium', help='low/medium/high or an itag',
+    )
+    parser.add_argument(
+        'video_id', metavar='video_id/url', type=video_id_from_url,
+    )
+    args = parser.parse_args(argv)
+
+    itag_to_url_map = itags_for_video(args.video_id)
+    desired_itag = itag_from_quality(args.quality, list(itag_to_url_map))
+
+    print('Using itag %s.' % desired_itag, file=sys.stderr)
+    print(itag_to_url_map[desired_itag])
 
 
 class YouTubeAPIError(Exception):
