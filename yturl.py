@@ -104,10 +104,13 @@ def parse_qs_single(query_string):
     do), and then return each value as a single element in the dictionary.
     '''
     parsed_raw = parse_qs(query_string)
-    dupe_keys = [key for (key, value) in parsed_raw.items() if len(value) != 1]
-    if dupe_keys:
-        raise ValueError('Duplicate keys (%r): %r' % (dupe_keys, parsed_raw))
-    return {key: value[0] for (key, value) in parsed_raw.items()}
+
+    for key, value in parsed_raw.items():
+        if len(value) != 1:
+            raise ValueError('Duplicate key: %r' % key)
+        parsed_raw[key] = value[0]
+
+    return parsed_raw
 
 
 def main(argv=None):
