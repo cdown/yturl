@@ -4,8 +4,8 @@ import yturl
 
 import httpretty
 from hypothesis import assume, given
-from hypothesis.strategies import (integers, lists, none, one_of, sampled_from,
-                                   text)
+from hypothesis.strategies import (binary, integers, lists, none, one_of,
+                                   sampled_from)
 from nose.tools import assert_raises, assert_true, eq_ as eq
 from tests import _test_utils
 
@@ -108,7 +108,7 @@ def test_itag_from_quality_num_but_not_available(itag, video_itags):
 
 
 @httpretty.activate
-@given(one_of(text(), none()))
+@given(one_of(binary(), none()))
 def test_api_error_raises(reason):
     '''
     Test that we raise YouTubeAPIError when the API status is "fail".
@@ -121,9 +121,6 @@ def test_api_error_raises(reason):
     }
 
     if reason is not None:
-        # In Python 2, urlencode bombs on some strings since it provides no way
-        # to specify an encoding, so we do it manually.
-        reason = reason.encode('utf-8')
         api_output_dict['reason'] = reason
 
     fake_api_output = urlencode(api_output_dict)
@@ -134,15 +131,11 @@ def test_api_error_raises(reason):
         yturl.itags_for_video(_test_utils.VIDEO_ID)
 
 
-@given(lists(text(min_size=1), min_size=1))
+@given(lists(binary(min_size=1), min_size=1))
 def test_parse_qs_single_duplicate_keys_raise(keys):
     '''
     Test that parse_qs_single raises ValueError on encountering duplicate keys.
     '''
-    # In Python 2, urlencode bombs on some strings since it provides no way
-    # to specify an encoding, so we do it manually.
-    keys = [key.encode('utf8') for key in keys]
-
     duplicated_keys = keys + keys
     query_string = urlencode(
         [(key, key) for key in duplicated_keys],
