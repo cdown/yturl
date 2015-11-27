@@ -7,12 +7,8 @@ from hypothesis import assume, given
 from hypothesis.strategies import (binary, integers, lists, none, one_of,
                                    sampled_from)
 from nose.tools import assert_raises, assert_true, eq_ as eq
+from six.moves.urllib.parse import urlencode
 from tests import _test_utils
-
-try:
-    from urllib.parse import urlencode
-except ImportError:  # Python 2 fallback
-    from urllib import urlencode
 
 
 @given(_test_utils.video_ids(), sampled_from(_test_utils.YOUTUBE_URL_EXAMPLES))

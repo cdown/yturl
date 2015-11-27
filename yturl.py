@@ -7,13 +7,9 @@ import collections
 import sys
 
 import requests
+import six
 
-try:
-    from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
-except ImportError:  # Python 2 fallback
-    from urllib import urlencode
-    from urlparse import parse_qs, urlparse, urlunparse
-
+from six.moves.urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 # A mapping of quality names to functions that determine the desired itag from
 # a list of itags. This is used when `-q quality` is passed on the command line
@@ -105,7 +101,7 @@ def parse_qs_single(query_string):
     '''
     parsed_raw = parse_qs(query_string)
 
-    for key, value in parsed_raw.items():
+    for key, value in six.iteritems(parsed_raw):
         if len(value) != 1:
             raise ValueError('Duplicate key: %r' % key)
         parsed_raw[key] = value[0]
