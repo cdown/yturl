@@ -7,8 +7,8 @@ import collections
 import sys
 
 import requests
-import six
 
+from six import iteritems
 from six.moves.urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 # A mapping of quality names to functions that determine the desired itag from
@@ -99,14 +99,14 @@ def parse_qs_single(query_string):
     Instead, we verify that no key appears twice (throwing an exception if any
     do), and then return each value as a single element in the dictionary.
     '''
-    parsed_raw = parse_qs(query_string)
+    raw_pairs = parse_qs(query_string)
 
-    for key, value in six.iteritems(parsed_raw):
-        if len(value) != 1:
-            raise ValueError('Duplicate key: %r' % key)
-        parsed_raw[key] = value[0]
+    dupes = [key for (key, values) in iteritems(raw_pairs) if len(values) > 1]
+    if dupes:
+        raise ValueError('Duplicate values for keys: %r' % dupes)
 
-    return parsed_raw
+    one_val_pairs = {key: values[0] for (key, values) in iteritems(raw_pairs)}
+    return one_val_pairs
 
 
 def main(argv=None):
