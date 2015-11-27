@@ -42,7 +42,7 @@ To install the latest development version directly from GitHub:
 Testing
 -------
 
-|travis| |coveralls| |scrutinizer|
+|travis| |coveralls|
 
 .. |travis| image:: https://travis-ci.org/cdown/yturl.svg?branch=develop
   :target: https://travis-ci.org/cdown/yturl
@@ -51,10 +51,6 @@ Testing
 .. |coveralls| image:: https://coveralls.io/repos/cdown/yturl/badge.svg?branch=develop&service=github
   :target: https://coveralls.io/github/cdown/yturl?branch=develop
   :alt: Coverage
-
-.. |scrutinizer| image:: https://img.shields.io/scrutinizer/g/cdown/yturl/develop.svg
-  :target: https://scrutinizer-ci.com/g/cdown/yturl/?branch=develop
-  :alt: Code quality
 
 .. code::
 
