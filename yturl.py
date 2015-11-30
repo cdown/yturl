@@ -120,6 +120,8 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     itag_to_url_map = itags_for_video(args.video_id)
+
+    # available_itags must be indexable for use with NAMED_QUALITY_GROUPS
     available_itags = list(iterkeys(itag_to_url_map))
     desired_itag = itag_from_quality(args.quality, available_itags)
 
