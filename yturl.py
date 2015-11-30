@@ -8,7 +8,7 @@ import sys
 
 import requests
 
-from six import iteritems
+from six import iteritems, iterkeys
 from six.moves.urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 # A mapping of quality names to functions that determine the desired itag from
@@ -120,7 +120,8 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     itag_to_url_map = itags_for_video(args.video_id)
-    desired_itag = itag_from_quality(args.quality, list(itag_to_url_map))
+    available_itags = list(iterkeys(itag_to_url_map))
+    desired_itag = itag_from_quality(args.quality, available_itags)
 
     print('Using itag %s.' % desired_itag, file=sys.stderr)
     print(itag_to_url_map[desired_itag])
