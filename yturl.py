@@ -103,7 +103,7 @@ def parse_qs_single(query_string):
 
     dupes = [key for (key, values) in iteritems(raw_pairs) if len(values) > 1]
     if dupes:
-        raise ValueError('Duplicate values for keys: %r' % dupes)
+        raise ValueError('Duplicate keys in query string: %r' % dupes)
 
     one_val_pairs = {key: values[0] for (key, values) in iteritems(raw_pairs)}
     return one_val_pairs
