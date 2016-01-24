@@ -1,8 +1,22 @@
+|travis| |coveralls|
+
+.. |travis| image:: https://travis-ci.org/cdown/yturl.svg?branch=develop
+  :target: https://travis-ci.org/cdown/yturl
+  :alt: Test status
+
+.. |coveralls| image:: https://coveralls.io/repos/cdown/yturl/badge.svg?branch=develop&service=github
+  :target: https://coveralls.io/github/cdown/yturl?branch=develop
+  :alt: Coverage
+
 yturl gets direct media URLs to YouTube media, freeing you having to
 view them in your browser.
 
+yturl is still maintained, but is pretty much "done". Outside of changes to
+match YouTube API changes, bug fixes, and support for newer Python versions,
+development is complete.
+
 Usage
-=====
+-----
 
 By default, yturl prints the media URL to standard output.
 
@@ -12,66 +26,38 @@ By default, yturl prints the media URL to standard output.
     Using itag 43.
     http://r2---sn-uphxqvujvh-30al.googlevideo.com/videoplayback?source=[...]
 
-This means that you can do something like the following to watch it in
-`mpv`_:
+
+You can use this URL in the media player of your choice. For media players that
+can be launched from the command line, this typically means that you can do
+something like the following to watch it in your preferred player:
 
 ::
 
-    $ mpv "$(yturl 'http://www.youtube.com/watch?v=8TCxE0bWQeQ')"
-
-Or something like the following to download it (using `curl`_):
-
-::
-
-    $ curl -Lo bill "$(yturl 'http://www.youtube.com/watch?v=8TCxE0bWQeQ')"
+    $ <your-preferred-player> "$(yturl 'http://www.youtube.com/watch?v=8TCxE0bWQeQ')"
 
 There is also a ``-q`` option for controlling the quality (for example ``-q
-high``), see the program help for more information.
-
-.. _mpv: http://mpv.io
-.. _curl: http://curl.haxx.se
+high``), see :code:`yturl --help` for more information.
 
 Installation
-============
+------------
 
-Installation requires `setuptools`_.
+To install the latest stable version from PyPi:
 
-.. _setuptools: https://pypi.python.org/pypi/setuptools
+.. code::
 
-Stable version
---------------
+    pip install -U yturl
 
-::
+To install the latest development version directly from GitHub:
 
-    $ pip install yturl
+.. code::
 
-Development version
--------------------
-
-::
-
-    $ git clone git://github.com/cdown/yturl.git
-    $ cd yturl
-    $ pip install -r requirements.txt
-    $ python setup.py install
+    pip install -U git+https://github.com/cdown/yturl.git@develop
 
 Testing
-=======
+-------
 
-.. image:: https://travis-ci.org/cdown/yturl.svg?branch=develop
-  :target: https://travis-ci.org/cdown/yturl
-  :alt: Test status
+.. code::
 
-::
+   tox -e quick
 
-    $ pip install -r tests/requirements.txt
-    $ python setup.py test
-
-License
-=======
-
-yturl is licensed under an `ISC license`_. Full information is in the
-`LICENSE`_ file.
-
-.. _ISC license: https://en.wikipedia.org/wiki/ISC_license
-.. _LICENSE: LICENSE
+.. _Tox: https://tox.readthedocs.org

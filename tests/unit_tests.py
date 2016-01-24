@@ -1,147 +1,142 @@
-#!/usr/bin/env python2
+import collections
 
-import os
 import yturl
-import json
+
 import httpretty
-from nose.tools import assert_raises, eq_ as eq, assert_true
-from nose_parameterized import parameterized
-from hypothesis import given, assume
-from hypothesis.strategies import integers, lists, sampled_from
+from hypothesis import assume, given
+from hypothesis.strategies import (binary, integers, lists, none, one_of,
+                                   sampled_from)
+from nose.tools import assert_raises, assert_true, eq_ as eq
+from six.moves.urllib.parse import urlencode
+from tests import _test_utils
 
 
-SCRIPT_DIR = os.path.dirname(__file__)
-MAX_NUM_ITAG = max(yturl.ITAGS_BY_QUALITY)
-
-
-def test_itag_order():
-    eq(
-        yturl.ITAGS_BY_QUALITY,
-        [38, 37, 46, 22, 45, 44, 35, 43, 34, 18, 6, 5, 36, 17, 13],
-    )
-
-@parameterized([
-    (18, [18, 6, 34, 5, 43, 36, 35, 17, 44, 13, 45, 22, 46, 37, 38]),
-    (38, [38, 37, 46, 22, 45, 44, 35, 43, 34, 18, 6, 5, 36, 17, 13]),
-    (13, [13, 17, 36, 5, 6, 18, 34, 43, 35, 44, 45, 22, 46, 37, 38]),
-    (46, [46, 22, 37, 45, 38, 44, 35, 43, 34, 18, 6, 5, 36, 17, 13]),
-])
-def test_itags_by_similarity(input_itag, expected):
-    itags_by_similarity = yturl.itags_by_similarity(input_itag)
-    eq(list(itags_by_similarity), expected)
-
-
-@given(
-    sampled_from(yturl.ITAGS_BY_QUALITY),
-    lists(sampled_from(yturl.ITAGS_BY_QUALITY), min_size=1),
-)
-def test_most_similar_available_itag(input_itag, available_itags):
-    chosen = yturl.most_similar_available_itag(input_itag, available_itags)
-
-    input_itag_idx = itag_quality_pos(input_itag)
-    chosen_itag_idx = itag_quality_pos(chosen)
-    ideal_distance = abs(input_itag_idx - chosen_itag_idx)
-
-    # No other element should be closer than the one we chose, although one
-    # could be *as* close.
-    assert_true(not any(
-        abs(input_itag_idx - itag_quality_pos(itag)) < ideal_distance
-        for itag in available_itags
-    ))
-
-
-@given(
-    sampled_from(yturl.ITAGS_BY_QUALITY),
-    lists(integers(min_value=MAX_NUM_ITAG), max_size=10),
-)
-def test_most_similar_available_itag_none(input_itag, available_itags):
-    assume(not any(x in yturl.ITAGS_BY_QUALITY for x in available_itags))
-    with assert_raises(yturl.NoLocallyKnownItagsAvailableError):
-        yturl.most_similar_available_itag(input_itag, available_itags)
-
-
-@parameterized([
-    ('http://www.youtube.com/watch?v=gEl6TXrkZnk&feature=pem', 'gEl6TXrkZnk'),
-    ('youtu.be/gEl6TXrkZnk?feature=pem&g=q#video', 'gEl6TXrkZnk'),
-    ('gEl6TXrkZnk', 'gEl6TXrkZnk'),
-])
-def test_video_id_from_url(url, expected):
-    eq(yturl.video_id_from_url(url), expected)
-
-
-@parameterized([
-    'http://www.youtube.com/watch?v=gEl6TXrkZn&feature=pem',
-    'some.other.site/gEl6TXrkZn',
-    'youtu.be/gEl6TXrkZn?feature=pem&g=q#video',
-    'gEl6TXrkZn',
-])
-def test_video_id_from_url_unparseable(url):
-    with assert_raises(yturl.VideoIDParserError):
-        yturl.video_id_from_url(url)
+@given(_test_utils.video_ids(), sampled_from(_test_utils.YOUTUBE_URL_EXAMPLES))
+def test_video_id_parsed_from_url(video_id, url_format):
+    '''
+    That that video IDs are successfully parsed from URLs.
+    '''
+    url = url_format % video_id
+    eq(yturl.video_id_from_url(url), video_id)
 
 
 @httpretty.activate
-def test_available_itags_parsing():
-    with open(os.path.join(SCRIPT_DIR, 'files/success_output')) as output_f:
-        expected_raw = json.load(output_f)
-        # JSON has no tuple type, and we return tuples from itags_for_video, so
-        # we need to coerce them.
-        expected = map(tuple, expected_raw)
+@given(lists(
+    integers(), min_size=1, unique_by=lambda x: x,
+))
+def test_available_itags_parsing(input_itags):
+    '''
+    Test that the itag -> url map is successfully parsed from an API response.
+    '''
+    # The YouTube get_video_info API provides its output as a urlencoded
+    # string. Individual keys and values inside a urlencoded string are always
+    # strings.
+    #
+    # As such, if we didn't convert these to strings, we'd still get strings
+    # back from parse_qsl (which is called inside yturl.itags_for_video). This
+    # means that the return value of itags_for_video is always a string to
+    # string OrderedDict, so we must convert to strings to be able to do the
+    # final equality test.
+    input_itags = list(map(str, input_itags))
 
-    with open(os.path.join(SCRIPT_DIR, 'files/success_input'), 'rb') as mock_f:
-        fake_api_output = mock_f.read()
-
-    httpretty.register_uri(
-        httpretty.GET, yturl.GVI_BASE_URL + 'fake',
-        body=fake_api_output, content_type='application/x-www-form-urlencoded',
+    # In real life, the URL will obviously not be the itag as a string, but the
+    # actual URL we retrieve is inconsequential to this test. We just want to
+    # check that they are parsed and linked together properly as tuples.
+    itag_to_url_map = collections.OrderedDict(
+        (itag, itag) for itag in input_itags
     )
 
-    eq(list(yturl.itags_for_video('fake')), list(expected))
+    # This is missing a lot of "real" keys that are returned by the YouTube API
+    # inside url_encoded_fmt_stream_map, but we don't check those keys inside
+    # itags_for_video, so we don't need them here.
+    api_itag_map = ','.join([
+        urlencode({
+            'itag': itag,
+            'url': itag_to_url_map[itag],
+        }) for itag in input_itags
+    ])
 
+    # This is also missing a lot of keys which are, in reality, returned by the
+    # YouTube API. If key references are added inside itags_for_video, the
+    # relevant keys will need to be added here.
+    fake_api_output = urlencode({
+        'url_encoded_fmt_stream_map': api_itag_map,
+        'status': 'ok',
+    })
 
-def itag_quality_pos(itag_quality):
-    '''
-    Return the position of an itag quality in ITAGS_BY_QUALITY, in order to
-    check that index constraints hold. See test_itag_from_quality.
-    '''
-    return yturl.ITAGS_BY_QUALITY.index(yturl.itag_from_quality(itag_quality))
+    _test_utils.mock_get_video_info_api_response(fake_api_output)
+    got_itags_for_video = yturl.itags_for_video(_test_utils.VIDEO_ID)
 
-
-@given(sampled_from(yturl.ITAGS_BY_QUALITY))
-def test_itag_from_quality_itag(itag):
-    eq(yturl.itag_from_quality(itag), itag)
+    # dict to OrderedDict comparisons don't care about order, so if we
+    # accidentally started returning a dict from itags_for_video, it's going to
+    # return True even though the order actually isn't respected. As such, we
+    # need to make sure the return type of itags_for_video is OrderedDict.
+    assert_true(isinstance(got_itags_for_video, collections.OrderedDict))
+    eq(got_itags_for_video, itag_to_url_map)
 
 
 @given(integers())
-def test_itag_from_quality_num_but_not_itag(itag):
-    assume(itag not in yturl.ITAGS_BY_QUALITY)
-    with assert_raises(yturl.UnknownQualityError):
-        yturl.itag_from_quality(itag)
+def test_itag_from_quality_itag_pass_through(itag):
+    '''
+    Test that, when passed to itag_from_quality, itags are returned unaffected.
+    '''
+    eq(yturl.itag_from_quality(itag, [itag]), itag)
 
 
-def test_itag_from_quality_string():
-    eq(yturl.itag_from_quality('high'), 38)
+@given(lists(integers(), min_size=1, unique=True))
+def test_itag_from_quality_ordering(itags):
+    '''
+    Test that quality ordering is correct from a relative index perspective.
+    '''
+    def get_index(quality_group):
+        return itags.index(yturl.itag_from_quality(quality_group, itags))
+    assert_true(get_index('high') <= get_index('medium') <= get_index('low'))
 
 
-def test_itag_from_quality_ordering():
-    assert_true(
-        itag_quality_pos('high') < \
-        itag_quality_pos('medium') < \
-        itag_quality_pos('low')
-    )
+@given(integers(), lists(integers()))
+def test_itag_from_quality_num_but_not_available(itag, video_itags):
+    '''
+    Test that we raise ValueError if explicitly requesting an unavailable itag.
+    '''
+    assume(itag not in video_itags)
+    with assert_raises(ValueError):
+        yturl.itag_from_quality(itag, video_itags)
 
 
 @httpretty.activate
-def test_embed_restriction_raises():
-    mock_filename = os.path.join(SCRIPT_DIR, 'files/embed_restricted')
+@given(one_of(binary(), none()))
+def test_api_error_raises(reason):
+    '''
+    Test that we raise YouTubeAPIError when the API status is "fail".
 
-    with open(mock_filename, 'rb') as mock_f:
-        fake_api_output = mock_f.read()
+    "reason" can be None, in which case we don't pass it in the API output. In
+    this case, we should fall back to our default API error message.
+    '''
+    api_output_dict = {
+        'status': 'fail',
+    }
 
-    httpretty.register_uri(
-        httpretty.GET, yturl.GVI_BASE_URL + 'fake',
-        body=fake_api_output, content_type='application/x-www-form-urlencoded',
+    if reason is not None:
+        api_output_dict['reason'] = reason
+
+    fake_api_output = urlencode(api_output_dict)
+
+    _test_utils.mock_get_video_info_api_response(fake_api_output)
+
+    with assert_raises(yturl.YouTubeAPIError):
+        yturl.itags_for_video(_test_utils.VIDEO_ID)
+
+
+@given(lists(binary(min_size=1), min_size=1))
+def test_parse_qs_single_duplicate_keys_raise(keys):
+    '''
+    Test that parse_qs_single raises ValueError on encountering duplicate keys.
+    '''
+    duplicated_keys = keys + keys
+    query_string = urlencode(
+        [(key, key) for key in duplicated_keys],
+        doseq=True,
     )
 
-    avail = yturl.itags_for_video('fake')
-    assert_raises(yturl.YouTubeAPIError, list, avail)
+    with assert_raises(ValueError):
+        yturl.parse_qs_single(query_string)

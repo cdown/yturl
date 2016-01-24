@@ -1,49 +1,41 @@
-#!/usr/bin/env python2
-
 import json
-import httpretty
-import os
+
 import yturl
-from nose.tools import assert_raises, eq_ as eq
+
+import httpretty
+from abduct import captured, err, out
+from nose.tools import eq_ as eq
+from nose_parameterized import parameterized
+from tests import _test_utils
 
 
-SCRIPT_DIR = os.path.dirname(__file__)
-VIDEO_ID = 'x' * yturl.VIDEO_ID_LEN
-FAKE_URL = 'http://foo.com/' + VIDEO_ID
-
-
+@parameterized([
+    ('high', 43),
+    ('medium', 5),
+    ('low', 17),
+])
 @httpretty.activate
-def test_quality_as_word_ok():
-    with open(os.path.join(SCRIPT_DIR, 'files/success_output')) as output_f:
-        expected = dict(json.load(output_f))[43]
+def test_quality_as_word_ok(quality_word, expected_itag):
+    '''
+    Test that qualities are correctly parsed into their equivalent itags.
 
-    with open(os.path.join(SCRIPT_DIR, 'files/success_input'), 'rb') as mock_f:
-        fake_api_output = mock_f.read()
+    A unit test for this is not enough, as this involves configuration of the
+    argument parser, and determination of output from the program. This is
+    essentially our "everything is generally ok" end to end test.
+    '''
+    # expected_raw is a sequence of (itag, url) pairs. Since we're specifically
+    # looking for the itag corresponding to to the quality word, we convert
+    # these tuples to a dict and pull out the URL for the expected itag.
+    expected_raw = _test_utils.read_fixture('files/success_output')
+    expected_url = dict(json.loads(expected_raw))[expected_itag]
 
-    httpretty.register_uri(
-        httpretty.GET, yturl.GVI_BASE_URL + VIDEO_ID,
-        body=fake_api_output, content_type='application/x-www-form-urlencoded',
-    )
+    fake_api_output = _test_utils.read_fixture('files/success_input', 'rb')
+    _test_utils.mock_get_video_info_api_response(fake_api_output)
 
-    chosen_uri = yturl.run(['-q', 'high', FAKE_URL], force_return=True)
-    eq(chosen_uri, expected)
+    with captured(out(), err()) as (stdout, stderr):
+        yturl.main(
+            ['-q', quality_word, _test_utils.FAKE_URL],
+        )
 
-
-def test_unknown_quality():
-    with assert_raises(yturl.UnknownQualityError):
-        yturl.run(['-q', '123456', FAKE_URL], force_return=True)
-
-
-@httpretty.activate
-def test_youtube_api_error_exit():
-    mock_filename = os.path.join(SCRIPT_DIR, 'files/embed_restricted')
-    with open(mock_filename, 'rb') as mock_f:
-        fake_api_output = mock_f.read()
-
-    httpretty.register_uri(
-        httpretty.GET, yturl.GVI_BASE_URL + VIDEO_ID,
-        body=fake_api_output, content_type='application/x-www-form-urlencoded',
-    )
-
-    with assert_raises(yturl.YouTubeAPIError):
-        yturl.run([FAKE_URL], force_return=True)
+    eq(stderr.getvalue(), 'Using itag %d.\n' % expected_itag)
+    eq(stdout.getvalue(), expected_url + '\n')

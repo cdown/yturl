@@ -1,5 +1,6 @@
+abduct
+httpretty
+hypothesis
 mock
 nose
 nose-parameterized
-httpretty
-hypothesis
