@@ -18,7 +18,7 @@ setup(
     description='Gets direct media URLs to YouTube media',
     long_description=README,
     url='https://github.com/cdown/yturl',
-    license='ISC',
+    license='Public Domain',
 
     author='Chris Down',
     author_email='chris@chrisdown.name',
@@ -33,7 +33,7 @@ setup(
 
     classifiers=[
         'Development Status :: 5 - Production/Stable',
-        'License :: OSI Approved :: ISC License (ISCL)',
+        'License :: Public Domain',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
