@@ -1,6 +1,10 @@
 yturl gets direct media URLs to YouTube media, freeing you having to
 view them in your browser.
 
+yturl is still maintained, but is pretty much "done". Outside of changes to
+match YouTube API changes, bug fixes, and support for newer Python versions,
+development is complete.
+
 Usage
 -----
 
