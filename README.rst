@@ -1,3 +1,13 @@
+|travis| |coveralls|
+
+.. |travis| image:: https://travis-ci.org/cdown/yturl.svg?branch=develop
+  :target: https://travis-ci.org/cdown/yturl
+  :alt: Test status
+
+.. |coveralls| image:: https://coveralls.io/repos/cdown/yturl/badge.svg?branch=develop&service=github
+  :target: https://coveralls.io/github/cdown/yturl?branch=develop
+  :alt: Coverage
+
 yturl gets direct media URLs to YouTube media, freeing you having to
 view them in your browser.
 
@@ -45,16 +55,6 @@ To install the latest development version directly from GitHub:
 
 Testing
 -------
-
-|travis| |coveralls|
-
-.. |travis| image:: https://travis-ci.org/cdown/yturl.svg?branch=develop
-  :target: https://travis-ci.org/cdown/yturl
-  :alt: Test status
-
-.. |coveralls| image:: https://coveralls.io/repos/cdown/yturl/badge.svg?branch=develop&service=github
-  :target: https://coveralls.io/github/cdown/yturl?branch=develop
-  :alt: Coverage
 
 .. code::
 
