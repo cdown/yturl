@@ -62,7 +62,13 @@ def itags_for_video(video_id):
     log.debug('parse_qs_single API response: %r', api_response)
 
     if api_response.get('status') != 'ok':
-        raise YouTubeAPIError(api_response.get('reason', 'Unspecified error.'))
+        reason = api_response.get('reason', 'Unspecified error.')
+
+        # Unfortunately YouTube returns HTML in this instance, so there's no
+        # reasonable way to use api_response directly.
+        if 'CAPTCHA' in api_response_raw.text:
+            reason = 'You need to solve a CAPTCHA, visit %s' % api_url
+        raise YouTubeAPIError(reason)
 
     # The YouTube API returns these from highest to lowest quality, which we
     # rely on. From this point forward, we need to make sure we maintain order.
