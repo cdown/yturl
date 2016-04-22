@@ -4,12 +4,16 @@ from __future__ import print_function, unicode_literals
 
 import argparse
 import collections
+import logging
 import sys
 
 import requests
 
 from six import iteritems, iterkeys
 from six.moves.urllib.parse import parse_qs, urlencode, urlparse, urlunparse
+
+
+log = logging.getLogger(__name__)
 
 # A mapping of quality names to functions that determine the desired itag from
 # a list of itags. This is used when `-q quality` is passed on the command line
@@ -18,6 +22,9 @@ NAMED_QUALITY_GROUPS = {
     'low': lambda itags: itags[-1],
     'medium': lambda itags: itags[len(itags) // 2],
     'high': lambda itags: itags[0],
+}
+DEFAULT_HEADERS = {
+    'User-Agent': 'yturl (https://github.com/cdown/yturl)',
 }
 
 
@@ -43,6 +50,7 @@ def video_id_from_url(url):
     parsed_url = urlparse(url)
     url_params = parse_qs_single(parsed_url.query)
     video_id = url_params.get('v', parsed_url.path.split('/')[-1])
+    log.debug('Parsed video ID %s from %s', url, video_id)
     return video_id
 
 
@@ -51,11 +59,19 @@ def itags_for_video(video_id):
     Return itags for a video with their media URLs, sorted by quality.
     '''
     api_url = construct_youtube_get_video_info_url(video_id)
-    api_response_raw = requests.get(api_url)
+    api_response_raw = requests.get(api_url, headers=DEFAULT_HEADERS)
+    log.debug('Raw API response: %r', api_response_raw.text)
     api_response = parse_qs_single(api_response_raw.text)
+    log.debug('parse_qs_single API response: %r', api_response)
 
     if api_response.get('status') != 'ok':
-        raise YouTubeAPIError(api_response.get('reason', 'Unspecified error.'))
+        reason = api_response.get('reason', 'Unspecified error.')
+
+        # Unfortunately YouTube returns HTML in this instance, so there's no
+        # reasonable way to use api_response directly.
+        if 'CAPTCHA' in api_response_raw.text:
+            reason = 'You need to solve a CAPTCHA, visit %s' % api_url
+        raise YouTubeAPIError(reason)
 
     # The YouTube API returns these from highest to lowest quality, which we
     # rely on. From this point forward, we need to make sure we maintain order.
@@ -115,9 +131,16 @@ def main(argv=None):
         '-q', '--quality', default='medium', help='low/medium/high or an itag',
     )
     parser.add_argument(
+        '--debug',
+        action="store_const", dest='log_level',
+        const=logging.DEBUG, default=logging.WARNING,
+        help='enable debug logging',
+    )
+    parser.add_argument(
         'video_id', metavar='video_id/url', type=video_id_from_url,
     )
     args = parser.parse_args(argv)
+    logging.basicConfig(level=args.log_level)
 
     itag_to_url_map = itags_for_video(args.video_id)
 
