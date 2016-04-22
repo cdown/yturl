@@ -11,7 +11,7 @@ with open('requirements.txt') as requirements_f:
 
 setup(
     name='yturl',
-    version='2.0.0',
+    version='2.0.1',
     description='Gets direct media URLs to YouTube media',
     long_description=README,
     url='https://github.com/cdown/yturl',
