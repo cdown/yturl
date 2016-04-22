@@ -4,7 +4,7 @@ import yturl
 
 import httpretty
 from hypothesis import assume, given
-from hypothesis.strategies import (binary, integers, lists, none, one_of,
+from hypothesis.strategies import (binary, integers, just, lists, none, one_of,
                                    sampled_from)
 from nose.tools import assert_raises, assert_true, eq_ as eq
 from six.moves.urllib.parse import urlencode
@@ -104,7 +104,7 @@ def test_itag_from_quality_num_but_not_available(itag, video_itags):
 
 
 @httpretty.activate
-@given(one_of(binary(), none()))
+@given(one_of(binary(), none(), just('CAPTCHA')))
 def test_api_error_raises(reason):
     '''
     Test that we raise YouTubeAPIError when the API status is "fail".
