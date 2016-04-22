@@ -23,6 +23,9 @@ NAMED_QUALITY_GROUPS = {
     'medium': lambda itags: itags[len(itags) // 2],
     'high': lambda itags: itags[0],
 }
+DEFAULT_HEADERS = {
+    'User-Agent': 'yturl (https://github.com/cdown/yturl)',
+}
 
 
 def construct_youtube_get_video_info_url(video_id):
@@ -56,7 +59,7 @@ def itags_for_video(video_id):
     Return itags for a video with their media URLs, sorted by quality.
     '''
     api_url = construct_youtube_get_video_info_url(video_id)
-    api_response_raw = requests.get(api_url)
+    api_response_raw = requests.get(api_url, headers=DEFAULT_HEADERS)
     log.debug('Raw API response: %r', api_response_raw.text)
     api_response = parse_qs_single(api_response_raw.text)
     log.debug('parse_qs_single API response: %r', api_response)
