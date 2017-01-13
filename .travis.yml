@@ -1,8 +1,5 @@
 language: python
 
-env:
-  - TOXENV=system
-
 python:
   - '2.7'
   - '3.3'

@@ -53,19 +53,22 @@ To install the latest stable version from PyPi:
 
 .. code::
 
-    pip install -U yturl
+    $ pip install -U yturl
 
 To install the latest development version directly from GitHub:
 
 .. code::
 
-    pip install -U git+https://github.com/cdown/yturl.git@develop
+    $ pip install -U git+https://github.com/cdown/yturl.git@develop
 
 Testing
 -------
 
 .. code::
 
-   tox -e quick
-
-.. _Tox: https://tox.readthedocs.org
+    $ pip install tox
+    $ tox
+    ..........
+    ----------------------------------------------------------------------
+    Ran 10 tests in 4.088s
+    OK
