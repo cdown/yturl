@@ -1,15 +1,22 @@
 language: python
-python: 3.5  # 3.5 requires manual download, so it needs to be selected
 
 env:
-  - TOXENV=py27
-  - TOXENV=py33
-  - TOXENV=py34
-  - TOXENV=py35
-  - TOXENV=coverage
+  - TOXENV=system
+
+python:
+  - '2.7'
+  - '3.3'
+  - '3.4'
+  - '3.5'
+  - '3.6'
 
 install: pip install tox
-script: tox
+
+script:
+  - 'tox'
+
+after_success:
+  - 'if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then tox -e coverage; fi'
 
 matrix:
   fast_finish: true
@@ -17,8 +24,3 @@ matrix:
 # This is required to enable container based Travis CI infrastructure.
 # See http://docs.travis-ci.com/user/migrating-from-legacy/
 sudo: false
-
-notifications:
-  email:
-    on_success: never
-    on_failure: always
