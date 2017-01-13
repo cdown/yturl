@@ -1,12 +1,20 @@
-|travis| |coveralls|
+|travis| |appveyor| |coveralls| |requires|
 
-.. |travis| image:: https://travis-ci.org/cdown/yturl.svg?branch=develop
+.. |travis| image:: https://img.shields.io/travis/cdown/yturl/develop.svg?label=linux%20tests
   :target: https://travis-ci.org/cdown/yturl
-  :alt: Test status
+  :alt: Linux tests
 
-.. |coveralls| image:: https://coveralls.io/repos/cdown/yturl/badge.svg?branch=develop&service=github
+.. |appveyor| image:: https://img.shields.io/appveyor/ci/cdown/yturl/develop.svg?label=windows%20tests
+  :target: https://ci.appveyor.com/project/cdown/yturl
+  :alt: Windows tests
+
+.. |coveralls| image:: https://img.shields.io/coveralls/cdown/yturl/develop.svg?label=test%20coverage
   :target: https://coveralls.io/github/cdown/yturl?branch=develop
   :alt: Coverage
+
+.. |requires| image:: https://img.shields.io/requires/github/cdown/yturl/develop.svg?label=dependencies
+  :target: https://requires.io/github/cdown/yturl/requirements/?branch=develop
+  :alt: Dependencies
 
 yturl gets direct media URLs to YouTube media, freeing you having to
 view them in your browser.
