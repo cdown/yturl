@@ -1,4 +1,4 @@
-|travis| |appveyor| |coveralls| |requires|
+|travis| |appveyor| |coveralls| |libraries|
 
 .. |travis| image:: https://img.shields.io/travis/cdown/yturl/develop.svg?label=linux%20tests
   :target: https://travis-ci.org/cdown/yturl
@@ -12,8 +12,8 @@
   :target: https://coveralls.io/github/cdown/yturl?branch=develop
   :alt: Coverage
 
-.. |requires| image:: https://img.shields.io/requires/github/cdown/yturl/develop.svg?label=dependencies
-  :target: https://requires.io/github/cdown/yturl/requirements/?branch=develop
+.. |libraries| image:: https://img.shields.io/librariesio/github/cdown/yturl.svg?label=dependencies
+  :target: https://libraries.io/github/cdown/yturl
   :alt: Dependencies
 
 yturl gets direct media URLs to YouTube media, freeing you having to
