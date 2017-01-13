@@ -10,6 +10,10 @@ python:
   - '3.5'
   - '3.6'
 
+  # Allowed to fail
+  - '3.7-dev'
+  - 'nightly'
+
 install: pip install tox
 
 script:
@@ -20,6 +24,9 @@ after_success:
 
 matrix:
   fast_finish: true
+  allow_failures:
+    - python: '3.7-dev'
+    - python: 'nightly'
 
 # This is required to enable container based Travis CI infrastructure.
 # See http://docs.travis-ci.com/user/migrating-from-legacy/
