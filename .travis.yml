@@ -16,14 +16,14 @@ install: pip install tox
 script:
   - 'tox'
 
-after_success:
-  - 'if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then tox -e coverage; fi'
-
 matrix:
   fast_finish: true
   allow_failures:
     - python: '3.7-dev'
     - python: 'nightly'
+  include:
+    - python: '3.6'
+      env: TOXENV=coverage
 
 # This is required to enable container based Travis CI infrastructure.
 # See http://docs.travis-ci.com/user/migrating-from-legacy/
