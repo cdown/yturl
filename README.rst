@@ -1,8 +1,8 @@
 |travis| |appveyor| |coveralls| |libraries|
 
-.. |travis| image:: https://img.shields.io/travis/cdown/yturl/develop.svg?label=linux%20tests
+.. |travis| image:: https://img.shields.io/travis/cdown/yturl/develop.svg?label=linux%20%2B%20mac%20tests
   :target: https://travis-ci.org/cdown/yturl
-  :alt: Linux tests
+  :alt: Linux and Mac tests
 
 .. |appveyor| image:: https://img.shields.io/appveyor/ci/cdown/yturl/develop.svg?label=windows%20tests
   :target: https://ci.appveyor.com/project/cdown/yturl
