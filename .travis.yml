@@ -13,7 +13,12 @@ before_install: |
     python3 --version
   fi
 
-install: pip install tox
+install: |
+  if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+    pip3 install tox
+  else
+    pip install tox
+  fi
 
 script:
   - 'tox'
