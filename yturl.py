@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+'''YouTube videos on the command line.'''
+
 from __future__ import print_function, unicode_literals
 
 import argparse
@@ -126,7 +128,7 @@ def parse_qs_single(query_string):
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         '-q', '--quality', default='medium', help='low/medium/high or an itag',
     )

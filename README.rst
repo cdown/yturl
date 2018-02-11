@@ -1,12 +1,20 @@
-|travis| |coveralls|
+|travis| |appveyor| |coveralls| |libraries|
 
-.. |travis| image:: https://travis-ci.org/cdown/yturl.svg?branch=develop
+.. |travis| image:: https://img.shields.io/travis/cdown/yturl/develop.svg?label=linux%20%2B%20mac%20tests
   :target: https://travis-ci.org/cdown/yturl
-  :alt: Test status
+  :alt: Linux and Mac tests
 
-.. |coveralls| image:: https://coveralls.io/repos/cdown/yturl/badge.svg?branch=develop&service=github
+.. |appveyor| image:: https://img.shields.io/appveyor/ci/cdown/yturl/develop.svg?label=windows%20tests
+  :target: https://ci.appveyor.com/project/cdown/yturl
+  :alt: Windows tests
+
+.. |coveralls| image:: https://img.shields.io/coveralls/cdown/yturl/develop.svg?label=test%20coverage
   :target: https://coveralls.io/github/cdown/yturl?branch=develop
   :alt: Coverage
+
+.. |libraries| image:: https://img.shields.io/librariesio/github/cdown/yturl.svg?label=dependencies
+  :target: https://libraries.io/github/cdown/yturl
+  :alt: Dependencies
 
 yturl gets direct media URLs to YouTube media, freeing you having to
 view them in your browser.
@@ -45,19 +53,22 @@ To install the latest stable version from PyPi:
 
 .. code::
 
-    pip install -U yturl
+    $ pip install -U yturl
 
 To install the latest development version directly from GitHub:
 
 .. code::
 
-    pip install -U git+https://github.com/cdown/yturl.git@develop
+    $ pip install -U git+https://github.com/cdown/yturl.git@develop
 
 Testing
 -------
 
 .. code::
 
-   tox -e quick
-
-.. _Tox: https://tox.readthedocs.org
+    $ pip install tox
+    $ tox
+    ..........
+    ----------------------------------------------------------------------
+    Ran 10 tests in 4.088s
+    OK
