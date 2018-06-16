@@ -5,7 +5,7 @@ import yturl
 import httpretty
 from abduct import captured, err, out
 from nose.tools import eq_ as eq
-from nose_parameterized import parameterized
+from parameterized import parameterized
 from tests import _test_utils
 
 

@@ -3,4 +3,4 @@ httpretty
 hypothesis
 mock
 nose
-nose-parameterized
+parameterized
