@@ -6,6 +6,7 @@ python:
   - '3.4'
   - '3.5'
   - '3.6'
+
 before_install: |
   if [ "$TRAVIS_OS_NAME" == "osx" ]; then
     brew update
@@ -29,6 +30,8 @@ matrix:
     # One-off runs
     - python: '3.6'
       env: TOXENV=coverage
+    - python: '3.6'
+      env: TOXENV=black
     - python: '3.6'
       env: TOXENV=pylint
 
