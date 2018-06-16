@@ -158,8 +158,6 @@ class YouTubeAPIError(Exception):
     more specific exception types.
     """
 
-    pass
-
 
 if __name__ == "__main__":
     main()
