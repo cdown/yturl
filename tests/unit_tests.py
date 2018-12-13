@@ -6,6 +6,7 @@ import httpretty
 from hypothesis import assume, given
 from hypothesis.strategies import (
     binary,
+    booleans,
     integers,
     just,
     lists,
@@ -28,8 +29,8 @@ def test_video_id_parsed_from_url(video_id, url_format):
 
 
 @httpretty.activate
-@given(lists(integers(), min_size=1, unique_by=lambda x: x))
-def test_available_itags_parsing(input_itags):
+@given(lists(integers(), min_size=1, unique_by=lambda x: x), booleans())
+def test_available_itags_parsing(input_itags, is_livestream):
     """
     Test that the itag -> url map is successfully parsed from an API response.
     """
@@ -62,19 +63,26 @@ def test_available_itags_parsing(input_itags):
     # This is also missing a lot of keys which are, in reality, returned by the
     # YouTube API. If key references are added inside itags_for_video, the
     # relevant keys will need to be added here.
-    fake_api_output = urlencode(
-        {"url_encoded_fmt_stream_map": api_itag_map, "status": "ok"}
-    )
+    fake_api_output = {"url_encoded_fmt_stream_map": api_itag_map, "status": "ok"}
 
-    _test_utils.mock_get_video_info_api_response(fake_api_output)
-    got_itags_for_video = yturl.itags_for_video(_test_utils.VIDEO_ID)
+    if is_livestream:
+        del fake_api_output["url_encoded_fmt_stream_map"]
+        fake_api_output["livestream"] = "1"
 
-    # dict to OrderedDict comparisons don't care about order, so if we
-    # accidentally started returning a dict from itags_for_video, it's going to
-    # return True even though the order actually isn't respected. As such, we
-    # need to make sure the return type of itags_for_video is OrderedDict.
-    assert_true(isinstance(got_itags_for_video, collections.OrderedDict))
-    eq(got_itags_for_video, itag_to_url_map)
+    _test_utils.mock_get_video_info_api_response(urlencode(fake_api_output))
+
+    if is_livestream:
+        with assert_raises(NotImplementedError):
+            got_itags_for_video = yturl.itags_for_video(_test_utils.VIDEO_ID)
+    else:
+        got_itags_for_video = yturl.itags_for_video(_test_utils.VIDEO_ID)
+
+        # dict to OrderedDict comparisons don't care about order, so if we
+        # accidentally started returning a dict from itags_for_video, it's going to
+        # return True even though the order actually isn't respected. As such, we
+        # need to make sure the return type of itags_for_video is OrderedDict.
+        assert_true(isinstance(got_itags_for_video, collections.OrderedDict))
+        eq(got_itags_for_video, itag_to_url_map)
 
 
 @given(integers())

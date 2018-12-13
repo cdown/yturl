@@ -75,7 +75,14 @@ def itags_for_video(video_id):
 
     # The YouTube API returns these from highest to lowest quality, which we
     # rely on. From this point forward, we need to make sure we maintain order.
-    streams = api_response["url_encoded_fmt_stream_map"].split(",")
+    try:
+        streams = api_response["url_encoded_fmt_stream_map"].split(",")
+    except KeyError:
+        if api_response.get("livestream") == "1":
+            raise NotImplementedError("Live videos are unsupported.")
+        else:
+            raise
+
     videos = [parse_qs_single(stream) for stream in streams]
     return collections.OrderedDict((vid["itag"], vid["url"]) for vid in videos)
 
