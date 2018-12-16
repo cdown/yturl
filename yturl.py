@@ -98,14 +98,15 @@ def itag_from_quality(group_or_itag, itags):
         # NAMED_QUALITY_GROUPS to get a function to determine the itag to use.
         func_to_get_desired_itag = NAMED_QUALITY_GROUPS[group_or_itag]
         return func_to_get_desired_itag(itags)
-    elif group_or_itag in itags:
+
+    if group_or_itag in itags:
         # "group_or_itag" is really an itag. Just pass it through unaltered.
         return group_or_itag
-    else:
-        raise ValueError(
-            "Group/itag %s unavailable (video itags: %r, known groups: %r)"
-            % (group_or_itag, itags, list(NAMED_QUALITY_GROUPS))
-        )
+
+    raise ValueError(
+        "Group/itag %s unavailable (video itags: %r, known groups: %r)"
+        % (group_or_itag, itags, list(NAMED_QUALITY_GROUPS))
+    )
 
 
 def parse_qs_single(query_string):
