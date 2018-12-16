@@ -85,6 +85,17 @@ def test_available_itags_parsing(input_itags, is_livestream):
         eq(got_itags_for_video, itag_to_url_map)
 
 
+@httpretty.activate
+def test_status_ok_still_raises():
+    """
+    Test that we reraise properly if url_encoded_fmt_stream_map is missing.
+    """
+    fake_api_output = {"status": "ok"}
+    _test_utils.mock_get_video_info_api_response(urlencode(fake_api_output))
+    with assert_raises(KeyError):
+        yturl.itags_for_video(_test_utils.VIDEO_ID)
+
+
 @given(integers())
 def test_itag_from_quality_itag_pass_through(itag):
     """
