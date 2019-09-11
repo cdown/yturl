@@ -4,28 +4,21 @@ environment:
   # See: http://stackoverflow.com/a/13751649/163740
   CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\run_with_env.cmd"
   TOX_ENV: "windows"
+
+  # Only really need to test one of each major version, since otherwise this is
+  # exercised on Mac/Windows
   matrix:
     - PYTHON: "C:\\Python27"
-      PYTHON_VERSION: "2.7.13"
+      PYTHON_VERSION: "2.7.16"
       PYTHON_ARCH: "64"
-    - PYTHON: "C:\\Python34"
-      PYTHON_VERSION: "3.4.5"
-      PYTHON_ARCH: "64"
-    - PYTHON: "C:\\Python35"
-      PYTHON_VERSION: "3.5.2"
-      PYTHON_ARCH: "64"
-    - PYTHON: "C:\\Python36"
-      PYTHON_VERSION: "3.6.0"
+    - PYTHON: "C:\\Python37"
+      PYTHON_VERSION: "3.7.4"
       PYTHON_ARCH: "64"
 
 install:
   # Download setup scripts and unzip
   - ps: "wget https://github.com/cloudify-cosmo/appveyor-utils/archive/master.zip -OutFile ./master.zip"
   - "7z e master.zip */appveyor/* -oappveyor"
-
-  # Install Python (from the official .msi of http://python.org) and pip when
-  # not already installed.
-  - "powershell ./appveyor/install.ps1"
 
   # Prepend newly installed Python to the PATH of this build (this cannot be
   # done from inside the powershell script as it would require to restart
@@ -39,7 +32,8 @@ install:
 build: false  # Not a C# project, build stuff at the test step instead.
 
 before_test:
-  - "%CMD_IN_ENV% pip install tox"
+  # --force-reinstall due to https://github.com/tox-dev/tox/issues/791
+  - "%CMD_IN_ENV% python -m pip install --upgrade --force-reinstall pip tox setuptools"
 
 test_script:
   - "%CMD_IN_ENV% tox -e %TOX_ENV%"
