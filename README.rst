@@ -1,12 +1,8 @@
-|travis| |appveyor| |lgtm| |coveralls| |libraries|
+|travis| |lgtm| |coveralls| |libraries|
 
-.. |travis| image:: https://img.shields.io/travis/cdown/yturl/develop.svg?label=linux%20%2B%20mac%20tests
+.. |travis| image:: https://img.shields.io/travis/cdown/yturl/develop.svg?label=tests
   :target: https://travis-ci.org/cdown/yturl
-  :alt: Linux and Mac tests
-
-.. |appveyor| image:: https://img.shields.io/appveyor/ci/cdown/yturl/develop.svg?label=windows%20tests
-  :target: https://ci.appveyor.com/project/cdown/yturl
-  :alt: Windows tests
+  :alt: Tests
 
 .. |lgtm| image:: https://img.shields.io/lgtm/grade/python/github/cdown/yturl.svg?label=code%20quality
   :target: https://lgtm.com/projects/g/cdown/yturl/overview/
