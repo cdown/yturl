@@ -8,11 +8,9 @@ import argparse
 import collections
 import logging
 import sys
+from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 import requests
-
-from six import iteritems, iterkeys
-from six.moves.urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 
 log = logging.getLogger(__name__)
@@ -123,11 +121,11 @@ def parse_qs_single(query_string):
     """
     raw_pairs = parse_qs(query_string)
 
-    dupes = [key for (key, values) in iteritems(raw_pairs) if len(values) > 1]
+    dupes = [key for (key, values) in raw_pairs.items() if len(values) > 1]
     if dupes:
         raise ValueError("Duplicate keys in query string: %r" % dupes)
 
-    one_val_pairs = {key: values[0] for (key, values) in iteritems(raw_pairs)}
+    one_val_pairs = {key: values[0] for (key, values) in raw_pairs.items()}
     return one_val_pairs
 
 
@@ -151,7 +149,7 @@ def main(argv=None):
     itag_to_url_map = itags_for_video(args.video_id)
 
     # available_itags must be indexable for use with NAMED_QUALITY_GROUPS
-    available_itags = list(iterkeys(itag_to_url_map))
+    available_itags = list(itag_to_url_map)
     desired_itag = itag_from_quality(args.quality, available_itags)
 
     print("Using itag %s." % desired_itag, file=sys.stderr)

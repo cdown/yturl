@@ -15,7 +15,7 @@ from hypothesis.strategies import (
     one_of,
     sampled_from,
 )
-from six.moves.urllib.parse import urlencode
+from urllib.parse import urlencode
 from tests import _test_utils
 
 
