@@ -13,7 +13,7 @@ from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 import requests
 
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 # A mapping of quality names to functions that determine the desired itag from
 # a list of itags. This is used when `-q quality` is passed on the command line
@@ -48,7 +48,7 @@ def video_id_from_url(url):
     parsed_url = urlparse(url)
     url_params = parse_qs_single(parsed_url.query)
     video_id = url_params.get("v", parsed_url.path.split("/")[-1])
-    log.debug("Parsed video ID %s from %s", url, video_id)
+    LOG.debug("Parsed video ID %s from %s", url, video_id)
     return video_id
 
 
@@ -58,9 +58,9 @@ def itags_for_video(video_id):
     """
     api_url = construct_youtube_get_video_info_url(video_id)
     api_response_raw = requests.get(api_url, headers=DEFAULT_HEADERS)
-    log.debug("Raw API response: %r", api_response_raw.text)
+    LOG.debug("Raw API response: %r", api_response_raw.text)
     api_response = parse_qs_single(api_response_raw.text)
-    log.debug("parse_qs_single API response: %r", api_response)
+    LOG.debug("parse_qs_single API response: %r", api_response)
 
     if api_response.get("status") != "ok":
         reason = api_response.get("reason", "Unspecified error.")
@@ -130,6 +130,9 @@ def parse_qs_single(query_string):
 
 
 def main(argv=None):
+    """
+    Parse user-provided args and print out an itag on stderr and URL on stdout.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "-q", "--quality", default="medium", help="low/medium/high or an itag"
@@ -164,5 +167,5 @@ class YouTubeAPIError(Exception):
     """
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()

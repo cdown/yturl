@@ -4,3 +4,4 @@ hypothesis
 mock
 parameterized
 pytest
+pytest-cov
