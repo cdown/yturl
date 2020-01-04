@@ -1,10 +1,11 @@
 import collections
+import os
 
 import yturl
 
 import httpretty
 import pytest
-from hypothesis import assume, given
+from hypothesis import assume, given, HealthCheck, settings
 from hypothesis.strategies import (
     binary,
     booleans,
@@ -17,6 +18,14 @@ from hypothesis.strategies import (
 )
 from urllib.parse import urlencode
 from tests import _test_utils
+
+SUPPRESSED_CHECKS = [HealthCheck.too_slow]
+
+settings.register_profile("base", settings(suppress_health_check=SUPPRESSED_CHECKS))
+settings.register_profile(
+    "release", settings(max_examples=1000, suppress_health_check=SUPPRESSED_CHECKS)
+)
+settings.load_profile(os.getenv("HYPOTHESIS_PROFILE", "base"))
 
 
 @given(_test_utils.video_ids(), sampled_from(_test_utils.YOUTUBE_URL_EXAMPLES))
