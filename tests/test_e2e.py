@@ -3,13 +3,14 @@ import json
 import yturl
 
 import httpretty
+import pytest
 from abduct import captured, err, out
-from nose.tools import eq_ as eq
-from parameterized import parameterized
 from tests import _test_utils
 
 
-@parameterized([("high", 43), ("medium", 5), ("low", 17)])
+@pytest.mark.parametrize(
+    "quality_word,expected_itag", [("high", 43), ("medium", 5), ("low", 17)]
+)
 @httpretty.activate
 def test_quality_as_word_ok(quality_word, expected_itag):
     """
@@ -31,5 +32,5 @@ def test_quality_as_word_ok(quality_word, expected_itag):
     with captured(out(), err()) as (stdout, stderr):
         yturl.main(["-q", quality_word, _test_utils.FAKE_URL])
 
-    eq(stderr.getvalue(), "Using itag %d.\n" % expected_itag)
-    eq(stdout.getvalue(), expected_url + "\n")
+    assert stderr.getvalue() == "Using itag %d.\n" % expected_itag
+    assert stdout.getvalue() == expected_url + "\n"

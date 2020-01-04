@@ -2,5 +2,5 @@ abduct
 httpretty
 hypothesis
 mock
-nose
 parameterized
+pytest

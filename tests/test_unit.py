@@ -3,6 +3,7 @@ import collections
 import yturl
 
 import httpretty
+import pytest
 from hypothesis import assume, given
 from hypothesis.strategies import (
     binary,
@@ -14,7 +15,6 @@ from hypothesis.strategies import (
     one_of,
     sampled_from,
 )
-from nose.tools import assert_raises, assert_true, eq_ as eq
 from six.moves.urllib.parse import urlencode
 from tests import _test_utils
 
@@ -25,7 +25,7 @@ def test_video_id_parsed_from_url(video_id, url_format):
     That that video IDs are successfully parsed from URLs.
     """
     url = url_format % video_id
-    eq(yturl.video_id_from_url(url), video_id)
+    assert yturl.video_id_from_url(url) == video_id
 
 
 @httpretty.activate
@@ -72,7 +72,7 @@ def test_available_itags_parsing(input_itags, is_livestream):
     _test_utils.mock_get_video_info_api_response(urlencode(fake_api_output))
 
     if is_livestream:
-        with assert_raises(NotImplementedError):
+        with pytest.raises(NotImplementedError):
             got_itags_for_video = yturl.itags_for_video(_test_utils.VIDEO_ID)
     else:
         got_itags_for_video = yturl.itags_for_video(_test_utils.VIDEO_ID)
@@ -81,8 +81,8 @@ def test_available_itags_parsing(input_itags, is_livestream):
         # accidentally started returning a dict from itags_for_video, it's going to
         # return True even though the order actually isn't respected. As such, we
         # need to make sure the return type of itags_for_video is OrderedDict.
-        assert_true(isinstance(got_itags_for_video, collections.OrderedDict))
-        eq(got_itags_for_video, itag_to_url_map)
+        assert isinstance(got_itags_for_video, collections.OrderedDict)
+        assert got_itags_for_video == itag_to_url_map
 
 
 @httpretty.activate
@@ -92,7 +92,7 @@ def test_status_ok_still_raises():
     """
     fake_api_output = {"status": "ok"}
     _test_utils.mock_get_video_info_api_response(urlencode(fake_api_output))
-    with assert_raises(KeyError):
+    with pytest.raises(KeyError):
         yturl.itags_for_video(_test_utils.VIDEO_ID)
 
 
@@ -101,7 +101,7 @@ def test_itag_from_quality_itag_pass_through(itag):
     """
     Test that, when passed to itag_from_quality, itags are returned unaffected.
     """
-    eq(yturl.itag_from_quality(itag, [itag]), itag)
+    assert yturl.itag_from_quality(itag, [itag]) == itag
 
 
 @given(lists(integers(), min_size=1, unique=True))
@@ -113,7 +113,7 @@ def test_itag_from_quality_ordering(itags):
     def get_index(quality_group):
         return itags.index(yturl.itag_from_quality(quality_group, itags))
 
-    assert_true(get_index("high") <= get_index("medium") <= get_index("low"))
+    assert get_index("high") <= get_index("medium") <= get_index("low")
 
 
 @given(integers(), lists(integers()))
@@ -122,7 +122,7 @@ def test_itag_from_quality_num_but_not_available(itag, video_itags):
     Test that we raise ValueError if explicitly requesting an unavailable itag.
     """
     assume(itag not in video_itags)
-    with assert_raises(ValueError):
+    with pytest.raises(ValueError):
         yturl.itag_from_quality(itag, video_itags)
 
 
@@ -144,7 +144,7 @@ def test_api_error_raises(reason):
 
     _test_utils.mock_get_video_info_api_response(fake_api_output)
 
-    with assert_raises(yturl.YouTubeAPIError):
+    with pytest.raises(yturl.YouTubeAPIError):
         yturl.itags_for_video(_test_utils.VIDEO_ID)
 
 
@@ -156,5 +156,5 @@ def test_parse_qs_single_duplicate_keys_raise(keys):
     duplicated_keys = keys + keys
     query_string = urlencode([(key, key) for key in duplicated_keys], doseq=True)
 
-    with assert_raises(ValueError):
+    with pytest.raises(ValueError):
         yturl.parse_qs_single(query_string)
