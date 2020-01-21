@@ -101,7 +101,7 @@ def test_status_ok_still_raises():
     """
     fake_api_output = {"status": "ok"}
     _test_utils.mock_get_video_info_api_response(urlencode(fake_api_output))
-    with pytest.raises(KeyError):
+    with pytest.raises(NotImplementedError):
         yturl.itags_for_video(_test_utils.VIDEO_ID)
 
 

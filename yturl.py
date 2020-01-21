@@ -76,9 +76,9 @@ def itags_for_video(video_id):
     try:
         streams = api_response["url_encoded_fmt_stream_map"].split(",")
     except KeyError:
-        if api_response.get("livestream") == "1":
-            raise NotImplementedError("Live videos are unsupported.")
-        raise
+        raise NotImplementedError(
+            "Live and streaming videos are unsupported."
+        ) from None
 
     videos = [parse_qs_single(stream) for stream in streams]
     return collections.OrderedDict((vid["itag"], vid["url"]) for vid in videos)
