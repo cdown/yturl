@@ -16,6 +16,9 @@
   :target: https://libraries.io/github/cdown/yturl
   :alt: Dependencies
 
+**As of 2020, yturl is unmaintained and unsupported. Users are suggested to
+migrate to youtube-dl.**
+
 yturl gets direct media URLs to YouTube media, freeing you having to
 view them in your browser.
 
